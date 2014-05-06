@@ -25,7 +25,7 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
   });
 
   ROUTER.otherwise({
-    redirectTo : '/'
+    redirectTo : '/users'
   });
 
   ROUTER.install($routeProvider);

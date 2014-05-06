@@ -4,22 +4,16 @@
 var fortune = require('fortune')
   , express = fortune.express;
 
-/**
- * Example demonstrating two different databases being
- * exposed through one API. Note that each instance is
- * not automatically aware of any other instances, so
- * you will have to solve any problems that arise from
- * that yourself.
- */
 var container = express()
   , port = process.argv[2] || 1337;
 
 var app = fortune({
   db: 'fortune-admin',
-  adapter: 'mongodb'
-});
+  adapter: 'mongodb',
+  namespace: '/api/v1'
+})
 
-app.resource("user", {
+.resource('user', {
   title : String,
   firstName : String,
   lastName : String,
@@ -28,9 +22,13 @@ app.resource("user", {
   nationality: String,
   languageCode: String,
   addresses: [{ref: "address", inverse: "user"}]
-});
+}).transform(
+  function (request) {
+    console.log(request.body);
+  }
+)
 
-app.resource("address", {
+.resource('address', {
   type: String,
   addressLine1: String,
   addressLine2: String,
@@ -47,6 +45,9 @@ app.resource("address", {
 container
   .use(express.static(__dirname + '/public/app'))
   .use(express.static(__dirname + '/public/app/scripts'))
+  .get('*', function(req, res) {
+    res.send('Hello, you have reached the API.');
+  })
   .use(app.router)
   .listen(port);
 
