@@ -45,9 +45,6 @@ var app = fortune({
 container
   .use(express.static(__dirname + '/public/app'))
   .use(express.static(__dirname + '/public/app/scripts'))
-  .get('*', function(req, res) {
-    res.send('Hello, you have reached the API.');
-  })
   .use(app.router)
   .listen(port);
 
