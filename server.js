@@ -10,7 +10,7 @@ var container = express()
 var app = fortune({
   db: 'fortune-admin',
   adapter: 'mongodb',
-  namespace: 'api/v1'
+  namespace: '/api/v1'
 })
 
 .resource('user', {
