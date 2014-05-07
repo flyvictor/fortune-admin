@@ -7,7 +7,6 @@ var fortuneAdmin = angular.module('fortuneAdmin',
     , 'ngSanitize'
     , 'ngRoute'
     , 'ui.bootstrap'
-    , 'restangular'
     , 'xeditable'
     , 'fortuneAdmin.Controllers'
     , 'fortuneAdmin.Directives'

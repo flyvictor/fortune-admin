@@ -2,92 +2,116 @@
 
 var controllers = angular.module('fortuneAdmin.Controllers', []);
 
-controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http', function($scope, $filter, $http) {
+controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http',
+  function($scope, $filter, $http) {
 
-  $scope.users = [
-    {id: 1, title:'Mr.', firstName: 'Foo', lastName: 'Bar', role: 'Viewer', email: 'foo@bar.com', nationality: 'UK', languageCode: 'en' },
-    {id: 2, title:'Mr.', firstName: 'John', lastName: 'Doe', role: 'Viewer', email: 'foo@bar.com', nationality: 'Spain', languageCode: 'es' },
-    {id: 3, title:'Mr.', firstName: 'Foo', lastName: 'Bar', role: 'Viewer', email: 'foo@bar.com', nationality: 'UK', languageCode: 'po' }
-  ];
+    $http.get('/api/v1/users')
+      .success(function (data, status, headers, config) {
+        $scope.users = data.users;
+      })
+      .error(function(data, status, headers, config) {
+        console.log(status);
+      });
 
-  $scope.titles = [
-    {value: 1, text: 'Mr.'},
-    {value: 2, text: 'Mrs.'}
-  ];
+    $scope.titles = [
+      {value: 'Mr.', text: 'Mr.'},
+      {value: 'Mrs.', text: 'Mrs.'}
+    ];
 
-  $scope.roles = [
-    {value: 1, text: 'viewer'},
-    {value: 2, text: 'admin'},
-    {value: 3, text: 'programmer'},
-    {value: 4, text: 'sysadmin'}
-  ];
+    $scope.roles = [
+      { value: 'viewer', text: 'viewer' },
+      { value: 'admin', text: 'admin' },
+      { value: 'programmer', text: 'programmer' },
+      { value: 'sysadmin', text: 'sysadmin' }
+    ];
 
-  $scope.countries = [
-    {value: 1, text: 'UK'},
-    {value: 2, text: 'Irland'},
-    {value: 3, text: 'Spain'},
-    {value: 4, text: 'France'}
-  ];
+    $scope.countries = [
+      {value: 'UK', text: 'UK'},
+      {value: 'Ireland', text: 'Ireland'},
+      {value: 'Spain', text: 'Spain'},
+      {value: 'France', text: 'France'}
+    ];
 
-  $scope.groups = [];
-
-  $scope.loadGroups = function() {
-    return $scope.groups.length ? null : $http.get('/groups').success(function(data) {
-      $scope.groups = data;
-    });
-  };
-
-  $scope.showRoles = function(user) {
-    if(user.role && $scope.roles.length) {
-      var selected = $filter('filter')($scope.roles, {id: user.role});
-      return selected.length ? selected[0].text : 'Not set';
-    } else {
-      return user.role || 'Not set';
-    }
-  };
-
-  $scope.showTitle = function(user) {
-    var selected = [];
-    if(user.status) {
-      selected = $filter('filter')($scope.titles, {value: user.title});
-    }
-    return selected.length ? selected[0].text : 'Not set';
-  };
-
-  $scope.showNacionality = function(user) {
-    var selected = [];
-    if(user.nacionality) {
-      selected = $filter('filter')($scope.countries, {value: user.nacionality});
-    }
-    return selected.length ? selected[0].text : 'Not set';
-  };
-
-  $scope.saveUser = function(data, id) {
-    //$scope.user not updated yet
-    angular.extend(data, {_id: id});
-    return $http.post('/api/v1/users', { users: [ data ], linked: {} });
-  };
-
-  // remove user
-  $scope.removeUser = function(index) {
-    $scope.users.splice(index, 1);
-  };
-
-  // add user
-  $scope.addUser = function() {
-    $scope.inserted = {
-      id: $scope.users.length+1,
-      title : null,
-      firstName : null,
-      lastName : null,
-      role : null,
-      email : null,
-      nationality: null,
-      languageCode: null
+    $scope.showRoles = function(user) {
+      if(user.role && $scope.roles.length) {
+        var selected = $filter('filter')($scope.roles, {value: user.role});
+        return selected.length ? selected[0].text : 'Not set';
+      } else {
+        return user.role || 'Not set';
+      }
     };
-    $scope.users.push($scope.inserted);
-  };
-}]);
+
+    $scope.showTitle = function(user) {
+      var selected = [];
+      if(user.title) {
+        selected = $filter('filter')($scope.titles, {value: user.title});
+      }
+      return selected.length ? selected[0].text : 'Not set';
+    };
+
+    $scope.showNationality = function(user) {
+      var selected = [];
+      if(user.nationality) {
+        selected = $filter('filter')($scope.countries, {value: user.nationality});
+      }
+      return selected.length ? selected[0].text : 'Not set';
+    };
+
+    $scope.saveUser = function(user, id) {
+
+      if (id === undefined) {
+        $http.post('/api/v1/users',{ users: [ user ] })
+          .success(function (data, status, headers, config) {
+            $http.get('/api/v1/users')
+              .success(function (data, status, headers, config) {
+                $scope.users = data.users;
+              })
+              .error(function(data, status, headers, config) {
+                console.log(status);
+              });
+          })
+          .error(function(data, status, headers, config) {
+            console.log(status);
+          });
+      } else {
+        $http.put('/api/v1/users/' + id,{ users: [ user ]})
+          .success(function (data, status, headers, config) {
+            console.log(status);
+          })
+          .error(function(data, status, headers, config) {
+            console.log(status);
+          });
+      }
+    };
+    // remove user
+    $scope.removeUser = function(index, id) {
+
+      $http.delete('/api/v1/users/' + id)
+        .success(function (data, status, headers, config) {
+          console.log(status);
+          $scope.users.splice(index, 1);
+        })
+        .error(function(data, status, headers, config) {
+          console.log(status);
+        });
+
+    };
+
+    // add user
+    $scope.addUser = function() {
+      $scope.inserted = {
+        title : null,
+        firstName : null,
+        lastName : null,
+        role : null,
+        email : null,
+        nationality: null,
+        languageCode: null
+      };
+      $scope.users.push($scope.inserted);
+    };
+  }
+]);
 
 
 

@@ -22,11 +22,7 @@ var app = fortune({
   nationality: String,
   languageCode: String,
   addresses: [{ref: "address", inverse: "user"}]
-}).transform(
-  function (request) {
-    console.log(request.body);
-  }
-)
+})
 
 .resource('address', {
   type: String,
