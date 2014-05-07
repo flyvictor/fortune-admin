@@ -121,21 +121,22 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
     $http.get('/api/v1/addresses')
       .success(function (data, status, headers, config) {
         $scope.addresses = data.addresses;
+        $http.get('/api/v1/users')
+          .success(function (data, status, headers, config) {
+            $scope.users = data.users;
+          })
+          .error(function(data, status, headers, config) {
+            console.log(status);
+          });
+
       })
       .error(function(data, status, headers, config) {
         console.log(status);
       });
 
-    $scope.titles = [
-      {value: 'Mr.', text: 'Mr.'},
-      {value: 'Mrs.', text: 'Mrs.'}
-    ];
-
-    $scope.roles = [
-      { value: 'viewer', text: 'viewer' },
-      { value: 'admin', text: 'admin' },
-      { value: 'programmer', text: 'programmer' },
-      { value: 'sysadmin', text: 'sysadmin' }
+    $scope.types = [
+      {value: 'Home', text: 'Home'},
+      {value: 'Office', text: 'Office'}
     ];
 
     $scope.countries = [
@@ -145,27 +146,26 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
       {value: 'France', text: 'France'}
     ];
 
-    $scope.showRoles = function(user) {
-      if(user.role && $scope.roles.length) {
-        var selected = $filter('filter')($scope.roles, {value: user.role});
-        return selected.length ? selected[0].text : 'Not set';
-      } else {
-        return user.role || 'Not set';
-      }
-    };
-
-    $scope.showTitle = function(user) {
+    $scope.showUsers = function(address) {
       var selected = [];
-      if(user.title) {
-        selected = $filter('filter')($scope.titles, {value: user.title});
+      if(address.user) {
+        selected = $filter('filter')($scope.users, {id: address.user});
       }
       return selected.length ? selected[0].text : 'Not set';
     };
 
-    $scope.showNationality = function(user) {
+    $scope.showTypes = function(address) {
       var selected = [];
-      if(user.nationality) {
-        selected = $filter('filter')($scope.countries, {value: user.nationality});
+      if(address.type) {
+        selected = $filter('filter')($scope.types, {value: address.type});
+      }
+      return selected.length ? selected[0].text : 'Not set';
+    };
+
+    $scope.showCountry = function(address) {
+      var selected = [];
+      if(address.country) {
+        selected = $filter('filter')($scope.countries, {value: address.country});
       }
       return selected.length ? selected[0].text : 'Not set';
     };
@@ -173,9 +173,9 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
     $scope.saveAddress = function(address, id) {
 
       if (id === undefined) {
-        $http.post('/api/v1/addresses',{ address: [ address ] })
+        $http.post('/api/v1/addresses',{ addresses: [ address ] })
           .success(function (data, status, headers, config) {
-            $http.get('/api/v1/users')
+            $http.get('/api/v1/addresses')
               .success(function (data, status, headers, config) {
                 $scope.users = data.users;
               })
@@ -187,7 +187,7 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
             console.log(status);
           });
       } else {
-        $http.put('/api/v1/users/' + id,{ users: [ user ]})
+        $http.put('/api/v1/addresses/' + id,{ addresses: [ address ]})
           .success(function (data, status, headers, config) {
             console.log(status);
           })
@@ -197,12 +197,12 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
       }
     };
     // remove user
-    $scope.removeUser = function(index, id) {
+    $scope.removeAddress = function(index, id) {
 
-      $http.delete('/api/v1/users/' + id)
+      $http.delete('/api/v1/addresses/' + id)
         .success(function (data, status, headers, config) {
           console.log(status);
-          $scope.users.splice(index, 1);
+          $scope.addresses.splice(index, 1);
         })
         .error(function(data, status, headers, config) {
           console.log(status);
@@ -211,17 +211,18 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
     };
 
     // add user
-    $scope.addUser = function() {
+    $scope.addAddress = function() {
       $scope.inserted = {
-        title : null,
-        firstName : null,
-        lastName : null,
-        role : null,
-        email : null,
+        type : null,
+        addressLine1 : null,
+        addressLine2 : null,
+        city : null,
+        region : null,
+        postCode: null,
         nationality: null,
         languageCode: null
       };
-      $scope.users.push($scope.inserted);
+      $scope.addresses.push($scope.inserted);
     };
 
   }

@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-12">
-        <h2>Users</h2>
+        <h2>Addresses</h2>
     </div>
 </div>
 <div class="row">
@@ -8,37 +8,60 @@
         <div ng-controller="AddressesCtrl">
             <table class="table table-bordered table-hover table-condensed">
                 <tr style="font-weight: bold">
+                    <td class="col-md-1">User</td>
                     <td class="col-md-1">Type</td>
                     <td class="col-md-2">Address Line 1</td>
                     <td class="col-md-2">Address Line 2</td>
-                    <td class="col-md-1">Address Line 3</td>
-                    <td class="col-md-2">Address Line 4</td>
-                    <td class="col-md-1">Nacionality</td>
-                    <td class="col-md-1">Language</td>
+                    <td class="col-md-1">City</td>
+                    <td class="col-md-1">Region</td>
+                    <td class="col-md-1">Post Code</td>
+                    <td class="col-md-1">Country</td>
                     <td class="col-md-2">Edit</td>
                 </tr>
                 <tr ng-repeat="address in addresses">
                     <td>
-                        <!-- editable username (text with validation) -->
-                        <span editable-text="user.name" e-name="name" e-form="rowform" onbeforesave="checkName($data, user.id)" e-required>
-                          {{ user.name || 'empty' }}
+                        <span editable-select="address.user" e-name="user" e-form="rowform" e-ng-options="s.id as s.firstName + ' ' + s.lastName for s in users">
+                          {{ showUsers(address) }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable status (select-local) -->
-                        <span editable-select="user.status" e-name="status" e-form="rowform" e-ng-options="s.value as s.text for s in statuses">
-                          {{ showStatus(user) }}
+                        <span editable-select="address.type" e-name="type" e-form="rowform" e-ng-options="s.value as s.text for s in types">
+                          {{ showTypes(address) }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable group (select-remote) -->
-                        <span editable-select="user.group" e-name="group" onshow="loadGroups()" e-form="rowform" e-ng-options="g.id as g.text for g in groups">
-                          {{ showGroup(user) }}
+                        <span editable-text="address.addressLine1" e-name="addressLine1" e-form="rowform" e-required>
+                          {{ address.addressLine1 || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="address.addressLine2" e-name="addressLine2" e-form="rowform">
+                          {{ address.addressLine2 || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="address.city" e-name="city" e-form="rowform">
+                          {{ address.city || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="address.region" e-name="region" e-form="rowform">
+                          {{ address.region || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-text="address.postCode" e-name="postCode" e-form="rowform">
+                          {{ address.postCode || 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span editable-select="address.country" e-name="country" e-form="rowform" e-ng-options="c.text as c.text for c in countries">
+                          {{ showCountry(address) }}
                         </span>
                     </td>
                     <td style="white-space: nowrap">
                         <!-- form -->
-                        <form editable-form name="rowform" onbeforesave="saveUser($data, address.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == address">
+                        <form editable-form name="rowform" onbeforesave="saveAddress($data, address.id)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == address">
                             <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
                                 save
                             </button>

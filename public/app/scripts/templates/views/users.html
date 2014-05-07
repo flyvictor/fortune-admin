@@ -19,43 +19,36 @@
                 </tr>
                 <tr ng-repeat="user in users">
                     <td>
-                        <!-- editable status (select-local) -->
                         <span editable-select="user.title" e-name="title" e-form="rowform" e-ng-options="t.text as t.text for t in titles">
                           {{ showTitle(user) }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable username (text with validation) -->
                         <span editable-text="user.firstName" e-name="firstName" e-form="rowform" e-required>
                           {{ user.firstName || 'empty' }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable username (text with validation) -->
                         <span editable-text="user.lastName" e-name="lastName" e-form="rowform" e-required>
                           {{ user.lastName || 'empty' }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable status (select-local) -->
                         <span editable-select="user.role" e-name="role" e-form="rowform" e-ng-options="r.text as r.text for r in roles">
                           {{ showRoles(user) }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable status (select-local) -->
                         <span editable-text="user.email" e-name="email" e-form="rowform" e-required>
                           {{ user.email || 'empty' }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable group (select-remote) -->
                         <span editable-select="user.nationality" e-name="nationality" e-form="rowform" e-ng-options="c.text as c.text for c in countries">
                           {{ showNationality(user) }}
                         </span>
                     </td>
                     <td>
-                        <!-- editable group (select-remote) -->
                         <span editable-text="user.languageCode" e-name="languageCode" e-form="rowform" e-required>
                           {{ user.languageCode || 'empty' }}
                         </span>
