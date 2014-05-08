@@ -118,17 +118,16 @@ controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http',
 controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
   function($scope, $filter, $http) {
 
-    $http.get('/api/v1/addresses')
+    $http.get('/api/v1/users')
       .success(function (data, status, headers, config) {
-        $scope.addresses = data.addresses;
-        $http.get('/api/v1/users')
+        $scope.users = data.users;
+        $http.get('/api/v1/addresses')
           .success(function (data, status, headers, config) {
-            $scope.users = data.users;
+            $scope.addresses = data.addresses;
           })
           .error(function(data, status, headers, config) {
             console.log(status);
           });
-
       })
       .error(function(data, status, headers, config) {
         console.log(status);
@@ -148,10 +147,10 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
 
     $scope.showUsers = function(address) {
       var selected = [];
-      if(address.user) {
-        selected = $filter('filter')($scope.users, {id: address.user});
+      if(address.links && address.links.user) {
+        selected = $filter('filter')($scope.users, {id: address.links.user});
       }
-      return selected.length ? selected[0].text : 'Not set';
+      return selected.length ? selected[0].firstName + selected[0].lastName : 'Not set';
     };
 
     $scope.showTypes = function(address) {
@@ -219,8 +218,7 @@ controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
         city : null,
         region : null,
         postCode: null,
-        nationality: null,
-        languageCode: null
+        country: null
       };
       $scope.addresses.push($scope.inserted);
     };
