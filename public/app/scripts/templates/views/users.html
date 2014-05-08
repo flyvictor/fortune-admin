@@ -9,12 +9,13 @@
             <table class="table table-bordered table-hover table-condensed">
                 <tr style="font-weight: bold">
                     <td class="col-md-1">Title</td>
-                    <td class="col-md-2">First Name</td>
-                    <td class="col-md-2">Last Name</td>
+                    <td class="col-md-1">First Name</td>
+                    <td class="col-md-1">Last Name</td>
                     <td class="col-md-1">Role</td>
                     <td class="col-md-2">Email</td>
                     <td class="col-md-1">Nacionality</td>
                     <td class="col-md-1">Language</td>
+                    <td class="col-md-2">Addresses</td>
                     <td class="col-md-2">Edit</td>
                 </tr>
                 <tr ng-repeat="user in users">
@@ -52,6 +53,9 @@
                         <span editable-text="user.languageCode" e-name="languageCode" e-form="rowform" e-required>
                           {{ user.languageCode || 'empty' }}
                         </span>
+                    </td>
+                    <td>
+                        <a data-ng-href="{{ r('addresses_by_user_path', { user_id: user.id }) }}">Addresses</a>
                     </td>
                     <td style="white-space: nowrap">
                         <!-- form -->

@@ -2,8 +2,8 @@
 
 var controllers = angular.module('fortuneAdmin.Controllers', []);
 
-controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http',
-  function($scope, $filter, $http) {
+controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http', '$routeParams',
+  function($scope, $filter, $http, $routeParams) {
 
     $http.get('/api/v1/users')
       .success(function (data, status, headers, config) {
@@ -115,13 +115,14 @@ controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http',
 
 
 
-controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http',
-  function($scope, $filter, $http) {
+controllers.controller('AddressesCtrl',[ '$scope', '$filter', '$http', '$routeParams',
+  function($scope, $filter, $http, $routeParams) {
 
+    var url =  $routeParams.user_id ? '/api/v1/users/' + $routeParams.user_id + '/addresses' : '/api/v1/addresses';
     $http.get('/api/v1/users')
       .success(function (data, status, headers, config) {
         $scope.users = data.users;
-        $http.get('/api/v1/addresses')
+        $http.get(url)
           .success(function (data, status, headers, config) {
             $scope.addresses = data.addresses;
           })

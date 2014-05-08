@@ -24,6 +24,10 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
   });
 
+  ROUTER.when('addresses_by_user_path', '/users/:user_id/addresses', {
+    templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
+  });
+
   ROUTER.otherwise({
     redirectTo : '/users'
   });
