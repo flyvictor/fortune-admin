@@ -15,7 +15,7 @@ var app = fortune({
   namespace: '/api/v1'
 })
 
-.resource('user', {
+.resource("user", {
   title : String,
   firstName : String,
   lastName : String,
@@ -23,10 +23,13 @@ var app = fortune({
   email : String,
   nationality: String,
   languageCode: String,
-  addresses: [{ref: "address", inverse: "user"}]
+  addresses: [{ref: "address", inverse: "user"}],
+  flights: [{ref: "flight", inverse: "flights", pkType: String}]
+}, {
+  model: {pk: "email"}
 })
 
-.resource('address', {
+.resource("address", {
   type: String,
   addressLine1: String,
   addressLine2: String,
@@ -37,8 +40,15 @@ var app = fortune({
   postCode: String,
   country: String,
   dateDeleted: Date,
-  user: { ref: "user", inverse: "addresses" }
-}).transform(
+  user: {ref: "user", inverse: "addresses", pkType: String}
+})
+
+.resource("flight", {
+  flightNumber: String,
+  users: [{ref: "user", inverse: "users", pkType : String}]
+}, { model: { pk: "flightNumber" }})
+
+.transform(
 //  before
   function () {
     return this;
