@@ -19,7 +19,7 @@
     "grunt": "~0.4.4"
   },
   "dependencies": {
-    "fortune": "git://github.com/flyvictor/fortune.git#v1.0.0",
-    "fortune-mongodb": "git://github.com/flyvictor/fortune-mongodb.git#v1.0.0"
+    "fortune": "git://github.com/flyvictor/fortune.git",
+    "fortune-mongodb": "git://github.com/flyvictor/fortune-mongodb.git"
   }
 }
