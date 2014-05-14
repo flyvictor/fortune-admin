@@ -7,7 +7,7 @@
     .directive('umlField', ['umlData', 'umlLinks', '$timeout', umlField]);
 
   function umlCanvas(umlData){
-    var graph, paper;
+    var paper;
     return{
       restrict: 'E',
       replace: true,
@@ -24,22 +24,17 @@
           model: ctrl.graph
         });
       }],
-      compile: function(tElt, tAttrs){
-        console.log('compiling canvas');
-        return function postLink(scope, elt, attrs){
-          umlData.load().then(function(data){
-            scope.data = data;
-            console.log(data);
-          }, function(){
-              console.error('Add alert');
-          });
-        }
+      link: function postLink(scope){
+        umlData.load().then(function(data){
+          scope.data = data;
+        }, function(){
+          console.error('Add alert');
+        });
       }
     }
   }
 
   function umlResource(umlData){
-    //var resource;
     return{
       restrict: 'E',
       require: '^umlCanvas',
@@ -50,7 +45,7 @@
       templateUrl: '/templates/directives/uml/resource.html',
       controller: function($scope){
         if ($scope.umlData.modelOptions && $scope.umlData.modelOptions.pk){
-          //delete pk to not render it twice
+          //delete pk from list to not render it twice
           delete $scope.umlData.schema[$scope.umlData.modelOptions.pk];
           console.log('deleting ', $scope.umlData);
         }
@@ -67,7 +62,6 @@
         };
 
         this.intersects = function(elt){
-
           return $scope.resource.getBBox().intersect(elt.getBBox());
         };
 
@@ -76,48 +70,45 @@
           return startPosition;
         };
       },
-      compile: function(tElt, tAttrs){
-        console.debug('compiling resource');
-        return function postLink(scope, elt, attrs, canvasCtrl){
-          scope.resource = new joint.shapes.basic.Rect({
-            position: {
-              x: 0,
-              y: 0
+      link: function postLink(scope, elt, attrs, canvasCtrl){
+        scope.resource = new joint.shapes.basic.Rect({
+          position: {
+            x: 0,
+            y: 0
+          },
+          size: {
+            width: umlData._config.resource.width,
+            height: umlData._config.resource.height
+          },
+          attrs: {
+            rect: {
+              fill: umlData._config.resource.bgColor
             },
-            size: {
-              width: umlData._config.resource.width,
-              height: umlData._config.resource.height
-            },
-            attrs: {
-              rect: {
-                fill: umlData._config.resource.bgColor
-              },
-              text: {
-                text: 'resource placeholder',
-                fill: umlData._config.resource.textColor
-              }
+            text: {
+              text: 'resource placeholder',
+              fill: umlData._config.resource.textColor
             }
-          });
-          //augment element to handle intersections
-          scope.resource.intersects = function(elt){
-            return scope.resource.getBBox().intersect(elt.getBBox());
-          };
-          console.log('intersects: ', scope.resource.intersects);
-          canvasCtrl.graph.addCell(scope.resource);
+          }
+        });
+        //augment element to easily handle intersections
+        scope.resource.intersects = function(elt){
+          return scope.resource.getBBox().intersect(elt.getBBox());
+        };
 
-          //update text once data is loaded
-          scope.$watch('umlData', function(){
-            scope.resource.attr({
-              text: {text: scope.umlData.name}
-            });
-            umlData.registerResource(scope.umlData.name, scope.resource);
-            scope.resource.set('inPorts', [scope.umlData.name]);
-            var translateX = umlData._config.resource.width + umlData._config.resource.minMarginX;
-            var translateY = 0; //umlData._config.resource.height;
-            canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
+        canvasCtrl.graph.addCell(scope.resource);
+
+        //update text once data is loaded
+        scope.$watch('umlData', function(){
+          scope.resource.attr({
+            text: {text: scope.umlData.name}
           });
-          console.log(scope.umlData);
-        }
+          umlData.registerResource(scope.umlData.name, scope.resource);
+          scope.resource.set('inPorts', [scope.umlData.name]);
+          var translateX = umlData._config.resource.width + umlData._config.resource.minMarginX;
+          var translateY = 0;
+          canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
+        });
+        console.log(scope.umlData);
       }
     }
   }
@@ -131,62 +122,61 @@
         fieldName: '=',
         fieldData: '='
       },
-      compile: function(tElt, tAttrs){
-        return function postLink(scope, elt, attrs, controllers){
-          var resourceCtrl = controllers[1];
-          var canvasCtrl = controllers[0];
-          scope.field = new joint.shapes.basic.Rect({
-            position: resourceCtrl.nextPostition(),
-            size: {
-              width: umlData._config.field.width,
-              height: umlData._config.field.height
+      link: function postLink(scope, elt, attrs, controllers){
+        var resourceCtrl = controllers[1];
+        var canvasCtrl = controllers[0];
+        scope.field = new joint.shapes.basic.Rect({
+          position: resourceCtrl.nextPostition(),
+          size: {
+            width: umlData._config.field.width,
+            height: umlData._config.field.height
+          },
+          attrs: {
+            rect: {
+              fill: attrs.isPk ? 'red' : umlData._config.field.bgColor
             },
-            attrs: {
-              rect: {
-                fill: attrs.isPk ? 'red' : umlData._config.field.bgColor
-              },
-              text: {
-                text: 'undefined',
-                fill: umlData._config.field.textColor
-              }
+            text: {
+              text: 'undefined',
+              fill: umlData._config.field.textColor
+            }
+          }
+        });
+        //augment element to handle intersections
+        scope.field.intersects = function(elt){
+          return scope.field.getBBox().intersect(elt.getBBox());
+        };
+        //push field to its resource container
+        resourceCtrl.embed(scope.field);
+        //and append it to the graph
+        canvasCtrl.graph.addCell(scope.field);
+        scope.$watch('fieldName', function(){
+          scope.field.attr({
+            text: {
+              text: attrs.isPk ? 'PK:' + scope.fieldName : scope.fieldName
             }
           });
-          //augment element to handle intersections
-          scope.field.intersects = function(elt){
-            return scope.field.getBBox().intersect(elt.getBBox());
-          };
-          resourceCtrl.embed(scope.field);
-          canvasCtrl.graph.addCell(scope.field);
-          scope.$watch('fieldName', function(){
-            scope.field.attr({
-              text: {
-                text: attrs.isPk ? 'PK:' + scope.fieldName : scope.fieldName
-              }
-            });
+        });
+        scope.$watch('fieldData', function(){
+          //wait until all other fields are rendered
+          $timeout(function(){
+            console.log(scope.fieldData);
+            if (angular.isArray(scope.fieldData)){
+              //many to many relationship
+              umlLinks.link(scope.field, scope.fieldData[0].ref, true);
+              markFk();
+            }else if (angular.isObject(scope.fieldData)){
+              umlLinks.link(scope.field, scope.fieldData.ref, false);
+              markFk();
+              //one to one relationship
+            }
           });
-          // get field metadata
-          scope.$watch('fieldData', function(){
-            //wait until all other fields are rendered
-            $timeout(function(){
-              console.log(scope.fieldData);
-              if (angular.isArray(scope.fieldData)){
-                //many to many relationship
-                umlLinks.link(scope.field, scope.fieldData[0].ref, true);
-                markFk();
-              }else if (angular.isObject(scope.fieldData)){
-                umlLinks.link(scope.field, scope.fieldData.ref, false);
-                markFk();
-                //one to one relationship
-              }
-            });
+        });
+        function markFk(){
+          scope.field.attr({
+            text: {
+              text: 'FK: ' + scope.fieldName
+            }
           });
-          function markFk(){
-            scope.field.attr({
-              text: {
-                text: 'FK: ' + scope.fieldName
-              }
-            });
-          }
         }
       }
     }

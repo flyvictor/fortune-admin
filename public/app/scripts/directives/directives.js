@@ -1,5 +1,7 @@
 'use strict';
-var directives = angular.module('fortuneAdmin.Directives', []);
+var directives = angular.module('fortuneAdmin.Directives', [
+  'fortuneAdmin.umlDiagram'
+]);
 
 directives.directive('myNavbar', [ '$rootScope', function($rootScope) {
   return {

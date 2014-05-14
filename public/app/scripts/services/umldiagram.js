@@ -31,7 +31,6 @@
     this.load = function(){
       var deferred = $q.defer();
       $http.get('/metadata').success(function(data){
-        console.log('data loaded');
         deferred.resolve(data.metadata);
       });
       return deferred.promise;
@@ -43,7 +42,6 @@
     this.getResource = function(name){
       return this._resources[name];
     };
-
   }
 
 
@@ -51,16 +49,13 @@
     var graph = this.graph = new joint.dia.Graph();
 
     this.moveResourceToFreePosition = function(elt, moveX, moveY){
-      /*var translateBy = {
-       x: moveX || (umlData._config.resource.width + umlData._config.resource.minMarginX),
-       y: moveY || (umlData._config.resource.minMarginY)
-       };*/
+
       removeIntersections(elt);
       function removeIntersections(elt){
         var intersecting = null;
         //iterate through children
         angular.forEach(graph.attributes.cells.models, function(existingElement){
-          // ignore itself and skip links
+          // ignore itself and links
           if (existingElement.cid !== elt.cid && existingElement.attributes.type !== 'link'){
             while (existingElement.intersects(elt)){
               intersecting = elt;
@@ -94,7 +89,7 @@
       });
       newLink.attr({
         '.connection': {
-          stroke: many ? 'red' : 'blue'
+          stroke: many ? 'green' : 'blue'
         },
         '.marker-target': {
           fill: 'white',
