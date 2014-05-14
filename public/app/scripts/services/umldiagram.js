@@ -74,7 +74,8 @@
   }
 
   function umlLinks(umlData, canvasCtrl){
-    this.link = function(from, toResource){
+
+    this.link = function(from, toResource, many){
       //find resource element
       var referencedResource = umlData.getResource(toResource);
       var newLink = new joint.dia.Link({
@@ -93,10 +94,10 @@
       });
       newLink.attr({
         '.connection': {
-          stroke: 'blue'
+          stroke: many ? 'red' : 'blue'
         },
         '.marker-target': {
-          fill: 'red',
+          fill: 'white',
           d: 'M 10 0 L 0 5 L 10 10 z'
         }
       });

@@ -166,9 +166,9 @@
               console.log(scope.fieldData);
               if (angular.isArray(scope.fieldData)){
                 //many to many relationship
-                umlLinks.link(scope.field, scope.fieldData[0].ref);
+                umlLinks.link(scope.field, scope.fieldData[0].ref, true);
               }else if (angular.isObject(scope.fieldData)){
-                umlLinks.link(scope.field, scope.fieldData.ref);
+                umlLinks.link(scope.field, scope.fieldData.ref, false);
                 //one to one relationship
               }
             });
