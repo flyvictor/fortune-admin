@@ -2,15 +2,31 @@
   angular.module('fortuneAdmin.umlDiagram', [])
     .service('umlData', ['$http', '$q', umlData])
     .directive('umlCanvas', ['umlData', umlCanvas])
-    .directive('umlResource', [umlResource])
-    .directive('umlField', [umlField])
-    .directive('umlLink', [umlLink]);
+    .directive('umlResource', ['umlData', umlResource])
+    .directive('umlField', ['umlData', umlField])
+    .directive('umlLink', ['umlData', umlLink]);
 
   function umlData($http, $q){
-    var metadata = {};
+    this._config = {
+      canvas: {
+        width: 1200,
+        height: 700
+      },
+      resource: {
+        width: 200,
+        height: 100,
+        bgColor: 'blue',
+        textColor: 'white'
+      },
+      field: {
+        width: 200,
+        height: 20,
+        bgColor: 'white',
+        textColor: 'black'
+      }
+    };
 
     this.load = function(){
-      //if (metadata) return metadata;
       var deferred = $q.defer();
       $http.get('/metadata').success(function(data){
         console.log('data loaded');
@@ -40,8 +56,8 @@
         graph = new joint.dia.Graph();
         paper = new joint.dia.Paper({
           el: $('#' + tAttrs.id),
-          width: 1200,
-          height: 700,
+          width: umlData._config.canvas.width,
+          height: umlData._config.canvas.height,
           model: graph
         });
         return function postLink(scope, elt, attrs){
@@ -56,7 +72,7 @@
     }
   }
 
-  function umlResource(){
+  function umlResource(umlData){
     //var resource;
     return{
       restrict: 'E',
@@ -71,7 +87,7 @@
         $scope.$watch('umlData', function(){
           startPosition = {
             x: 10,
-            y: 100
+            y: umlData._config.resource.height - umlData._config.field.height
           };
         });
         this.embed = function(child){
@@ -81,7 +97,7 @@
 
         this.nextPosition = function(){
           var nextX = startPosition.x;
-          var nextY = startPosition.y += 20;
+          var nextY = startPosition.y += umlData._config.field.height;
           return {
             x: nextX,
             y: nextY
@@ -93,14 +109,17 @@
         return function postLink(scope, elt, attrs, canvasCtrl){
           scope.resource = new joint.shapes.basic.Rect({
             position: {x: 10, y: 10},
-            size: {width: 200, height: 100},
+            size: {
+              width: umlData._config.resource.width,
+              height: umlData._config.resource.height
+            },
             attrs: {
               rect: {
-                fill: 'blue'
+                fill: umlData._config.resource.bgColor
               },
               text: {
                 text: 'resource placeholder',
-                fill: 'white'
+                fill: umlData._config.resource.textColor
               }
             }
           });
@@ -119,7 +138,7 @@
     }
   }
 
-  function umlField(){
+  function umlField(umlData){
     return{
       restrict: 'E',
       require: ['^umlCanvas', '^umlResource'],
@@ -134,14 +153,17 @@
           var canvasCtrl = controllers[0];
           scope.field = new joint.shapes.basic.Rect({
             position: resourceCtrl.nextPosition(),
-            size: {width: 200, height: 20},
+            size: {
+              width: umlData._config.field.width,
+              height: umlData._config.field.height
+            },
             attrs: {
               rect: {
-                fill: 'white'
+                fill: umlData._config.field.bgColor
               },
               text: {
                 text: 'none',
-                fill: 'black'
+                fill: umlData._config.field.textColor
               }
             }
           });
@@ -161,7 +183,7 @@
     }
   }
 
-  function umlLink(){
+  function umlLink(umlData){
     var link;
     return{
       restrict: 'E',
