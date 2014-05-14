@@ -13,7 +13,7 @@ function populateClasses(data){
       relations = [],
       R = 250,
       fi = 0,
-      dfi = 2*Math.PI / 8,
+      dfi = 2*Math.PI / 7, // position nodes in circle
       uml = joint.shapes.uml;
     for(var resource in data){
         var attributes = []
@@ -24,21 +24,20 @@ function populateClasses(data){
         for(var a in fks)
             attributes.push("[FK] " + fks[a]);
         for(var a in schema){
-            if(schema[a] != pk && -1 == fks.indexOf(schema[a]))
+            if(schema[a] != pk && -1 == fks.indexOf(schema[a])) // PK and FKs are grouped at the top
                 attributes.push(schema[a]);
         }
         classes[resource] = new uml.Class({
-            position: {x: 400 + R * Math.sin(fi), y: 300 - R * Math.cos(fi)},
-            size: {width: 100, height: 50+15*attributes.length},
+            position: {x: 400 + R * Math.cos(fi), y: 300 - R * Math.sin(fi)},
+            size: {width: 100, height: 50+13*attributes.length},
             name: resource,
             attributes: attributes,
             methods: []
         });
         fi += dfi;
-        if(fi > 2*Math.PI){
-            fi = Math.PI / 8;
+        if(fi > 2*Math.PI){ // when first circle is finished, make a smaller one
             R = 150;
-        }
+        } // after that, we repeat pattern and hope for the best
     }
     for(var resource in data){
         for(var rel in data[resource]['relations'])

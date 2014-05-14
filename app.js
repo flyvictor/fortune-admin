@@ -48,6 +48,7 @@ var app = fortune({
   users: [{ref: "user", inverse: "users", pkType : String}]
 }, { model: { pk: "flightNumber" }})
 
+
 .transform(
 //  before
   function () {
@@ -65,6 +66,31 @@ var app = fortune({
     return this;
   }
 )
+
+
+container
+  .use(express.static(__dirname + '/public/app'))
+  .use(express.static(__dirname + '/public/app/scripts'))
+  .use(app.router)
+  .get('/schema', function(req, res){ res.json( packageSchema() );})
+  .listen(port);
+
+console.log('Listening on port ' + port + '...');
+
+/**
+ * Find User.
+ */
+function findUser(id) {
+  return new RSVP.Promise(function(resolve, reject) {
+    app.adapter.find('user', id).then(function(resource){
+      if(!!resource) {
+        resolve(resource);
+      } else {
+        reject(this);
+      }
+    });
+  });
+}
 
 function checkRelations(resource, key){
     var ret = [],
@@ -88,45 +114,21 @@ function packageSchema(){
     var all_relations = [];
     for(var resource in app.metadata){
         var pk = app.metadata[resource].modelOptions ?
-            app.metadata[resource].modelOptions['pk'] : 'id';
+            app.metadata[resource].modelOptions['pk'] : 'id'; // id being mongo default
         ret[resource] = { 'schema': [], 
                           'pk': pk,
                           'fks': [],
                           'relations': [] };
         for(var key in app.metadata[resource]['schema']){
-            ret[resource]['schema'].push(key);
+            ret[resource]['schema'].push(key); // we need only key names: values are usually Function objects
             var rels = checkRelations(resource, key);
             all_relations = all_relations.concat(rels);
         }
     }
     for(var r in all_relations){
         var rel = all_relations[r];
-        ret[rel['from']]['relations'].push(rel['to']);
-        ret[rel['to']]['fks'].push(rel['as']);
+        ret[rel['from']]['relations'].push(rel['to']); // X relates to Y
+        ret[rel['to']]['fks'].push(rel['as']); // so Y has foreign key at field related by X
     }
     return ret;
-}
-            
-container
-  .use(express.static(__dirname + '/public/app'))
-  .use(express.static(__dirname + '/public/app/scripts'))
-  .use(app.router)
-  .get('/schema', function(req, res){ res.json( packageSchema() );})
-  .listen(port);
-
-console.log('Listening on port ' + port + '...');
-
-/**
- * Find User.
- */
-function findUser(id) {
-  return new RSVP.Promise(function(resolve, reject) {
-    app.adapter.find('user', id).then(function(resource){
-      if(!!resource) {
-        resolve(resource);
-      } else {
-        reject(this);
-      }
-    });
-  });
 }
