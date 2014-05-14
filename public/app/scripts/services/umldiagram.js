@@ -14,9 +14,9 @@
         minMarginX: 100,
         minMarginY: 50,
         width: 200,
-        height: 100,
-        bgColor: 'black',
-        textColor: 'white'
+        height: 50,
+        bgColor: 'white',
+        textColor: 'black'
       },
       field: {
         width: 200,
