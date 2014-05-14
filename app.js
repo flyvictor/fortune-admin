@@ -66,10 +66,43 @@ var app = fortune({
   }
 )
 
+function checkRelations(node){
+    var ret = [];
+    for(var n in node){
+        if(node[n].hasOwnProperty('ref'))
+            ret.push(node[n]['ref']);
+        if(n == 'ref')
+            ret.push(node[n]);
+    }
+    return ret;
+}
+
+function packageSchema(){
+    var ret = {};
+    for(var resource in app.metadata){
+        var pk = app.metadata[resource].modelOptions ?
+            app.metadata[resource].modelOptions['pk'] : 'id';
+        ret[resource] = { 'schema': [], 
+                          'pk': pk,
+                          'fks': [],
+                          'relations': [] };
+        for(var key in app.metadata[resource]['schema']){
+            ret[resource]['schema'].push(key);
+            var rels = checkRelations(app.metadata[resource]['schema'][key])
+            for(var rel in rels){
+                ret[resource]['relations'].push(rels[rel]);
+            }
+        }
+    }
+        
+    return ret;
+}
+            
 container
   .use(express.static(__dirname + '/public/app'))
   .use(express.static(__dirname + '/public/app/scripts'))
   .use(app.router)
+  .get('/schema', function(req, res){ res.json( packageSchema() );})
   .listen(port);
 
 console.log('Listening on port ' + port + '...');
@@ -79,7 +112,7 @@ console.log('Listening on port ' + port + '...');
  */
 function findUser(id) {
   return new RSVP.Promise(function(resolve, reject) {
-    app.adapter.find('user', id).then(function(resource) {
+    app.adapter.find('user', id).then(function(resource){
       if(!!resource) {
         resolve(resource);
       } else {

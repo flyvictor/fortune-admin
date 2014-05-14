@@ -28,6 +28,10 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
   });
 
+  ROUTER.when('visualise_path', '/visualise', {
+    templateUrl : CONFIG.prepareViewTemplateUrl('visualisation')
+  });
+    
   ROUTER.otherwise({
     redirectTo : '/users'
   });
