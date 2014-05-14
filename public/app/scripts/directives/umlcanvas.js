@@ -13,6 +13,8 @@
         height: 700
       },
       resource: {
+        minMarginX: 100,
+        minMarginY: 50,
         width: 200,
         height: 100,
         bgColor: 'blue',
@@ -49,7 +51,29 @@
           addCell: function(item){
             graph.addCell(item);
           }
-        }
+        };
+
+        this.moveResourceToFreePosition = function(elt, moveX, moveY){
+          /*var translateBy = {
+            x: moveX || (umlData._config.resource.width + umlData._config.resource.minMarginX),
+            y: moveY || (umlData._config.resource.minMarginY)
+          };*/
+          removeIntersections(elt);
+          function removeIntersections(elt){
+            var intersecting = null;
+            //iterate through children
+            angular.forEach(graph.attributes.cells.models, function(existingElement){
+              //run only for parents and ignore itself
+              if (existingElement.cid !== elt.cid){
+                while (existingElement.intersects(elt)){
+                  intersecting = elt;
+                  elt.translate(moveX, moveY);
+                }
+              }
+            });
+            if (intersecting) removeIntersections(intersecting);
+          }
+        };
       },
       compile: function(tElt, tAttrs){
         console.log('compiling canvas');
@@ -86,7 +110,7 @@
         var startPosition;
         $scope.$watch('umlData', function(){
           startPosition = {
-            x: 10,
+            x: 0,
             y: umlData._config.resource.height - umlData._config.field.height
           };
         });
@@ -95,20 +119,24 @@
           console.log('field embedded to: ', $scope.resource);
         };
 
-        this.nextPosition = function(){
-          var nextX = startPosition.x;
-          var nextY = startPosition.y += umlData._config.field.height;
-          return {
-            x: nextX,
-            y: nextY
-          }
-        }
+        this.intersects = function(elt){
+
+          return $scope.resource.getBBox().intersect(elt.getBBox());
+        };
+
+        this.nextPostition = function(){
+          startPosition.y += umlData._config.field.height;
+          return startPosition;
+        };
       },
       compile: function(tElt, tAttrs){
         console.debug('compiling resource');
         return function postLink(scope, elt, attrs, canvasCtrl){
           scope.resource = new joint.shapes.basic.Rect({
-            position: {x: 10, y: 10},
+            position: {
+              x: 0,
+              y: 0
+            },
             size: {
               width: umlData._config.resource.width,
               height: umlData._config.resource.height
@@ -123,6 +151,11 @@
               }
             }
           });
+          //augment element to handle intersections
+          scope.resource.intersects = function(elt){
+            return scope.resource.getBBox().intersect(elt.getBBox());
+          };
+          console.log('intersects: ', scope.resource.intersects);
           canvasCtrl.graph.addCell(scope.resource);
 
           //update text once data is loaded
@@ -130,7 +163,9 @@
             scope.resource.attr({
               text: {text: scope.umlData.name}
             });
-
+            var translateX = umlData._config.resource.width + umlData._config.resource.minMarginX;
+            var translateY = 0; //umlData._config.resource.height;
+            canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
           });
           console.log(scope.umlData);
         }
@@ -152,7 +187,7 @@
           var resourceCtrl = controllers[1];
           var canvasCtrl = controllers[0];
           scope.field = new joint.shapes.basic.Rect({
-            position: resourceCtrl.nextPosition(),
+            position: resourceCtrl.nextPostition(),
             size: {
               width: umlData._config.field.width,
               height: umlData._config.field.height
@@ -167,6 +202,10 @@
               }
             }
           });
+          //augment element to handle intersections
+          scope.field.intersects = function(elt){
+            return scope.field.getBBox().intersect(elt.getBBox());
+          };
           resourceCtrl.embed(scope.field);
           canvasCtrl.graph.addCell(scope.field);
           scope.$watch('fieldName', function(){
