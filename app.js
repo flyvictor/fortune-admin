@@ -66,19 +66,26 @@ var app = fortune({
   }
 )
 
-function checkRelations(node){
-    var ret = [];
+function checkRelations(resource, key){
+    var ret = [],
+        node = app.metadata[resource]['schema'][key],
+        tmp = {'from': resource};
     for(var n in node){
         if(node[n].hasOwnProperty('ref'))
-            ret.push(node[n]['ref']);
+            ret.push({'from': resource, 'to': node[n]['ref'], 'as': node[n]['inverse']});
         if(n == 'ref')
-            ret.push(node[n]);
+            tmp['to'] = node[n];
+        if(n == 'inverse')
+            tmp['as'] = node[n];
     }
+    if(tmp.hasOwnProperty('to'))
+        ret.push(tmp);
     return ret;
 }
 
 function packageSchema(){
     var ret = {};
+    var all_relations = [];
     for(var resource in app.metadata){
         var pk = app.metadata[resource].modelOptions ?
             app.metadata[resource].modelOptions['pk'] : 'id';
@@ -88,13 +95,15 @@ function packageSchema(){
                           'relations': [] };
         for(var key in app.metadata[resource]['schema']){
             ret[resource]['schema'].push(key);
-            var rels = checkRelations(app.metadata[resource]['schema'][key])
-            for(var rel in rels){
-                ret[resource]['relations'].push(rels[rel]);
-            }
+            var rels = checkRelations(resource, key);
+            all_relations = all_relations.concat(rels);
         }
     }
-        
+    for(var r in all_relations){
+        var rel = all_relations[r];
+        ret[rel['from']]['relations'].push(rel['to']);
+        ret[rel['to']]['fks'].push(rel['as']);
+    }
     return ret;
 }
             
