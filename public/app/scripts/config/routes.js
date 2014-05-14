@@ -28,6 +28,10 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
   });
 
+  ROUTER.when('uml_diagram', '/uml', {
+    templateUrl : CONFIG.prepareViewTemplateUrl('uml')
+  });
+
   ROUTER.otherwise({
     redirectTo : '/users'
   });
