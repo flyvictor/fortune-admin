@@ -2,7 +2,7 @@
   angular.module('fortuneAdmin.umlDiagram.services', [])
     .service('umlData', ['$http', '$q', umlData])
     .service('umlCanvasController', [umlCanvasController])
-    .service('umlLinks', ['umlData', umlLinks]);
+    .service('umlLinks', ['umlData', 'umlCanvasController', umlLinks]);
 
   function umlData($http, $q){
     this._config = {
@@ -15,7 +15,7 @@
         minMarginY: 50,
         width: 200,
         height: 100,
-        bgColor: 'blue',
+        bgColor: 'black',
         textColor: 'white'
       },
       field: {
@@ -48,11 +48,7 @@
 
 
   function umlCanvasController(){
-    this.graph = {
-      addCell: function(item){
-        graph.addCell(item);
-      }
-    };
+    var graph = this.graph = new joint.dia.Graph();
 
     this.moveResourceToFreePosition = function(elt, moveX, moveY){
       /*var translateBy = {
@@ -64,8 +60,8 @@
         var intersecting = null;
         //iterate through children
         angular.forEach(graph.attributes.cells.models, function(existingElement){
-          //run only for parents and ignore itself
-          if (existingElement.cid !== elt.cid){
+          // ignore itself and skip links
+          if (existingElement.cid !== elt.cid && existingElement.attributes.type !== 'link'){
             while (existingElement.intersects(elt)){
               intersecting = elt;
               elt.translate(moveX, moveY);
@@ -77,9 +73,7 @@
     };
   }
 
-  function umlLinks(umlData){
-    this.links = [];
-
+  function umlLinks(umlData, canvasCtrl){
     this.link = function(from, toResource){
       //find resource element
       var referencedResource = umlData.getResource(toResource);
@@ -89,11 +83,25 @@
         },
         target: {
           id: referencedResource.id
+        },
+        router: {
+          name: 'manhattan'
+        },
+        connector: {
+          name: 'rounded'
+        }
+      });
+      newLink.attr({
+        '.connection': {
+          stroke: 'blue'
+        },
+        '.marker-target': {
+          fill: 'red',
+          d: 'M 10 0 L 0 5 L 10 10 z'
         }
       });
       //Append to canvas
-
-      this.links.push(newLink);
+      canvasCtrl.graph.addCell(newLink);
     };
   }
 

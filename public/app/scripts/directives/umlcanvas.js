@@ -4,25 +4,28 @@
     ])
     .directive('umlCanvas', ['umlData', umlCanvas])
     .directive('umlResource', ['umlData', umlResource])
-    .directive('umlField', ['umlData', 'umlLinks', umlField]);
+    .directive('umlField', ['umlData', 'umlLinks', '$timeout', umlField]);
 
   function umlCanvas(umlData){
     var graph, paper;
     return{
       restrict: 'E',
       replace: true,
-      scope: {},
+      scope: {
+        id: '@'
+      },
       templateUrl: '/templates/directives/uml/canvas.html',
-      controller: 'umlCanvasController',
-      compile: function(tElt, tAttrs){
-        console.log('compiling canvas');
-        graph = new joint.dia.Graph();
+      controller: ['$scope', 'umlCanvasController', function($scope, ctrl){
+        angular.extend(this, ctrl);
         paper = new joint.dia.Paper({
-          el: $('#' + tAttrs.id),
+          el: $('#' + $scope.id),
           width: umlData._config.canvas.width,
           height: umlData._config.canvas.height,
-          model: graph
+          model: ctrl.graph
         });
+      }],
+      compile: function(tElt, tAttrs){
+        console.log('compiling canvas');
         return function postLink(scope, elt, attrs){
           umlData.load().then(function(data){
             scope.data = data;
@@ -103,6 +106,7 @@
               text: {text: scope.umlData.name}
             });
             umlData.registerResource(scope.umlData.name, scope.resource);
+            scope.resource.set('inPorts', [scope.umlData.name]);
             var translateX = umlData._config.resource.width + umlData._config.resource.minMarginX;
             var translateY = 0; //umlData._config.resource.height;
             canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
@@ -113,7 +117,7 @@
     }
   }
 
-  function umlField(umlData, umlLinks){
+  function umlField(umlData, umlLinks, $timeout){
     return{
       restrict: 'E',
       require: ['^umlCanvas', '^umlResource'],
@@ -158,14 +162,16 @@
           // get field metadata
           scope.$watch('fieldData', function(){
             // decide if it should create a link
-            console.log(scope.fieldData);
-            if (angular.isArray(scope.fieldData)){
-              //many to one relationship
-
-            }else if (angular.isObject(scope.fieldData)){
-              umlLinks.link(scope.field, scope.fieldData.ref);
-              //one to one relationship
-            }
+            $timeout(function(){
+              console.log(scope.fieldData);
+              if (angular.isArray(scope.fieldData)){
+                //many to many relationship
+                umlLinks.link(scope.field, scope.fieldData[0].ref);
+              }else if (angular.isObject(scope.fieldData)){
+                umlLinks.link(scope.field, scope.fieldData.ref);
+                //one to one relationship
+              }
+            });
           });
         }
       }
