@@ -1,43 +1,10 @@
 (function(angular){
-  angular.module('fortuneAdmin.umlDiagram', [])
-    .service('umlData', ['$http', '$q', umlData])
+  angular.module('fortuneAdmin.umlDiagram', [
+      'fortuneAdmin.umlDiagram.services'
+    ])
     .directive('umlCanvas', ['umlData', umlCanvas])
     .directive('umlResource', ['umlData', umlResource])
-    .directive('umlField', ['umlData', umlField])
-    .directive('umlLink', ['umlData', umlLink]);
-
-  function umlData($http, $q){
-    this._config = {
-      canvas: {
-        width: 1200,
-        height: 700
-      },
-      resource: {
-        minMarginX: 100,
-        minMarginY: 50,
-        width: 200,
-        height: 100,
-        bgColor: 'blue',
-        textColor: 'white'
-      },
-      field: {
-        width: 200,
-        height: 20,
-        bgColor: 'white',
-        textColor: 'black'
-      }
-    };
-
-    this.load = function(){
-      var deferred = $q.defer();
-      $http.get('/metadata').success(function(data){
-        console.log('data loaded');
-        deferred.resolve(data.metadata);
-      });
-      return deferred.promise;
-    };
-
-  }
+    .directive('umlField', ['umlData', 'umlLinks', umlField]);
 
   function umlCanvas(umlData){
     var graph, paper;
@@ -46,35 +13,7 @@
       replace: true,
       scope: {},
       templateUrl: '/templates/directives/uml/canvas.html',
-      controller: function($scope, $element){
-        this.graph = {
-          addCell: function(item){
-            graph.addCell(item);
-          }
-        };
-
-        this.moveResourceToFreePosition = function(elt, moveX, moveY){
-          /*var translateBy = {
-            x: moveX || (umlData._config.resource.width + umlData._config.resource.minMarginX),
-            y: moveY || (umlData._config.resource.minMarginY)
-          };*/
-          removeIntersections(elt);
-          function removeIntersections(elt){
-            var intersecting = null;
-            //iterate through children
-            angular.forEach(graph.attributes.cells.models, function(existingElement){
-              //run only for parents and ignore itself
-              if (existingElement.cid !== elt.cid){
-                while (existingElement.intersects(elt)){
-                  intersecting = elt;
-                  elt.translate(moveX, moveY);
-                }
-              }
-            });
-            if (intersecting) removeIntersections(intersecting);
-          }
-        };
-      },
+      controller: 'umlCanvasController',
       compile: function(tElt, tAttrs){
         console.log('compiling canvas');
         graph = new joint.dia.Graph();
@@ -163,6 +102,7 @@
             scope.resource.attr({
               text: {text: scope.umlData.name}
             });
+            umlData.registerResource(scope.umlData.name, scope.resource);
             var translateX = umlData._config.resource.width + umlData._config.resource.minMarginX;
             var translateY = 0; //umlData._config.resource.height;
             canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
@@ -173,7 +113,7 @@
     }
   }
 
-  function umlField(umlData){
+  function umlField(umlData, umlLinks){
     return{
       restrict: 'E',
       require: ['^umlCanvas', '^umlResource'],
@@ -216,26 +156,17 @@
             });
           });
           // get field metadata
-          // decide if it should create a link
-        }
-      }
-    }
-  }
+          scope.$watch('fieldData', function(){
+            // decide if it should create a link
+            console.log(scope.fieldData);
+            if (angular.isArray(scope.fieldData)){
+              //many to one relationship
 
-  function umlLink(umlData){
-    var link;
-    return{
-      restrict: 'E',
-      replace: true,
-      scope: {},
-      templateUrl: '/templates/directives/uml/link.html',
-      compile: function(tElt, tAttrs){
-        link = joint.dia.link({
-          source: {id: tAttrs.from},
-          target: {id: tAttrs.to}
-        });
-        return function postLink(scope, elt, attrs){
-          scope.graph.addCell(link);
+            }else if (angular.isObject(scope.fieldData)){
+              umlLinks.link(scope.field, scope.fieldData.ref);
+              //one to one relationship
+            }
+          });
         }
       }
     }
