@@ -48,6 +48,7 @@ var app = fortune({
   users: [{ref: "user", inverse: "users", pkType : String}]
 }, { model: { pk: "flightNumber" }})
 
+
 .transform(
 //  before
   function () {
@@ -66,10 +67,12 @@ var app = fortune({
   }
 )
 
+
 container
   .use(express.static(__dirname + '/public/app'))
   .use(express.static(__dirname + '/public/app/scripts'))
   .use(app.router)
+  .get('/schema', function(req, res){ res.json( packageSchema() );})
   .listen(port);
 
 console.log('Listening on port ' + port + '...');
@@ -79,7 +82,7 @@ console.log('Listening on port ' + port + '...');
  */
 function findUser(id) {
   return new RSVP.Promise(function(resolve, reject) {
-    app.adapter.find('user', id).then(function(resource) {
+    app.adapter.find('user', id).then(function(resource){
       if(!!resource) {
         resolve(resource);
       } else {
@@ -87,4 +90,45 @@ function findUser(id) {
       }
     });
   });
+}
+
+function checkRelations(resource, key){
+    var ret = [],
+        node = app._resources[resource]['schema'][key],
+        tmp = {'from': resource};
+    for(var n in node){
+        if(node[n].hasOwnProperty('ref'))
+            ret.push({'from': resource, 'to': node[n]['ref'], 'as': node[n]['inverse']});
+        if(n == 'ref')
+            tmp['to'] = node[n];
+        if(n == 'inverse')
+            tmp['as'] = node[n];
+    }
+    if(tmp.hasOwnProperty('to'))
+        ret.push(tmp);
+    return ret;
+}
+
+function packageSchema(){
+    var ret = {};
+    var all_relations = [];
+    for(var resource in app._resources){
+        var pk = app._resources[resource].modelOptions ?
+            app._resources[resource].modelOptions['pk'] : 'id'; // id being mongo default
+        ret[resource] = { 'schema': [], 
+                          'pk': pk,
+                          'fks': [],
+                          'relations': [] };
+        for(var key in app._resources[resource]['schema']){
+            ret[resource]['schema'].push(key); // we need only key names: values are usually Function objects
+            var rels = checkRelations(resource, key);
+            all_relations = all_relations.concat(rels);
+        }
+    }
+    for(var r in all_relations){
+        var rel = all_relations[r];
+        ret[rel['from']]['relations'].push(rel['to']); // X relates to Y
+        ret[rel['to']]['fks'].push(rel['as']); // so Y has foreign key at field related by X
+    }
+    return ret;
 }
