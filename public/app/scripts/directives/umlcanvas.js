@@ -49,6 +49,11 @@
       },
       templateUrl: '/templates/directives/uml/resource.html',
       controller: function($scope){
+        if ($scope.umlData.modelOptions && $scope.umlData.modelOptions.pk){
+          //delete pk to not render it twice
+          delete $scope.umlData.schema[$scope.umlData.modelOptions.pk];
+          console.log('deleting ', $scope.umlData);
+        }
         var startPosition;
         $scope.$watch('umlData', function(){
           startPosition = {
@@ -122,10 +127,10 @@
       restrict: 'E',
       require: ['^umlCanvas', '^umlResource'],
       scope: {
+        resource: '=',
         fieldName: '=',
         fieldData: '='
       },
-      //templateUrl: '/templates/directives/uml/field.html',
       compile: function(tElt, tAttrs){
         return function postLink(scope, elt, attrs, controllers){
           var resourceCtrl = controllers[1];
@@ -138,10 +143,10 @@
             },
             attrs: {
               rect: {
-                fill: umlData._config.field.bgColor
+                fill: attrs.isPk ? 'red' : umlData._config.field.bgColor
               },
               text: {
-                text: 'none',
+                text: 'undefined',//attrs.isPk ? 'PK:' + attrs.fieldName : 'undefined',
                 fill: umlData._config.field.textColor
               }
             }
@@ -155,7 +160,7 @@
           scope.$watch('fieldName', function(){
             scope.field.attr({
               text: {
-                text: scope.fieldName
+                text: attrs.isPk ? 'PK:' + scope.fieldName : scope.fieldName
               }
             });
           });

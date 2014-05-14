@@ -1,5 +1,13 @@
 <div>
+  <div ng-if="!umlData.modelOptions.pk">
+    <div ng-init="pkParams = 'ObjectId'; pkName = '_id'"></div>
+    <uml-field field-name="pkName" field-data="pkParams" resource="umlData.name" is-pk="true"></uml-field>
+  </div>
+  <div ng-if="umlData.modelOptions.pk">
+    <div ng-init="pkName = umlData.modelOptions.pk"></div>
+    <uml-field field-name="pkName" field-data="umlData.schema[pkName]" is-pk="true"></uml-field>
+  </div>
   <div ng-repeat="(name, params) in umlData.schema">
-    <uml-field field-name="name" field-data="params"></uml-field>
+    <uml-field field-name="name" field-data="params" resource="umlData.name"></uml-field>
   </div>
 </div>
