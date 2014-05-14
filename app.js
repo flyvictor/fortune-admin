@@ -94,7 +94,7 @@ function findUser(id) {
 
 function checkRelations(resource, key){
     var ret = [],
-        node = app.metadata[resource]['schema'][key],
+        node = app._resources[resource]['schema'][key],
         tmp = {'from': resource};
     for(var n in node){
         if(node[n].hasOwnProperty('ref'))
@@ -112,14 +112,14 @@ function checkRelations(resource, key){
 function packageSchema(){
     var ret = {};
     var all_relations = [];
-    for(var resource in app.metadata){
-        var pk = app.metadata[resource].modelOptions ?
-            app.metadata[resource].modelOptions['pk'] : 'id'; // id being mongo default
+    for(var resource in app._resources){
+        var pk = app._resources[resource].modelOptions ?
+            app._resources[resource].modelOptions['pk'] : 'id'; // id being mongo default
         ret[resource] = { 'schema': [], 
                           'pk': pk,
                           'fks': [],
                           'relations': [] };
-        for(var key in app.metadata[resource]['schema']){
+        for(var key in app._resources[resource]['schema']){
             ret[resource]['schema'].push(key); // we need only key names: values are usually Function objects
             var rels = checkRelations(resource, key);
             all_relations = all_relations.concat(rels);
