@@ -146,7 +146,7 @@
                 fill: attrs.isPk ? 'red' : umlData._config.field.bgColor
               },
               text: {
-                text: 'undefined',//attrs.isPk ? 'PK:' + attrs.fieldName : 'undefined',
+                text: 'undefined',
                 fill: umlData._config.field.textColor
               }
             }
@@ -166,18 +166,27 @@
           });
           // get field metadata
           scope.$watch('fieldData', function(){
-            // decide if it should create a link
+            //wait until all other fields are rendered
             $timeout(function(){
               console.log(scope.fieldData);
               if (angular.isArray(scope.fieldData)){
                 //many to many relationship
                 umlLinks.link(scope.field, scope.fieldData[0].ref, true);
+                markFk();
               }else if (angular.isObject(scope.fieldData)){
                 umlLinks.link(scope.field, scope.fieldData.ref, false);
+                markFk();
                 //one to one relationship
               }
             });
           });
+          function markFk(){
+            scope.field.attr({
+              text: {
+                text: 'FK: ' + scope.fieldName
+              }
+            });
+          }
         }
       }
     }
