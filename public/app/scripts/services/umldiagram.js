@@ -48,13 +48,20 @@
   function umlCanvasController(){
     var graph = this.graph = new joint.dia.Graph();
 
-    this.moveResourceToFreePosition = function(elt, moveX, moveY){
+    /**
+     *
+     * @param elt - element which is suspected in overflowing
+     * @param moveX
+     * @param moveY
+     * @param mockGraph - dirty hack for testing
+     */
+    this.moveResourceToFreePosition = function(elt, moveX, moveY, mockGraph){
 
       removeIntersections(elt);
       function removeIntersections(elt){
         var intersecting = null;
         //iterate through children
-        angular.forEach(graph.attributes.cells.models, function(existingElement){
+        angular.forEach(mockGraph || graph.attributes.cells.models, function(existingElement){
           // ignore itself and links
           if (existingElement.cid !== elt.cid && existingElement.attributes.type !== 'link'){
             while (existingElement.intersects(elt)){
@@ -69,7 +76,6 @@
   }
 
   function umlLinks(umlData, canvasCtrl){
-
     this.link = function(from, toResource, many){
       //find resource element
       var referencedResource = umlData.getResource(toResource);
