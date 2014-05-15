@@ -30,7 +30,7 @@
 
     this.load = function(){
       var deferred = $q.defer();
-      $http.get('/metadata').success(function(data){
+      $http.get('/resources').success(function(data){
         deferred.resolve(data.metadata);
       });
       return deferred.promise;
