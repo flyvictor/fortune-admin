@@ -1,13 +1,13 @@
 (function(angular){
   angular.module('fortuneAdmin.umlDiagram.services', [])
     .service('umlData', ['$http', '$q', umlData])
-    .service('umlCanvasController', [umlCanvasController])
+    .service('umlCanvasController', ['umlData', umlCanvasController])
     .service('umlLinks', ['umlData', 'umlCanvasController', umlLinks]);
 
   function umlData($http, $q){
     this._config = {
       canvas: {
-        width: 1200,
+        width: 1140,
         height: 700
       },
       resource: {
@@ -45,7 +45,7 @@
   }
 
 
-  function umlCanvasController(){
+  function umlCanvasController(umlData){
     var graph = this.graph = new joint.dia.Graph();
 
     /**
@@ -56,22 +56,56 @@
      * @param mockGraph - dirty hack for testing
      */
     this.moveResourceToFreePosition = function(elt, moveX, moveY, mockGraph){
-
+      var models = mockGraph || graph.attributes.cells.models;
+      var cumulativeX = 0;
+      var that = this;
       removeIntersections(elt);
+
+      /**
+       * @param elt - element that is suspected to overflow something
+       */
       function removeIntersections(elt){
         var intersecting = null;
         //iterate through children
-        angular.forEach(mockGraph || graph.attributes.cells.models, function(existingElement){
+        angular.forEach(models, function(existingElement){
           // ignore itself and links
           if (existingElement.cid !== elt.cid && existingElement.attributes.type !== 'link'){
             while (existingElement.intersects(elt)){
               intersecting = elt;
-              elt.translate(moveX, moveY);
+              cumulativeX += moveX;
+              if (cumulativeX > umlData._config.canvas.width) {
+                //recoil to the left and move one row down
+                elt.translate(-cumulativeX + moveX, that.getMaxResourceHeight(models));
+                cumulativeX = 0;
+              }else{
+                elt.translate(moveX, moveY);
+              }
             }
           }
         });
         if (intersecting) removeIntersections(intersecting);
       }
+    };
+
+    /**
+     * @param models - hack for tests
+     * @returns {number} - tallest resource height + margin
+     */
+    this.getMaxResourceHeight = function(models){
+      var max = 0;
+      var headHeight = umlData._config.resource.height;
+      var fieldHeight = umlData._config.field.height;
+      angular.forEach(models, function(item){
+        if (item.attributes.attrs.rect){
+          if (item.attributes.embeds){
+            var eltHeight = headHeight + fieldHeight * item.attributes.embeds.length;
+            if (max < eltHeight){
+              max = eltHeight;
+            }
+          }
+        }
+      });
+      return max + 10;
     };
   }
 

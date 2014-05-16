@@ -31,6 +31,25 @@ describe("umlDiagram services", function(){
   });
   describe('Service: umlCanvasController', function(){
     var canvasCtrl;
+    beforeEach(function(){
+      module(function($provide){
+        $provide.service('umlData', function mockUmlData(){
+          this._config = {
+            canvas: {
+              width: 1140
+            },
+            resource: {
+              width: 200,
+              height: 50
+            },
+            field: {
+              width: 200,
+              height: 20
+            }
+          }
+        });
+      });
+    });
     beforeEach(inject(function($injector){
       canvasCtrl = $injector.get('umlCanvasController');
     }));
@@ -69,6 +88,42 @@ describe("umlDiagram services", function(){
       canvasCtrl.moveResourceToFreePosition(elt, 0, 0, mockGraph);
       // graph#0 is ignored and 2 movements from graph#1
       expect(movements).toEqual(2);
+    });
+    it('should move element to the next row once canvas width is reached', function(){
+      function intersects(){
+        var count = 0;
+        return function(elt){
+          count++;
+          return count < elt.cid;
+        }
+      }
+      var mockGraph = [];
+      for (var i = 0; i < 4; i++){
+        mockGraph.push({
+          cid: i,
+          intersects: intersects(),
+          attributes: {
+            attrs: {
+              rect: true
+            },
+            embeds: ['one','two','three'],
+            type: 'fake'
+          }
+        });
+      }
+      //mock element
+      var rowWrapped = 0;
+      var elt = {
+        //three elements will fit in a row. The fourth should move down
+        cid: 3,
+        translate: function(moveX, moveY){
+          if (moveY != 0){
+            rowWrapped++;
+          }
+        }
+      };
+      canvasCtrl.moveResourceToFreePosition(elt, 300, 0, mockGraph);
+      expect(rowWrapped).toEqual(1);
     });
   });
   describe('Service: umlLinks', function(){
