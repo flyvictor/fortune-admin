@@ -32,6 +32,9 @@
         $scope.allSelected = true;
         $scope.selected = $scope.resources;
       }
+      angular.forEach($scope.resources, function(res){
+        res.$selected = $scope.selected;
+      });
     }
   }
 })(angular);
