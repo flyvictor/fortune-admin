@@ -2,15 +2,15 @@
   <h1 class="text-center">Resources map</h1>
   <ul class="list-group">
     <li class="list-group-item">
-      <button type="button" class="btn btn-default btn-sm" ng-click="umlDiagramCtrl.toggleSelectAll()">{{ allSelected ? "Deselect" : "Select" }} all</button>
-      <button type="button" class="btn btn-default btn-sm" ng-click="showList = !showList">{{ showList ? "Collapse" : "Show" }} list</button>
+      <button type="button" class="btn btn-default btn-sm" ng-click="umlDiagramCtrl.toggleSelectAll()">{{ allSelected ? "Remove" : "Render" }} all</button>
+      <button type="button" class="btn btn-default btn-sm" ng-click="showList = !showList">{{ showList ? "Collapse" : "Show" }} resources list</button>
     </li>
     <li class="list-group-item" ng-repeat="resource in resources" ng-show="showList">
       <input type="checkbox" ng-model="resource.$selected" ng-change="umlDiagramCtrl.toggleSelect(resource)"/>
       <span>Name: <strong>{{ resource.name }}</strong> </span>
       <span>Fields count: <strong>{{ resource.$schemaLength }}</strong> </span>
       <span>PK: <strong>{{ resource.modelOptions.pk ? resource.modelOptions.pk : "_id" }}</strong> </span>
-      <a ng-click="showJson=!showJson"> {{ showJson ? "Hide" : "Show" }} JSON</a>
+      <a ng-click="showJson=!showJson"> {{ showJson ? "Hide" : "Show" }} raw JSON</a>
       <pre ng-show="showJson">{{ resource | json }}</pre>
     </li>
   </ul>
