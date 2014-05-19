@@ -8,21 +8,22 @@
     this._config = {
       canvas: {
         width: 1140,
-        height: 700
+        height: 7000
       },
       resource: {
         minMarginX: 100,
         minMarginY: 50,
         width: 200,
         height: 50,
-        bgColor: 'white',
-        textColor: 'black'
+        bgColor: 'black',
+        textColor: 'white'
       },
       field: {
         width: 200,
         height: 20,
         bgColor: 'white',
-        textColor: 'black'
+        textColor: 'black',
+        pkColor: 'green'
       }
     };
 
@@ -30,7 +31,8 @@
 
     this.load = function(){
       var deferred = $q.defer();
-      $http.get('/resources').success(function(data){
+      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+        console.debug(data);
         deferred.resolve(data.resources);
       });
       return deferred.promise;
@@ -113,6 +115,13 @@
     this.link = function(from, toResource, many){
       //find resource element
       var referencedResource = umlData.getResource(toResource);
+      if (!referencedResource){
+        return from.attr({
+          rect: {
+            fill: 'yellow'
+          }
+        });
+      }
       var newLink = new joint.dia.Link({
         source: {
           id: from.id

@@ -1,6 +1,8 @@
 'use strict';
 
-var controllers = angular.module('fortuneAdmin.Controllers', []);
+var controllers = angular.module('fortuneAdmin.Controllers', [
+  'fortuneAdmin.Controllers.umlDiagram'
+]);
 
 controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http', '$routeParams',
   function($scope, $filter, $http, $routeParams) {
