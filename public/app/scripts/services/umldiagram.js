@@ -15,14 +15,15 @@
         minMarginY: 50,
         width: 200,
         height: 50,
-        bgColor: 'white',
-        textColor: 'black'
+        bgColor: 'black',
+        textColor: 'white'
       },
       field: {
         width: 200,
         height: 20,
         bgColor: 'white',
-        textColor: 'black'
+        textColor: 'black',
+        pkColor: 'green'
       }
     };
 
@@ -115,7 +116,11 @@
       //find resource element
       var referencedResource = umlData.getResource(toResource);
       if (!referencedResource){
-        return console.log('reference to undefined');
+        return from.attr({
+          rect: {
+            fill: 'yellow'
+          }
+        });
       }
       var newLink = new joint.dia.Link({
         source: {

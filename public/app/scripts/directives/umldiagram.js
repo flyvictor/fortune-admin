@@ -136,7 +136,7 @@
           },
           attrs: {
             rect: {
-              fill: attrs.isPk ? 'red' : umlData._config.field.bgColor
+              fill: attrs.isPk ? umlData._config.field.pkColor : umlData._config.field.bgColor
             },
             text: {
               text: 'undefined',
@@ -182,6 +182,9 @@
         }
         function markFk(){
           scope.field.attr({
+            rect: {
+              fill: umlData._config.field.bgColor
+            },
             text: {
               text: 'FK: ' + scope.fieldName
             }
