@@ -8,8 +8,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resources <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li data-match-route="/users"><a data-ng-href="{{ r('users_path') }}">Users</a></li>
-                        <li data-match-route="/addresses"><a data-ng-href="{{ r('addresses_path') }}">Addresses</a></li>
+                        <li ng-repeat="resource in resources"><a data-ng-href="{{ r('resource', {name: resource.name }) }}">{{ resource.name }}</a></li>
                     </ul>
                 </li>
                 <li data-match-route="/uml"><a data-ng-href="{{ r('uml_diagram') }}">UML</a></li>
