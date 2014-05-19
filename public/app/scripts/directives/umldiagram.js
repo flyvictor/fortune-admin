@@ -161,9 +161,35 @@
         //and append it to the graph
         canvasCtrl.graph.addCell(scope.field);
         scope.$watch('fieldName', function(){
+          scope.fieldType = null;
+          if (angular.isObject(scope.fieldData) || angular.isArray(scope.fieldData)){
+            scope.fieldType = 'ref';
+          }else{
+            switch (scope.fieldData){
+              case 'String':
+                scope.fieldType = 'str';
+                break;
+              case 'Number':
+                scope.fieldType = 'num';
+                break;
+              case 'Date':
+                scope.fieldType = 'date';
+                break;
+              case 'Boolean':
+                scope.fieldType = 'bool';
+                break;
+              case 'Array':
+                scope.fieldType = 'array';
+                break;
+              case 'Buffer':
+                scope.fieldType = 'buff';
+                break;
+            }
+          }
           scope.field.attr({
             text: {
-              text: attrs.isPk ? 'PK:' + scope.fieldName : scope.fieldName
+              text: (attrs.isPk ? 'PK:' + scope.fieldName : scope.fieldName) +
+                (scope.fieldType ? ' [' + scope.fieldType +']' : '')
             }
           });
         });
@@ -194,7 +220,8 @@
               fill: umlData._config.field.bgColor
             },
             text: {
-              text: 'FK: ' + scope.fieldName
+              text: 'FK: ' + scope.fieldName +
+                (scope.fieldType ? ' [' + scope.fieldType + ']' : '')
             }
           });
         }
