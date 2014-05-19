@@ -1,0 +1,1 @@
+<h4 class="text-center">{{currentResource.name}}</h4><table class="table table-bordered"><tr><th ng-repeat="(name, type) in currentResource.schema">{{name}}</th></tr><tr ng-repeat="entity in data"><td ng-repeat="(path, type) in currentResource.schema"><fa-editable ng-model="entity[path]" path="path" schema-type="type"></fa-editable></td></tr></table>
