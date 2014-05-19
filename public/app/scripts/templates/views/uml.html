@@ -7,7 +7,11 @@
     </li>
     <li class="list-group-item" ng-repeat="resource in resources" ng-show="showList">
       <input type="checkbox" ng-model="resource.$selected" ng-change="umlDiagramCtrl.toggleSelect(resource)"/>
-      <span>{{ resource.name }}</span>
+      <span>Name: <strong>{{ resource.name }}</strong> </span>
+      <span>Fields count: <strong>{{ resource.$schemaLength }}</strong> </span>
+      <span>PK: <strong>{{ resource.modelOptions.pk ? resource.modelOptions.pk : "_id" }}</strong> </span>
+      <a ng-click="showJson=!showJson"> {{ showJson ? "Hide" : "Show" }} JSON</a>
+      <pre ng-show="showJson">{{ resource | json }}</pre>
     </li>
   </ul>
   <section>

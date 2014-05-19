@@ -9,6 +9,9 @@
     $scope.selected = [];
     $scope.allSelected = false;
     umlData.load().then(function(resources){
+      angular.forEach(resources, function(res){
+        res.$schemaLength = Object.keys(res.schema).length;
+      });
       $scope.resources = resources;
     }, function(err){
       $scope.error = err;
