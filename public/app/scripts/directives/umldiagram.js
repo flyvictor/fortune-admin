@@ -24,6 +24,14 @@
           height: umlData._config.canvas.height,
           model: ctrl.graph
         });
+        $scope.$on('fortuneAdmin:uml:relink', function(){
+          angular.forEach(ctrl.graph.attributes.cells.models, function(item){
+            if (item.attributes.type === 'link'){
+              console.log('removing link');
+              item.remove();
+            }
+          });
+        });
       }],
       link: function postLink(scope){
         console.log('selected: ', scope.selectedResources);
