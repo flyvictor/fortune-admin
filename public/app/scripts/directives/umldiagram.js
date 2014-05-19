@@ -12,7 +12,8 @@
       restrict: 'E',
       replace: true,
       scope: {
-        id: '@'
+        id: '@',
+        selectedResources: '='
       },
       templateUrl: '/templates/directives/uml/canvas.html',
       controller: ['$scope', 'umlCanvasController', function($scope, ctrl){
@@ -25,11 +26,7 @@
         });
       }],
       link: function postLink(scope){
-        umlData.load().then(function(data){
-          scope.data = data;
-        }, function(){
-          console.error('Add alert');
-        });
+        console.log('selected: ', scope.selectedResources);
       }
     }
   }
@@ -58,7 +55,7 @@
         });
         this.embed = function(child){
           $scope.resource.embed(child);
-          console.log('field embedded to: ', $scope.resource);
+          //console.log('field embedded to: ', $scope.resource);
         };
 
         this.intersects = function(elt){
@@ -69,6 +66,12 @@
           startPosition.y += umlData._config.field.height;
           return startPosition;
         };
+
+        $scope.$on('$destroy', function(){
+          //remove resource from canvas
+          //no need to remove individual fields as they are embedded to resource
+          $scope.resource.remove();
+        });
       },
       link: function postLink(scope, elt, attrs, canvasCtrl){
         scope.resource = new joint.shapes.basic.Rect({
@@ -108,7 +111,7 @@
           var translateY = 0;
           canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
         });
-        console.log(scope.umlData);
+        //console.log(scope.umlData);
       }
     }
   }
@@ -156,21 +159,27 @@
             }
           });
         });
-        scope.$watch('fieldData', function(){
+        scope.$watch('fieldData', relink);
+        scope.$on('fortuneAdmin:uml:relink', relink);
+        function relink(){
+          console.log('relinking');
           //wait until all other fields are rendered
           $timeout(function(){
-            console.log(scope.fieldData);
+            //console.log(scope.fieldData);
             if (angular.isArray(scope.fieldData)){
               //many to many relationship
+              if(!scope.fieldData[0]){
+                return console.log('empty array instead of reference');
+              }
+              markFk();
               umlLinks.link(scope.field, scope.fieldData[0].ref, true);
-              markFk();
             }else if (angular.isObject(scope.fieldData)){
-              umlLinks.link(scope.field, scope.fieldData.ref, false);
               markFk();
+              umlLinks.link(scope.field, scope.fieldData.ref, false);
               //one to one relationship
             }
           });
-        });
+        }
         function markFk(){
           scope.field.attr({
             text: {

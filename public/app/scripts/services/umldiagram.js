@@ -8,7 +8,7 @@
     this._config = {
       canvas: {
         width: 1140,
-        height: 700
+        height: 7000
       },
       resource: {
         minMarginX: 100,
@@ -30,7 +30,8 @@
 
     this.load = function(){
       var deferred = $q.defer();
-      $http.get('/resources').success(function(data){
+      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+        console.debug(data);
         deferred.resolve(data.resources);
       });
       return deferred.promise;
@@ -113,6 +114,9 @@
     this.link = function(from, toResource, many){
       //find resource element
       var referencedResource = umlData.getResource(toResource);
+      if (!referencedResource){
+        return console.log('reference to undefined');
+      }
       var newLink = new joint.dia.Link({
         source: {
           id: from.id
