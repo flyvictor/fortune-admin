@@ -32,11 +32,65 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     templateUrl : CONFIG.prepareViewTemplateUrl('uml')
   });
 
+  //Resolve necessary data here to simplify controller
+  ROUTER.when('resource', '/:name', {
+    templateUrl: CONFIG.prepareViewTemplateUrl('resources'),
+    controller: 'ResourcesCtrl as ResourcesCtrl',
+    resolve: {
+      resources: ['$q', '$http', function($q, $http){
+        var d = $q.defer();
+        $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+          d.resolve(data.resources);
+        });
+        return d.promise;
+      }],
+      data: ['$q', '$http', '$route', function($q, $http, $route){
+        var resourceName = $route.current.params.name;
+         var d = $q.defer();
+         $http.get(CONFIG.getApiNamespace() + '/' + pluralize(resourceName))
+          .success(function (data) {
+             d.resolve(data[pluralize(resourceName)]);
+          });
+        return d.promise;
+      }]
+    }
+  });
+
+  ROUTER.when('subresource', '/:name/:id/:sub', {
+    templateUrl: CONFIG.prepareViewTemplateUrl('resources'),
+    controller: 'ResourcesCtrl as ResourcesCtrl',
+    resolve: {
+      resources: ['$q', '$http', function($q, $http){
+        var d = $q.defer();
+        $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+          d.resolve(data.resources);
+        });
+        return d.promise;
+      }],
+      data: ['$q', '$http', '$route', function($q, $http, $route){
+        var d = $q.defer();
+        var parentResource = $route.current.params.name;
+        var parentId = $route.current.params.id;
+        var childResource = $route.current.params.sub;
+        $http.get(CONFIG.getApiNamespace() + '/' + pluralize(parentResource) +
+            '/' + parentId + '/' + pluralize(childResource))
+          .success(function (data, status, headers, config) {
+            d.resolve(data[pluralize(childResource)]);
+          });
+        return d.promise;
+      }]
+    }
+  });
+
   ROUTER.otherwise({
-    redirectTo : '/users'
+    redirectTo : '/user'
   });
 
   ROUTER.install($routeProvider);
+
+  function pluralize(str){
+    return /s$/.test(str) ? str + 'es' : str + 's';
+  }
 
 }]);
 

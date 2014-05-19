@@ -5,6 +5,16 @@ var controllers = angular.module('fortuneAdmin.Controllers', [
   'fortuneAdmin.Controllers.umlDiagram'
 ]);
 
+controllers.controller('ResourcesCtrl', ['$scope', '$http', '$routeParams', 'resources', 'data', ResourcesCtrl]);
+
+function ResourcesCtrl($scope, $http, $routeParams, resources, data){
+  $scope.allResources = resources;
+  $scope.currentResource  = resources.find(function(res){
+    return res.name === $routeParams.name;
+  });
+  $scope.data = data;
+}
+
 controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http', '$routeParams',
   'ConstUserTitles', 'ConstUserRoles', 'ConstCountries',
   function($scope, $filter, $http, $routeParams, cTitles, cRoles, cCountries) {
