@@ -7,16 +7,17 @@ var CONFIG;
 
   var appPrefix = '/';
   var templateUrlPrefix = 'templates/';
-  var baseRESTEndpoint = 'http://victor-dev-routing-service.herokuapp.com';
+  var baseRESTEndpoint = ''; //'http://victor-dev-routing-service.herokuapp.com';
   var appVersion = 8;
+  var apiNamespace = '/api/v1';
 
   CONFIG = {
 
     version : appVersion,
 
     baseEndpoint: baseRESTEndpoint,
-    getApiPrefix: function(){
-      return baseRESTEndpoint + '/api/v' + appVersion;
+    getApiNamespace: function(){
+      return baseRESTEndpoint + apiNamespace;
     },
 
     baseDirectory : appPrefix,
