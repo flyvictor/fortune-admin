@@ -24,7 +24,7 @@ var app = fortune({
   nationality: String,
   languageCode: String,
   addresses: [{ref: "address", inverse: "user"}],
-  flights: [{ref: "flight", inverse: "flights", pkType: String}]
+  flights: [{ref: "flight", inverse: "users", pkType: String}]
 }, {
   model: {pk: "email"}
 })
@@ -45,7 +45,7 @@ var app = fortune({
 
 .resource("flight", {
   flightNumber: String,
-  users: [{ref: "user", inverse: "users", pkType : String}]
+  users: [{ref: "user", inverse: "flights", pkType : String}]
 }, { model: { pk: "flightNumber" }})
 
 .transform(
