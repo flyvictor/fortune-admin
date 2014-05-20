@@ -2,17 +2,42 @@
 
 var controllers = angular.module('fortuneAdmin.Controllers', [
   'fortuneAdmin.Constants',
+  'fortuneAdmin.Services',
   'fortuneAdmin.Controllers.umlDiagram'
 ]);
 
-controllers.controller('ResourcesCtrl', ['$scope', '$http', '$routeParams', 'resources', 'data', ResourcesCtrl]);
+controllers.controller('ResourcesCtrl', ['$scope', '$http', 'Inflect', '$routeParams', 'resources', 'data', ResourcesCtrl]);
 
-function ResourcesCtrl($scope, $http, $routeParams, resources, data){
+function ResourcesCtrl($scope, $http, Inflect, $routeParams, resources, data){
   $scope.allResources = resources;
   $scope.currentResource  = resources.find(function(res){
-    return res.name === $routeParams.name;
+    return res.name === $routeParams.name || Inflect.pluralize(res.name) === $routeParams.name;
   });
-  $scope.data = data;
+  $scope.data = data[Inflect.pluralize($scope.currentResource.name)];
+  $scope.links = data.links;
+
+  this.resolveInverse = function(linkName){
+    var parts = linkName.split('.');
+    var fieldName = parts[parts.length - 1];
+
+    // Dig down through nested schemas
+    var iterator = $scope.currentResource.schema;
+    for (var i = 1; i < parts.length - 1; i++){
+      iterator = iterator[parts[i]];
+    }
+    var ref = iterator[fieldName];
+
+    var inverse = '';
+    if (angular.isArray(ref)){
+      inverse = ref[0].inverse;
+    }else if(angular.isObject(ref)){
+      inverse = ref.inverse;
+    }else {
+      throw new Error('Malformed reference');
+    }
+    return inverse;
+  };
+
 }
 
 controllers.controller('UsersCtrl',[ '$scope', '$filter', '$http', '$routeParams',

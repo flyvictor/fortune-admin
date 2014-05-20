@@ -56,7 +56,7 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     }
   });
 
-  ROUTER.when('subresource', '/:parent/:id/:name', {
+  ROUTER.when('subresource', '/:parent/:id/:name/as/:inverse', {
     templateUrl: CONFIG.prepareViewTemplateUrl('resources'),
     controller: 'ResourcesCtrl as ResourcesCtrl',
     resolve: {
@@ -67,13 +67,14 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
         });
         return d.promise;
       }],
-      data: ['$q', '$http', '$route', function($q, $http, $route){
+      data: ['$q', '$http', '$route', 'Inflect', function($q, $http, $route, Inflect){
         var d = $q.defer();
         var parentResource = $route.current.params.parent;
+        var inverse = $route.current.params.inverse;
         var parentId = $route.current.params.id;
         var childResource = $route.current.params.name;
         $http.get(CONFIG.getApiNamespace() + '/' + childResource +
-          '?filter[' + parentResource + ']=' + parentId)
+          '?filter[' + inverse + ']=' + parentId)
           .success(function (data) {
             d.resolve(data);
           });
