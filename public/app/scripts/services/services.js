@@ -3,4 +3,6 @@
  */
 'use strict';
 
-var services = angular.module('fortuneAdmin.Services', []);
+var services = angular.module('fortuneAdmin.Services', [
+  'fortuneAdmin.Services.inflectPort'
+]);
