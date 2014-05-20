@@ -8,10 +8,12 @@ var fortuneAdmin = angular.module('fortuneAdmin',
     , 'ngRoute'
     , 'ui.bootstrap'
     , 'xeditable'
+    , 'fortuneAdmin.Constants'
     , 'fortuneAdmin.Controllers'
     , 'fortuneAdmin.Directives'
     , 'fortuneAdmin.Services'
     , 'fortuneAdmin.Routes'
+    , 'fortuneAdmin.Filters'
   ]
 );
 

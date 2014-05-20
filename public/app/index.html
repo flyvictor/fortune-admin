@@ -28,7 +28,7 @@
 
     <my-navbar></my-navbar>
     <!-- Add your site or application content here -->
-    <div class="container">
+    <div class="">
        <div ng-view=""></div>
     </div>
     <!--[if lt IE 9]>
@@ -56,9 +56,12 @@
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/lib/router.js"></script>
     <script src="scripts/config/config.js"></script>
+    <script src="scripts/constants/index.js"></script>
+    <script src="scripts/filters/index.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/umlDiagram.js"></script>
     <script src="scripts/services/services.js"></script>
+    <script src="scripts/services/inflect.js"></script>
     <script src="scripts/services/umldiagram.js"></script>
     <script src="scripts/directives/directives.js"></script>
     <script src="scripts/directives/umldiagram.js"></script>
