@@ -44,19 +44,19 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
         });
         return d.promise;
       }],
-      data: ['$q', '$http', '$route', function($q, $http, $route){
+      data: ['$q', '$http', '$route', 'Inflect', function($q, $http, $route, Inflect){
         var resourceName = $route.current.params.name;
          var d = $q.defer();
-         $http.get(CONFIG.getApiNamespace() + '/' + pluralize(resourceName))
+         $http.get(CONFIG.getApiNamespace() + '/' + Inflect.pluralize(resourceName))
           .success(function (data) {
-             d.resolve(data[pluralize(resourceName)]);
+             d.resolve(data);
           });
         return d.promise;
       }]
     }
   });
 
-  ROUTER.when('subresource', '/:name/:id/:sub', {
+  ROUTER.when('subresource', '/:parent/:id/:name', {
     templateUrl: CONFIG.prepareViewTemplateUrl('resources'),
     controller: 'ResourcesCtrl as ResourcesCtrl',
     resolve: {
@@ -69,13 +69,13 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
       }],
       data: ['$q', '$http', '$route', function($q, $http, $route){
         var d = $q.defer();
-        var parentResource = $route.current.params.name;
+        var parentResource = $route.current.params.parent;
         var parentId = $route.current.params.id;
-        var childResource = $route.current.params.sub;
-        $http.get(CONFIG.getApiNamespace() + '/' + pluralize(parentResource) +
-            '/' + parentId + '/' + pluralize(childResource))
-          .success(function (data, status, headers, config) {
-            d.resolve(data[pluralize(childResource)]);
+        var childResource = $route.current.params.name;
+        $http.get(CONFIG.getApiNamespace() + '/' + childResource +
+          '?filter[' + parentResource + ']=' + parentId)
+          .success(function (data) {
+            d.resolve(data);
           });
         return d.promise;
       }]
@@ -87,10 +87,6 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
   });
 
   ROUTER.install($routeProvider);
-
-  function pluralize(str){
-    return /s$/.test(str) ? str + 'es' : str + 's';
-  }
 
 }]);
 
