@@ -1,1 +1,26 @@
-<h4 class="text-center">{{currentResource.name}}</h4><table class="table table-bordered"><tr><th ng-repeat="(name, type) in currentResource.schema">{{name}}</th></tr><tr ng-repeat="entity in data"><td ng-repeat="(path, type) in currentResource.schema"><fa-editable ng-model="entity[path]" path="path" schema-type="type"></fa-editable></td></tr></table>
+<h4 class="text-center">{{currentResource.name}}</h4>
+<table class="table table-bordered">
+  <tr>
+    <th ng-repeat="(name, type) in currentResource.schema | filterLinks">{{name}}</th>
+    <th ng-repeat="link in links">{{link.type}}</th>
+    <th>Actions</th>
+  </tr>
+  <tr ng-repeat="entity in data">
+    <td ng-repeat="(path, type) in currentResource.schema | filterLinks">
+      <fa-editable ng-model="entity[path]" path="path" resource-name="{{plurResourceName}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
+    </td>
+    <td ng-repeat="(linkName, link) in links">
+      <a ng-href="{{ r('subresource', {parent: currentResource.name, id: entity.id, name: link.type, inverse: ResourcesCtrl.resolveInverse(linkName)}) }}">Navigate to {{link.type}}</a>
+    </td>
+    <td>
+      <button type="button" ng-click="ResourcesCtrl.deleteRow($index, entity.id)" class="btn btn-xs btn-danger">Delete</button>
+    </td>
+  </tr>
+</table>
+<div class="col-md-3">
+  <div ng-hide="PK === 'id'">
+    <label>Enter new {{ currentResource.name }}s {{ PK }}</label>
+    <input type="text" ng-model="PrimaryKey" ng-required="true" class="form-control"/>
+  </div>
+  <button type="button" ng-click="ResourcesCtrl.addRow(PrimaryKey)" class="btn btn-default btn-sm" ng-disabled="PK !== 'id' && !PrimaryKey">Create new row</button>
+</div>
