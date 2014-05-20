@@ -1,1 +1,16 @@
-<section><div ng-if="isRef"><fa-ref value="value" ref="schemaType"></fa-ref></div><div ng-if="!isRef"><div ng-switch="schemaType"><div ng-switch-when="String"><a href="#" editable-text="value">{{value || 'Not set.'}}</a></div><div ng-switch-when="Number"><a href="#" editable-number="value">{{value || 'Not set.'}}</a></div><div ng-switch-when="Date"><a href="#" editable-date="value">{{value || 'Not set.'}}</a></div><div ng-switch-when="Boolean"><input type="checkbox" ng-model="value"/></div></div></div></section>
+<section>
+  <div ng-switch="schemaType">
+    <div ng-switch-when="String">
+      <a href="#" onaftersave="apply(value)" editable-text="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Number">
+      <a href="#" onaftersave="apply(value)" editable-number="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Date">
+      <a href="#" onaftersave="apply(value)" editable-date="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Boolean">
+      <a href="#" onaftersave="apply(value)" editable-checkbox="value">{{value ? 'Yep' : 'Nope'}}</a>
+    </div>
+  </div>
+</section>
