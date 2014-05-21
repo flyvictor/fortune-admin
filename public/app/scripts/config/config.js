@@ -7,9 +7,11 @@ var CONFIG;
 
   var appPrefix = '/';
   var templateUrlPrefix = 'templates/';
-  var baseRESTEndpoint = ''; //'http://victor-dev-routing-service.herokuapp.com';
-  var appVersion = 8;
+  // Set this to dev service, or run locally
+  var baseRESTEndpoint = '';
+  // Current fortune namespace
   var apiNamespace = '/api/v1';
+  var appVersion = 8;
 
   CONFIG = {
 
