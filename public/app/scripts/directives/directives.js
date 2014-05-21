@@ -26,7 +26,27 @@ directives.directive('myNavbar', [ '$http', '$rootScope', function($http, $rootS
   }
 }]);
 
-directives.directive('faEditable', ['$http', function($http){
+directives.controller('faEditableCtrl', ['$scope', '$http', function($scope, $http){
+  $scope.apply = function(value){
+    //Send PATCH to the server
+    var cmd = [];
+    cmd.push({
+      op: 'replace',
+      path: '/' + $scope.resourceName + '/0/links/' + $scope.path,
+      value: value
+    });
+
+    $http({
+      method: 'PATCH',
+      url: CONFIG.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
+      data: cmd
+    }).success(function(data, status){
+        console.log(data, status);
+    });
+  };
+}]);
+
+directives.directive('faEditable', [function(){
   return {
     restrict: 'E',
     replace: true,
@@ -38,26 +58,49 @@ directives.directive('faEditable', ['$http', function($http){
       resourceId: '@'
     },
     templateUrl: '/templates/directives/faEditable.html',
-    link: function(scope){
+    controller: 'faEditableCtrl'
+  }
+}]);
 
-      scope.apply = function(value){
-        //Pass new value from x-editable to ngModel
-        scope.value = value;
-        //And send PATCH to the server
-        var cmd = [];
-        cmd.push({
-          op: 'replace',
-          path: '/' + scope.resourceName + '/0/' + scope.path,
-          value: value
+
+directives.directive('faRef', ['$http', '$compile', 'Inflect', function($http, $compile, Inflect){
+  return {
+    restrict: 'E',
+    replace: false,
+    scope: {
+      value: '=ngModel',
+      ref: '=',
+      resourceName: '@',
+      resourceId: '@'
+    },
+    controller: 'faEditableCtrl',
+    link: function(scope, elt){
+      var refTo = scope.path = scope.ref.ref;
+      var resources, currentResource;
+
+      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+        resources = data.resources;
+        angular.forEach(resources, function(resource){
+          if (resource.name === refTo){
+            currentResource = resource;
+          }
         });
-        $http({
-          method: 'PATCH',
-          url: CONFIG.getApiNamespace() + '/' + scope.resourceName + '/' + scope.resourceId,
-          data: cmd
-        }).success(function(data, status){
-          console.log(data, status);
-        });
-      };
+        $http.get(CONFIG.getApiNamespace() + '/' + Inflect.pluralize(refTo))
+          .success(function(data){
+            var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
+            scope.list = data[Inflect.pluralize(refTo)];
+            var tpl = ['<a href="#" editable-select="value" ',
+              'e-ng-options="item.', PK || 'id',
+              ' as item.', PK || 'id',
+              ' for item in list" ',
+              'onaftersave="apply(value)">',
+              '{{ value || "Not set." }}',
+              '</a>'
+            ];
+            var select = $compile(tpl.join(''))(scope);
+            elt.append(select);
+          });
+      });
     }
   }
 }]);
