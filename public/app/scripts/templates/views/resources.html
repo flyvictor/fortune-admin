@@ -1,3 +1,4 @@
+<my-navbar></my-navbar>
 <h4 class="text-center">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>
 <table class="table table-bordered">
   <tr>
@@ -11,7 +12,7 @@
     </td>
     <td ng-repeat="(linkName, link) in links">
       <div ng-if="ResourcesCtrl.linkToMany(linkName)">
-        <a ng-href="{{ r('subresource', {parent: currentResource.name, id: entity.id, name: link.type, inverse: ResourcesCtrl.resolveInverse(linkName)}) }}">Navigate to {{link.type}}</a>
+        <a ng-href="{{ fortuneAdminRoute('subresource', {parent: currentResource.name, id: entity.id, name: link.type, inverse: ResourcesCtrl.resolveInverse(linkName)}) }}">Navigate to {{link.type}}</a>
       </div>
       <div ng-if="!ResourcesCtrl.linkToMany(linkName)">
         <div ng-init="fname = ResourcesCtrl.resolveFieldName(linkName)"></div>

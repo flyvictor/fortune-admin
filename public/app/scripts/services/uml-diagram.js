@@ -1,10 +1,11 @@
 (function(angular){
   angular.module('fortuneAdmin.umlDiagram.services', [])
-    .service('umlData', ['$http', '$q', umlData])
+    .service('umlData', ['$http', '$q', 'fortuneAdmin', umlData])
     .service('umlCanvasController', ['umlData', umlCanvasController])
     .service('umlLinks', ['umlData', 'umlCanvasController', umlLinks]);
 
-  function umlData($http, $q){
+  function umlData($http, $q, fortuneAdmin){
+    var CONFIG = fortuneAdmin.getConfig();
     this._config = {
       canvas: {
         width: 1140,

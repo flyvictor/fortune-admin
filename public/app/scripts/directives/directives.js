@@ -1,13 +1,14 @@
 'use strict';
+(function(angular){
 var directives = angular.module('fortuneAdmin.Directives', [
   'fortuneAdmin.umlDiagram'
 ]);
 
-directives.directive('myNavbar', [ '$http', '$rootScope', function($http, $rootScope) {
+directives.directive('myNavbar', [ '$http', '$rootScope', 'fortuneAdmin', function($http, $rootScope, fortuneAdmin) {
   return {
     restrict: 'E',
 
-    templateUrl: 'templates/views/mynavbar.html',
+    templateUrl: '/templates/views/mynavbar.html',
 
     replace: true,
 
@@ -16,8 +17,9 @@ directives.directive('myNavbar', [ '$http', '$rootScope', function($http, $rootS
     scope: {},
 
     link: function (scope, element, attrs) {
-      scope.r = $rootScope.r;
+      scope.r = $rootScope.fortuneAdminRoute;
       scope.resources = [];
+      var CONFIG = fortuneAdmin.getConfig();
       $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
         scope.resources = data.resources;
       });
@@ -26,7 +28,9 @@ directives.directive('myNavbar', [ '$http', '$rootScope', function($http, $rootS
   }
 }]);
 
-directives.controller('faEditableCtrl', ['$scope', '$http', function($scope, $http){
+directives.controller('faEditableCtrl', ['$scope', '$http', 'fortuneAdmin',
+  function($scope, $http, fortuneAdmin){
+    var CONFIG = fortuneAdmin.getConfig();
   $scope.apply = function(value){
     //Send PATCH to the server
     var cmd = [];
@@ -63,7 +67,9 @@ directives.directive('faEditable', [function(){
 }]);
 
 
-directives.directive('faRef', ['$http', '$compile', 'Inflect', function($http, $compile, Inflect){
+directives.directive('faRef', ['$http', '$compile', 'Inflect', 'fortuneAdmin',
+  function($http, $compile, Inflect, fortuneAdmin){
+  var CONFIG = fortuneAdmin.getConfig();
   return {
     restrict: 'E',
     replace: false,
@@ -104,3 +110,5 @@ directives.directive('faRef', ['$http', '$compile', 'Inflect', function($http, $
     }
   }
 }]);
+
+});

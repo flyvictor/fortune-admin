@@ -1,7 +1,6 @@
 'use strict';
-
+(function(angular){
 var controllers = angular.module('fortuneAdmin.Controllers', [
-  'fortuneAdmin.Constants',
   'fortuneAdmin.Services',
   'fortuneAdmin.Controllers.umlDiagram'
 ]);
@@ -18,9 +17,19 @@ controllers.filter('filterLinks', [function(){
   }
 }]);
 
-controllers.controller('ResourcesCtrl', ['$scope', '$http', 'Inflect', '$routeParams', 'resources', 'data', ResourcesCtrl]);
+controllers.controller('ResourcesCtrl', [
+  '$scope',
+  '$http',
+  'Inflect',
+  'fortuneAdmin',
+  '$routeParams',
+  'resources',
+  'data',
+  ResourcesCtrl
+]);
 
-function ResourcesCtrl($scope, $http, Inflect, $routeParams, resources, data){
+function ResourcesCtrl($scope, $http, Inflect, fortuneAdmin, $routeParams, resources, data){
+  var CONFIG = fortuneAdmin.getConfig();
   console.log(resources);
   var currentResource = {};
   angular.forEach(resources, function(res){
@@ -106,3 +115,4 @@ function ResourcesCtrl($scope, $http, Inflect, $routeParams, resources, data){
 
   }
 }
+})(angular);
