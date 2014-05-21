@@ -114,4 +114,8 @@ describe('Controller: ResourcesCtrl', function(){
     $httpBackend.flush();
     expect($rootScope.data[1].links.user).toEqual('userId');
   });
+  afterEach(function(){
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  })
 });
