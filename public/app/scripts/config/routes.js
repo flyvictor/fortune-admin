@@ -16,18 +16,6 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     }
   }
 
-  ROUTER.when('users_path', '/users', {
-    templateUrl : CONFIG.prepareViewTemplateUrl('users')
-  });
-
-  ROUTER.when('addresses_path', '/addresses', {
-    templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
-  });
-
-  ROUTER.when('addresses_by_user_path', '/users/:user_id/addresses', {
-    templateUrl : CONFIG.prepareViewTemplateUrl('addresses')
-  });
-
   ROUTER.when('uml_diagram', '/uml', {
     templateUrl : CONFIG.prepareViewTemplateUrl('uml')
   });
@@ -56,7 +44,7 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
     }
   });
 
-  ROUTER.when('subresource', '/:parent/:id/:name/as/:inverse', {
+  ROUTER.when('subresource', '/:parent/:id/:name/refby/:inverse', {
     templateUrl: CONFIG.prepareViewTemplateUrl('resources'),
     controller: 'ResourcesCtrl as ResourcesCtrl',
     resolve: {
@@ -84,7 +72,7 @@ routes.config(['$routeProvider', '$locationProvider', function($routeProvider, $
   });
 
   ROUTER.otherwise({
-    redirectTo : '/user'
+    redirectTo : '/uml'
   });
 
   ROUTER.install($routeProvider);
