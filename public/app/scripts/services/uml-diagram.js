@@ -1,11 +1,10 @@
 (function(angular){
   angular.module('fortuneAdmin.umlDiagram.services', [])
-    .service('umlData', ['$http', '$q', 'fortuneAdmin', umlData])
+    .service('umlData', ['$http', '$q', umlData])
     .service('umlCanvasController', ['umlData', umlCanvasController])
     .service('umlLinks', ['umlData', 'umlCanvasController', umlLinks]);
 
-  function umlData($http, $q, fortuneAdmin){
-    var CONFIG = fortuneAdmin.getConfig();
+  function umlData($http, $q){
     this._config = {
       canvas: {
         width: 1140,
@@ -32,8 +31,7 @@
 
     this.load = function(){
       var deferred = $q.defer();
-      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
-        console.debug(data);
+      $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
         deferred.resolve(data.resources);
       });
       return deferred.promise;

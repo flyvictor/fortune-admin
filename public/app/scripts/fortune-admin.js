@@ -1,4 +1,6 @@
 (function(angular){
+
+
   angular.module('fortuneAdmin', [
         'ui.bootstrap'
       , 'xeditable'
@@ -32,37 +34,13 @@
         }
       };
 
-      var baseRestEndpoint = '';
-      var apiNamespace = '/api/v1';
-      var appVersion = 1;
-      var mountPoint = '';
-
-      var config =  {
-        templateDirectory: '/templates/',
-        templateFileQuerystring: '?v=' + appVersion,
-        baseEndpoint: '',
-        apiNamespace: '/api/v1',
-        getApiNamespace: function(){
-          return baseRestEndpoint + apiNamespace;
-        },
-        mountPoint: mountPoint,
-        appVersion: appVersion,
-        viewUrlPrefix: '/templates/views/',
-        templateFileSuffix: '.html',
-        prepareViewTemplateUrl: function(url){
-          return this.viewUrlPrefix + url + this.templateFileSuffix + this.templateFileQuerystring;
-        },
-        routing: {
-          html5Mode : true,
-          prefix: ''
-        }
-      };
+      var config = window.CONFIG.fortuneAdmin;
       return {
         setApiHost: function(host){
-          config.baseEndpoint = host;
+          CONFIG.fortuneAdmin.baseEndpoint = host;
         },
         setApiNamespace: function(namespace){
-          config.apiNamespace = namespace;
+          CONFIG.fortuneAdmin.apiNamespace = namespace;
         },
         mountTo: function($routeProvider, mountPoint){
 
@@ -125,9 +103,6 @@
 
         $get: function(){
           return {
-            getConfig: function(){
-              return config;
-            },
 
             getRoute: function(key) {
               return lookup[key];

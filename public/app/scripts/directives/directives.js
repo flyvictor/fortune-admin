@@ -4,7 +4,7 @@ var directives = angular.module('fortuneAdmin.Directives', [
   'fortuneAdmin.umlDiagram'
 ]);
 
-directives.directive('myNavbar', [ '$http', '$rootScope', 'fortuneAdmin', function($http, $rootScope, fortuneAdmin) {
+directives.directive('myNavbar', [ '$http', '$rootScope', function($http, $rootScope) {
   return {
     restrict: 'E',
 
@@ -19,8 +19,7 @@ directives.directive('myNavbar', [ '$http', '$rootScope', 'fortuneAdmin', functi
     link: function (scope, element, attrs) {
       scope.r = $rootScope.fortuneAdminRoute;
       scope.resources = [];
-      var CONFIG = fortuneAdmin.getConfig();
-      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+      $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
         scope.resources = data.resources;
       });
     }
@@ -28,9 +27,8 @@ directives.directive('myNavbar', [ '$http', '$rootScope', 'fortuneAdmin', functi
   }
 }]);
 
-directives.controller('faEditableCtrl', ['$scope', '$http', 'fortuneAdmin',
-  function($scope, $http, fortuneAdmin){
-    var CONFIG = fortuneAdmin.getConfig();
+directives.controller('faEditableCtrl', ['$scope', '$http',
+  function($scope, $http){
   $scope.apply = function(value){
     //Send PATCH to the server
     var cmd = [];
@@ -42,10 +40,10 @@ directives.controller('faEditableCtrl', ['$scope', '$http', 'fortuneAdmin',
 
     $http({
       method: 'PATCH',
-      url: CONFIG.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
+      url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
       data: cmd
-    }).success(function(data, status){
-        console.log(data, status);
+    }).catch(function(data, status){
+        console.error(data, status);
     });
   };
 }]);
@@ -67,9 +65,8 @@ directives.directive('faEditable', [function(){
 }]);
 
 
-directives.directive('faRef', ['$http', '$compile', 'Inflect', 'fortuneAdmin',
-  function($http, $compile, Inflect, fortuneAdmin){
-  var CONFIG = fortuneAdmin.getConfig();
+directives.directive('faRef', ['$http', '$compile', 'Inflect',
+  function($http, $compile, Inflect){
   return {
     restrict: 'E',
     replace: false,
@@ -84,14 +81,14 @@ directives.directive('faRef', ['$http', '$compile', 'Inflect', 'fortuneAdmin',
       var refTo = scope.path = scope.ref.ref;
       var resources, currentResource;
 
-      $http.get(CONFIG.baseEndpoint + '/resources').success(function(data){
+      $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
         resources = data.resources;
         angular.forEach(resources, function(resource){
           if (resource.name === refTo){
             currentResource = resource;
           }
         });
-        $http.get(CONFIG.getApiNamespace() + '/' + Inflect.pluralize(refTo))
+        $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + Inflect.pluralize(refTo))
           .success(function(data){
             var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
             scope.list = data[Inflect.pluralize(refTo)];
@@ -111,4 +108,4 @@ directives.directive('faRef', ['$http', '$compile', 'Inflect', 'fortuneAdmin',
   }
 }]);
 
-});
+})(angular);

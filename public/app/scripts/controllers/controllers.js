@@ -21,16 +21,13 @@ controllers.controller('ResourcesCtrl', [
   '$scope',
   '$http',
   'Inflect',
-  'fortuneAdmin',
   '$routeParams',
   'resources',
   'data',
   ResourcesCtrl
 ]);
 
-function ResourcesCtrl($scope, $http, Inflect, fortuneAdmin, $routeParams, resources, data){
-  var CONFIG = fortuneAdmin.getConfig();
-  console.log(resources);
+function ResourcesCtrl($scope, $http, Inflect, $routeParams, resources, data){
   var currentResource = {};
   angular.forEach(resources, function(res){
     if(res.name === $routeParams.name || Inflect.pluralize(res.name) === $routeParams.name){
@@ -98,19 +95,18 @@ function ResourcesCtrl($scope, $http, Inflect, fortuneAdmin, $routeParams, resou
     }
     var cmd = {};
     cmd[plurResourceName] = [newRow];
-    $http.post(CONFIG.getApiNamespace() + '/' + plurResourceName, cmd).success(function(data) {
+    $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd).success(function(data) {
       $scope.data.push(data[plurResourceName][0]);
     });
   };
 
   this.deleteRow = function(index, id){
-    $http.delete(CONFIG.getApiNamespace() + '/' + plurResourceName + '/' + id)
+    $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
       .success(function (data, status) {
-        console.log(status);
         $scope.data.splice(index, 1);
       })
       .error(function(data, status) {
-        console.log(status);
+        console.error(data, status);
       });
 
   }
