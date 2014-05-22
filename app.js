@@ -72,6 +72,13 @@ container
   .use(app.router)
   .listen(port);
 
+app.router.get('*', function(req, res, next){
+  var resource = /^\/resources/;
+  var api = /^\/api.+/;
+  if (resource.test(req.url) || api.test(req.url)) return next();
+  res.redirect('/');
+});
+
 console.log('Listening on port ' + port + '...');
 
 /**
