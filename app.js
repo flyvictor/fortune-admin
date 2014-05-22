@@ -74,7 +74,7 @@ container
   .listen(port);
 
 app.router.get('*', function(req, res, next){
-  var resources = /^\/resources.+/;
+  var resources = /^\/resources.*/;
   var api = new RegExp(fortuneConfig.namespace + '.+');
   if (resources.test(req.url) || api.test(req.url)) return next();
   res.redirect('/');
