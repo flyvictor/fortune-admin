@@ -57,7 +57,6 @@ var app = fortune(fortuneConfig)
   },
 //  after
   function (request) {
-    console.log('Request : ' + util.inspect(request.body));
     if (request.body.addresses) {
       findUser(request.body.addresses[0].user).then(function (user) {
         console.log(user);
