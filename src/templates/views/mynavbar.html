@@ -8,7 +8,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Resources <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li ng-repeat="resource in resources"><a data-ng-href="{{ r('resource', {name: resource.name }) }}">{{ resource.name }}</a></li>
+                        <li ng-repeat="resource in resources"><a data-ng-href="{{ r('resource', {name: pluralize(resource.name) }) }}">{{ pluralize(resource.name) }}</a></li>
                     </ul>
                 </li>
                 <li><a data-ng-href="{{ r('uml_diagram') }}">UML</a></li>

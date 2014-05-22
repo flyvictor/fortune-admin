@@ -60,10 +60,10 @@
                 });
                 return d.promise;
               }],
-              data: ['$q', '$http', '$route', 'Inflect', function($q, $http, $route, Inflect){
+              data: ['$q', '$http', '$route', function($q, $http, $route){
                 var resourceName = $route.current.params.name;
                 var d = $q.defer();
-                $http.get(config.getApiNamespace() + '/' + Inflect.pluralize(resourceName))
+                $http.get(config.getApiNamespace() + '/' + resourceName)
                   .success(function (data) {
                     d.resolve(data);
                   });

@@ -2,7 +2,7 @@
 angular.module('fortuneAdmin.Directives', [
     'fortuneAdmin.umlDiagram'
   ])
-  .directive('fortuneAdminNavbar', [ '$http', '$rootScope', function($http, $rootScope) {
+  .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
     return {
       restrict: 'E',
 
@@ -20,6 +20,10 @@ angular.module('fortuneAdmin.Directives', [
         $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
           scope.resources = data.resources;
         });
+
+        scope.pluralize = function(name){
+          return Inflect.pluralize(name);
+        };
       }
 
     }
