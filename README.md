@@ -46,3 +46,6 @@ fortune-admin
 See examples/sampleApp for 'full-featured' app using plugin.
 
 To run example: `node examples/server.js`
+
+fortune-admin depends on joint.js, ui.bootstrap and angular-xeditable.
+You can either provide deps yourself or take fortune-admin.vendor.js file.

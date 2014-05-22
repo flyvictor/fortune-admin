@@ -19,24 +19,27 @@ module.exports = function(grunt){
       }
     },
     concat: {
-      'lib/fortune-admin.tpls.js': [
-        'lib/templates.js',
+      'lib/fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
-        'bower_components/joint/dist/joint.js',
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+        'bower_components/joint/dist/joint.js'
+      ],
+      'lib/fortune-admin.js': [
+        'lib/templates.js',
         'src/fortune-admin.js',
         'src/**/*.js'
       ],
       'lib/fortune-admin.css': [
-        'src/main.css',
+        'bower_components/angular-xeditable/dist/css/xeditable.css',
         'bower_components/joint/joint.css',
-        'bower_components/angular-xeditable/dist/css/xeditable.css'
+        'src/main.css'
       ]
     },
     uglify: {
       target:{
         files: {
-          'lib/fortune-admin.tpls.min.js': ['lib/fortune-admin.tpls.js']
+          'lib/fortune-admin.vendor.min.js': ['lib/fortune-admin.vendor.js'],
+          'lib/fortune-admin.min.js': ['lib/fortune-admin.js']
         }
       }
     }
@@ -46,11 +49,11 @@ module.exports = function(grunt){
 
   grunt.registerTask('addtemplates', function(){
     var fs = require('fs');
-    var main = fs.readFileSync('lib/fortune-admin.tpls.js', {encoding: 'utf-8'});
+    var main = fs.readFileSync('lib/fortune-admin.js', {encoding: 'utf-8'});
 
     main = main.replace("angular.module('fortuneAdmin', [", "angular.module('fortuneAdmin', [ 'templates-main', ");
 
-    fs.writeFileSync('lib/fortune-admin.tpls.js', main);
+    fs.writeFileSync('lib/fortune-admin.js', main);
   });
 };
 
