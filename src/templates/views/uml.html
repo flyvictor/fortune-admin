@@ -7,7 +7,7 @@
       <button type="button" class="btn btn-default btn-sm" ng-click="showList = !showList">{{ showList ? "Collapse" : "Show" }} resources list</button>
     </li>
     <li class="list-group-item" ng-repeat="resource in resources" ng-show="showList">
-      <input type="checkbox" ng-model="resource.$selected" ng-change="umlDiagramCtrl.toggleSelect(resource)"/>
+      <input type="checkbox" ng-model="resource.$selected" ng-change="umlDiagramCtrl.toggleSelect(resource, $index)"/>
       <span>Name: <strong>{{ resource.name }}</strong> </span>
       <span>Fields count: <strong>{{ resource.$schemaLength }}</strong> </span>
       <span>PK: <strong>{{ resource.modelOptions.pk ? resource.modelOptions.pk : "_id" }}</strong> </span>

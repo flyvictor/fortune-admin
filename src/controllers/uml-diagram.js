@@ -27,15 +27,21 @@ angular.module('fortuneAdmin.Controllers.umlDiagram', [
       };
 
       this.toggleSelectAll = function(){
+
+        //Flip selection and clear list
+        $scope.allSelected = !$scope.allSelected;
+        $scope.selected = [];
+
         if ($scope.allSelected){
-          $scope.selected = [];
-          $scope.allSelected = false;
-        }else{
-          $scope.allSelected = true;
-          $scope.selected = $scope.resources;
+          //push clones
+          angular.forEach($scope.resources, function(r){
+            $scope.selected.push(r);
+          });
         }
+
+        //mark each resource
         angular.forEach($scope.resources, function(res){
-          res.$selected = $scope.selected;
+          res.$selected = $scope.allSelected;
         });
       }
     }
