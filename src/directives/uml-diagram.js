@@ -23,14 +23,12 @@ angular.module('fortuneAdmin.umlDiagram', [
           $scope.$on('fortuneAdmin:uml:relink', function(){
             angular.forEach(ctrl.graph.attributes.cells.models, function(item){
               if (item.attributes.type === 'link'){
-                console.log('removing link');
                 item.remove();
               }
             });
           });
         }],
         link: function postLink(scope){
-          console.log('selected: ', scope.selectedResources);
         }
       }
     }])
@@ -49,7 +47,6 @@ angular.module('fortuneAdmin.umlDiagram', [
           if ($scope.umlData.modelOptions && $scope.umlData.modelOptions.pk){
             //delete pk from list to not render it twice
             delete $scope.umlData.schema[$scope.umlData.modelOptions.pk];
-            console.log('deleting ', $scope.umlData);
           }
           var startPosition;
           $scope.$watch('umlData', function(){
@@ -60,7 +57,6 @@ angular.module('fortuneAdmin.umlDiagram', [
           });
           this.embed = function(child){
             $scope.resource.embed(child);
-            //console.log('field embedded to: ', $scope.resource);
           };
 
           this.intersects = function(elt){
@@ -116,7 +112,6 @@ angular.module('fortuneAdmin.umlDiagram', [
             var translateY = 0;
             canvasCtrl.moveResourceToFreePosition(scope.resource, translateX, translateY);
           });
-          //console.log(scope.umlData);
         }
       }
     }])
@@ -194,14 +189,12 @@ angular.module('fortuneAdmin.umlDiagram', [
           scope.$watch('fieldData', relink);
           scope.$on('fortuneAdmin:uml:relink', relink);
           function relink(){
-            console.log('relinking');
             //wait until all other fields are rendered
             $timeout(function(){
-              //console.log(scope.fieldData);
               if (angular.isArray(scope.fieldData)){
                 //many to many relationship
                 if(!scope.fieldData[0]){
-                  return console.log('empty array instead of reference');
+                  return console.error('empty array instead of reference');
                 }
                 markFk();
                 umlLinks.link(scope.field, scope.fieldData[0].ref, true);
