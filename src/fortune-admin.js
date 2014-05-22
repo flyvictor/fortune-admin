@@ -127,7 +127,14 @@
                 url = this.replaceUrlParams(url, args);
               }
               return url;
-            }
+            },
+
+            setApiHost: function(host){
+              CONFIG.fortuneAdmin.baseEndpoint = host;
+            },
+            setApiNamespace: function(namespace){
+              CONFIG.fortuneAdmin.apiNamespace = namespace;
+            },
           }
         }
       }
