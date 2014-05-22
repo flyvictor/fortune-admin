@@ -19,13 +19,13 @@ fortune-admin
 
 3) set mount point in your routes configuration
 
-4) add a menu link pointing to where you mount fortune-admin
+4) add a menu link pointing to where you mount fortune-admin + '/uml'
 
 ```js
 
     angular.module('yourApp', [
        'ngRoute',
-       'fortune-admin'
+       'fortuneAdmin'
     ])
      .config('$routeProvider', '$locationProvider', 'fortuneAdminProvider',
       function($routeProvider, $locationProvider, fortuneAdminProvider){
@@ -42,3 +42,7 @@ fortune-admin
         $locationProvider.html5Mode(true);
      });
 ```
+
+See examples/sampleApp for 'full-featured' app using plugin.
+
+To run example: `node examples/server.js`

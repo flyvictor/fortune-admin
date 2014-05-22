@@ -1,6 +1,4 @@
-// fake app for development.
-// it's only purpose is to initiate and mount fortuneAdmin
-// it's not included to build
+// A standalone app. Don't include it in plugin build.
 (function(angular){
   angular.module('fortuneAdmin.Standalone', [
     'ngRoute',
