@@ -38,5 +38,7 @@
       </g>
     </svg>
   </section>
-  <uml-canvas selected-resources="selected" ng-if="selected.length"></uml-canvas>
+  <div ng-if="build">
+    <uml-canvas selected-resources="selected" ng-if="selected.length"></uml-canvas>
+  </div>
 </section>

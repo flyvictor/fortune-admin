@@ -20,16 +20,7 @@ angular.module('fortuneAdmin.umlDiagram', [
             height: umlData._config.canvas.height,
             model: ctrl.graph
           });
-          $scope.$on('fortuneAdmin:uml:relink', function(){
-            angular.forEach(ctrl.graph.attributes.cells.models, function(item){
-              if (item.attributes.type === 'link'){
-                item.remove();
-              }
-            });
-          });
-        }],
-        link: function postLink(scope){
-        }
+        }]
       }
     }])
 
@@ -187,7 +178,6 @@ angular.module('fortuneAdmin.umlDiagram', [
             });
           });
           scope.$watch('fieldData', relink);
-          scope.$on('fortuneAdmin:uml:relink', relink);
           function relink(){
             //wait until all other fields are rendered
             $timeout(function(){
@@ -199,9 +189,9 @@ angular.module('fortuneAdmin.umlDiagram', [
                 markFk();
                 umlLinks.link(scope.field, scope.fieldData[0].ref, true);
               }else if (angular.isObject(scope.fieldData)){
+                //one to one relationship
                 markFk();
                 umlLinks.link(scope.field, scope.fieldData.ref, false);
-                //one to one relationship
               }
             });
           }

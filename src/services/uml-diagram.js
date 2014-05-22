@@ -39,12 +39,18 @@ angular.module('fortuneAdmin.umlDiagram.services', [])
       this.getResource = function(name){
         return this._resources[name];
       };
+      this.destroy = function(){
+        this._resources = {};
+      };
     }])
 
   .service('umlCanvasController', ['umlData',
     function umlCanvasController(umlData){
       var graph = this.graph = new joint.dia.Graph();
 
+      this.rebuild = function(){
+        graph = this.graph = new joint.dia.Graph();
+      };
       /**
        *
        * @param elt - element which is suspected in overflowing

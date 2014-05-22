@@ -1,12 +1,13 @@
 angular.module('fortuneAdmin.Controllers.umlDiagram', [
     'fortuneAdmin.umlDiagram.services'
   ])
-  .controller('umlDiagramCtrl', ['$scope', 'umlData',
+  .controller('umlDiagramCtrl', ['$scope', 'umlData', '$timeout',
 
-    function umlDiagramCtrl($scope, umlData){
+    function umlDiagramCtrl($scope, umlData, $timeout){
       $scope.resources = [];
       $scope.selected = [];
       $scope.allSelected = false;
+      $scope.build = true;
       umlData.load().then(function(resources){
         angular.forEach(resources, function(res){
           res.$schemaLength = Object.keys(res.schema).length;
@@ -23,7 +24,13 @@ angular.module('fortuneAdmin.Controllers.umlDiagram', [
         }else{
           $scope.selected.splice(index, 1);
         }
-        $scope.$broadcast('fortuneAdmin:uml:relink');
+
+        // Rebuild canvas from scratch
+        umlData.destroy();
+        $scope.build = false;
+        $timeout(function(){
+          $scope.build = true;
+        });
       };
 
       this.toggleSelectAll = function(){
