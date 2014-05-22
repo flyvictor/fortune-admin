@@ -1,17 +1,44 @@
 fortune-admin
 =============
 
-This repository is the start of a project to provide a generic admin/CRUD interface for fortune resources based on the resource descriptions.
-
-The intention is for this to be an angular component that could be used standalone, or embedded within a host angular application.
-
-To run the app:
+## Running as a standalone app
 
 1) npm install
 
-2) cd public
-   bower install
+2) bower install
 
-Start application:
+3) node app.js [port]
 
-3) node app
+4) open your browser
+
+## Running as a plugin for existing app
+
+1) Add .css and .js files from /lib
+
+2) include `fortune-admin` to your app deps
+
+3) set mount point in your routes configuration
+
+4) add a menu link pointing to where you mount fortune-admin
+
+```js
+
+    angular.module('yourApp', [
+       'ngRoute',
+       'fortune-admin'
+    ])
+     .config('$routeProvider', '$locationProvider', 'fortuneAdminProvider',
+      function($routeProvider, $locationProvider, fortuneAdminProvider){
+        //Your routes go here.
+
+        //1. Point plugin to your running fortune service
+        fortuneAdminProvider.setApiHost('http://some.other.host.com');
+        //2. Provide api namespace as configured in fortune
+        fortuneAdminProvider.setApiNamespace('/api/v2');
+        //3. Mount plugin to any route of your choice
+        fortuneAdminProvider.mountTo($routeProvider, '/admin');
+
+        //Currently your app should run in html5Mode
+        $locationProvider.html5Mode(true);
+     });
+```
