@@ -6,3 +6,5 @@ app/bower_components
 public/app/bower_components
 public/.tmp
 **/.idea
+.idea
+bower_components
