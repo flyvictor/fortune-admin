@@ -9,11 +9,13 @@ var fortune = require('fortune')
 var container = express()
   , port = process.argv[2] || 1337;
 
-var app = fortune({
+var fortuneConfig = {
   db: 'fortune-admin',
   adapter: 'mongodb',
   namespace: '/api/v1'
-})
+};
+
+var app = fortune(fortuneConfig)
 
 .resource("user", {
   title : String,
@@ -73,9 +75,9 @@ container
   .listen(port);
 
 app.router.get('*', function(req, res, next){
-  var resource = /^\/resources/;
-  var api = /^\/api.+/;
-  if (resource.test(req.url) || api.test(req.url)) return next();
+  var resources = /^\/resources.+/;
+  var api = new RegExp(fortuneConfig.namespace + '.+');
+  if (resources.test(req.url) || api.test(req.url)) return next();
   res.redirect('/');
 });
 
