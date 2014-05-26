@@ -7,6 +7,7 @@
       , 'fortuneAdmin.Controllers'
       , 'fortuneAdmin.Directives'
       , 'fortuneAdmin.Services'
+      , 'fortuneAdmin.Uml'
     ])
     .provider('fortuneAdmin', [function(){
 
@@ -45,7 +46,8 @@
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
-            templateUrl : config.prepareViewTemplateUrl('uml')
+            templateUrl : config.prepareViewTemplateUrl('uml'),
+            controller: 'UmlCtrl as UmlCtrl'
           });
 
           //Resolve necessary data here to simplify controller

@@ -1,44 +1,6 @@
 <fortune-admin-navbar></fortune-admin-navbar>
-<section class="container" ng-controller="umlDiagramCtrl as umlDiagramCtrl">
-  <h1 class="text-center">Resources map</h1>
-  <ul class="list-group">
-    <li class="list-group-item">
-      <button type="button" class="btn btn-default btn-sm" ng-click="umlDiagramCtrl.toggleSelectAll()">{{ allSelected ? "Remove" : "Render" }} all</button>
-      <button type="button" class="btn btn-default btn-sm" ng-click="showList = !showList">{{ showList ? "Collapse" : "Show" }} resources list</button>
-    </li>
-    <li class="list-group-item" ng-repeat="resource in resources" ng-show="showList">
-      <input type="checkbox" ng-model="resource.$selected" ng-change="umlDiagramCtrl.toggleSelect(resource, $index)"/>
-      <span>Name: <strong>{{ resource.name }}</strong> </span>
-      <span>Fields count: <strong>{{ resource.$schemaLength }}</strong> </span>
-      <span>PK: <strong>{{ resource.modelOptions.pk ? resource.modelOptions.pk : "_id" }}</strong> </span>
-      <a ng-click="showJson=!showJson"> {{ showJson ? "Hide" : "Show" }} raw JSON</a>
-      <pre ng-show="showJson">{{ resource | json }}</pre>
-    </li>
-  </ul>
-  <section>
-    <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" id="v-2" width="1170" height="100">
-      <g stroke="none" fill="#FFF" width="40" height="20" transform="translate(5,20)">
-        <text font-size="16" fill="black" font-family="Arial, helvetica, sans-serif">Legend:</text>
-      </g>
-      <g stroke=none" fill="#FFF" width="80" height="10" transform="translate(120, 20)">
-        <line x1="-20" y1="-5" x2="-10" y2="-5" stroke="green" stroke-width="2"></line>
-        <text font-size="14" fill="black" font-family="Arial, helvetica, sans-serif">Many to many</text>
-      </g>
-      <g stroke="none" fill="#FFF" width="80" height="10" transform="translate(120, 40)">
-        <line x1="-20" y1="-5" x2="-10" y2="-5" stroke="blue" stroke-width="2"></line>
-        <text font-size="14" fill="black" font-family="Arial, helvetica, sans-serif">One to one</text>
-      </g>
-      <g stroke="none" fill="#FFF" width="80" height="10" transform="translate(300, 20)">
-        <rect x="-30" y="-10" width="20" height="10" fill="green"></rect>
-        <text font-size="14" fill="black" font-family="Arial, helvetica, sans-serif">Primary key</text>
-      </g>
-      <g stroke="none" fill="#FFF" width="80" height="10" transform="translate(300, 40)">
-        <rect x="-30" y="-10" width="20" height="10" fill="yellow"></rect>
-        <text font-size="14" fill="black" font-family="Arial, helvetica, sans-serif">FK referencing hidden resource</text>
-      </g>
-    </svg>
-  </section>
-  <div ng-if="build">
-    <uml-canvas selected-resources="selected" ng-if="selected.length"></uml-canvas>
+<section ng-if="resources.length !== 0">
+  <div ng-if="render">
+    <div resources-canvas resources="resources"></div>
   </div>
 </section>

@@ -58,7 +58,6 @@ var app = fortune({
   function (request) {
     if (request.body.addresses) {
       findUser(request.body.addresses[0].user).then(function (user) {
-        console.log(user);
         user.addresses.push(this._id);
       });
     }
