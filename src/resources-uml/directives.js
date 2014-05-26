@@ -1,7 +1,7 @@
 (function(angular){
   var config = {
     headerHeight: 50,
-    fieldHeight: 25,
+    fieldHeight: 20,
     fieldWidth: 200,
     columnWidth: 300,
     vgap: 50
@@ -315,7 +315,7 @@
 
         //Decide where target element is placed
         var onTheRight = false;
-        var sameCol = (portX - target.right < 100); //(target.column - Math.floor(portX / 300) === 0);
+        var sameCol = (portX - target.right < 100);
         if (portX <= target.left){
           onTheRight = true;
         }
@@ -369,13 +369,13 @@
             });
             var gapY = nearestElement.y + nearestElement.height + (Math.random() * 50);
             var gapX = nearestElement.x;
-            var center = 0;
+            var center = 50;
 
             if (onTheRight){
-              lineData.push({x: gapX + center, y: gapY});
-              lineData.push({x: gapX + config.columnWidth - 50 - center, y: gapY});
+              lineData.push({x: gapX - center, y: gapY});
+              lineData.push({x: gapX + config.columnWidth - center, y: gapY});
             }else{
-              lineData.push({x: gapX + config.columnWidth - 50 + center, y: gapY});
+              lineData.push({x: gapX + config.columnWidth + center, y: gapY});
               lineData.push({x: gapX - center, y: gapY});
             }
 

@@ -69,6 +69,7 @@ body {
 
 /* Canvas elements styling */
 svg .resource{
+  font-size: 12px;
   border: solid 1px;
 }
 svg .header{
