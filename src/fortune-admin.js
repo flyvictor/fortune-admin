@@ -7,6 +7,7 @@
       , 'fortuneAdmin.Controllers'
       , 'fortuneAdmin.Directives'
       , 'fortuneAdmin.Services'
+      , 'fortuneAdmin.Uml'
     ])
     .provider('fortuneAdmin', [function(){
 
@@ -42,10 +43,15 @@
         setApiNamespace: function(namespace){
           CONFIG.fortuneAdmin.apiNamespace = namespace;
         },
+        html5Mode: function(use, prefix){
+          CONFIG.fortuneAdmin.routing.html5Mode = !!use;
+          CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+        },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
-            templateUrl : config.prepareViewTemplateUrl('uml')
+            templateUrl : config.prepareViewTemplateUrl('uml'),
+            controller: 'UmlCtrl as UmlCtrl'
           });
 
           //Resolve necessary data here to simplify controller
@@ -126,7 +132,7 @@
               if(url && args) {
                 url = this.replaceUrlParams(url, args);
               }
-              return url;
+              return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
             },
 
             setApiHost: function(host){

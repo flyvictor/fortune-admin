@@ -38,14 +38,26 @@ fortune-admin
         //3. Mount plugin to any route of your choice
         fortuneAdminProvider.mountTo($routeProvider, '/admin');
 
-        //Currently your app should run in html5Mode
+        //fortune-admin defaults to use html5Mode
         $locationProvider.html5Mode(true);
      });
 ```
+
+## Running with html5Mode disabled
+
+fortuneAdminProvider has html5Mode method which accepts a boolean and optional hash prefix
+
+```js
+
+     fortuneAdminProvider.html5Mode(false, '!');
+     $locationProvider.hashPrefix('!');
+
+```
+
 
 See examples/sampleApp for 'full-featured' app using plugin.
 
 To run example: `node examples/server.js`
 
-fortune-admin depends on joint.js, ui.bootstrap and angular-xeditable.
+fortune-admin depends on d3, ui.bootstrap and angular-xeditable.
 You can either provide deps yourself or take fortune-admin.vendor.js file.

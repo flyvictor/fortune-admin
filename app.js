@@ -15,9 +15,12 @@ var fortuneConfig = {
   namespace: '/api/v1'
 };
 
-var app = fortune(fortuneConfig)
+var app = fortune(fortuneConfig);
 
-.resource("user", {
+require('./resources')(app);
+
+
+/*.resource("user", {
   title : String,
   firstName : String,
   lastName : String,
@@ -48,9 +51,9 @@ var app = fortune(fortuneConfig)
 .resource("flight", {
   flightNumber: String,
   users: [{ref: "user", inverse: "flights", pkType : String}]
-}, { model: { pk: "flightNumber" }})
+}, { model: { pk: "flightNumber" }})*/
 
-.transform(
+app.transform(
 //  before
   function () {
     return this;
@@ -59,7 +62,6 @@ var app = fortune(fortuneConfig)
   function (request) {
     if (request.body.addresses) {
       findUser(request.body.addresses[0].user).then(function (user) {
-        console.log(user);
         user.addresses.push(this._id);
       });
     }

@@ -22,7 +22,7 @@ module.exports = function(grunt){
       'lib/fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-        'bower_components/joint/dist/joint.js'
+        'bower_components/d3/d3.js'
       ],
       'lib/fortune-admin.js': [
         'lib/templates.js',
@@ -31,7 +31,6 @@ module.exports = function(grunt){
       ],
       'lib/fortune-admin.css': [
         'bower_components/angular-xeditable/dist/css/xeditable.css',
-        'bower_components/joint/joint.css',
         'src/main.css'
       ]
     },
