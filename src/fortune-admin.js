@@ -43,6 +43,10 @@
         setApiNamespace: function(namespace){
           CONFIG.fortuneAdmin.apiNamespace = namespace;
         },
+        html5Mode: function(use, prefix){
+          CONFIG.fortuneAdmin.routing.html5Mode = !!use;
+          CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+        },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
@@ -128,7 +132,7 @@
               if(url && args) {
                 url = this.replaceUrlParams(url, args);
               }
-              return url;
+              return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
             },
 
             setApiHost: function(host){
