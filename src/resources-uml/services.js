@@ -1,7 +1,6 @@
 (function(angular){
   angular.module('fortuneAdmin.Uml.Services', [])
-    .service('UmlElementsRegistry', [ElementsRegistry])
-    .service('UmlElementModel', ['UmlElementsRegistry', UmlElementModel]);
+    .service('UmlElementsRegistry', [ElementsRegistry]);
 
   function ElementsRegistry(){
     var elements = {
@@ -59,39 +58,6 @@
       this.positions = [];
       this.bottomLine = [];
     }
-  }
-
-  function UmlElementModel(UmlElementRegistry){
-    function Element(name, data, links){
-      //Make sure the element is unique
-      if (UmlElementRegistry.find(parent + name)){
-        throw new Error('Element ' + parent + name + ' exists');
-      }
-
-      this.name = name;
-      this.parent = parent;
-      this.data = data;
-      this.links = links;
-    }
-
-    /**
-     * Ensure data format.
-     * Calculate missing attributes
-     * Store in registry
-     * @param type
-     * @param data
-     */
-    this.createElement = function(type, data){
-
-    };
-
-    this.addChild = function(parent, child){
-
-    };
-
-    this.clear = function(name){
-      UmlElementRegistry.remove(name);
-    };
   }
 
 })(angular);
