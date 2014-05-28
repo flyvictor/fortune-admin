@@ -17,7 +17,12 @@ angular.module('fortuneAdmin.Directives', [
       link: function (scope, element, attrs) {
         scope.r = $rootScope.fortuneAdminRoute;
         scope.resources = [];
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+        var conf = {
+          params: {
+            userAuthToken: CONFIG.fortuneAdmin.authToken
+          }
+        };
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
           scope.resources = data.resources;
         });
 
@@ -42,7 +47,10 @@ angular.module('fortuneAdmin.Directives', [
         $http({
           method: 'PATCH',
           url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
-          data: cmd
+          data: cmd,
+          params: {
+            userAuthToken: CONFIG.fortuneAdmin.authToken
+          }
         }).catch(function(data, status){
             console.error(data, status);
           });
@@ -81,14 +89,20 @@ angular.module('fortuneAdmin.Directives', [
           var refTo = scope.path = scope.ref.ref;
           var resources, currentResource;
 
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+          var conf = {
+            params: {
+              userAuthToken: CONFIG.fortuneAdmin.authToken
+            }
+          };
+
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
             resources = data.resources;
             angular.forEach(resources, function(resource){
               if (resource.name === refTo){
                 currentResource = resource;
               }
             });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + Inflect.pluralize(refTo))
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + Inflect.pluralize(refTo), conf)
               .success(function(data){
                 var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
                 scope.list = data[Inflect.pluralize(refTo)];

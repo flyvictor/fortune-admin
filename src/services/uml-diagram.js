@@ -27,7 +27,12 @@ angular.module('fortuneAdmin.umlDiagram.services', [])
 
       this.load = function(){
         var deferred = $q.defer();
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+        var conf = {
+          params: {
+            userAuthToken: CONFIG.fortuneAdmin.authToken
+          }
+        };
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
           deferred.resolve(data.resources);
         });
         return deferred.promise;
