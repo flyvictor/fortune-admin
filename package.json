@@ -9,12 +9,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/alduro/fortune-admin.git"
+    "url": "git://github.com/flyvictor/fortune-admin.git"
   },
-  "author": "Aldo Nievas",
-  "license": "BSD-2-Clause",
+  "author": "Victor",
   "bugs": {
-    "url": "https://github.com/alduro/fortune-admin/issues"
+    "url": "https://github.com/flyvictor/fortune-admin/issues"
   },
   "devDependencies": {
     "grunt": "~0.4.4",
