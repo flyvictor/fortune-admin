@@ -31,6 +31,17 @@ angular.module('fortuneAdmin.Controllers', [
           currentResource = res;
         }
       });
+
+      ////Flatten nested objects to get rid of index configuration
+      angular.forEach(currentResource.schema, function(res, key){
+        if (angular.isObject(res) && !angular.isArray(res)){
+          if (res.type){
+            currentResource.schema[key] = res.type;
+          }else{
+            delete currentResource.schema[key];
+          }
+        }
+      });
       var plurResourceName = Inflect.pluralize(currentResource.name);
 
       $scope.plurResourceName = plurResourceName;
