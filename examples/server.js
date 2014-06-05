@@ -67,8 +67,8 @@ var app = fortune({
 
 container
   .use(express.static(path.join(__dirname , '/')))
-  .use(express.static(path.join(__dirname , '../lib')))
-  .use(express.static(path.join(__dirname , '../bower_components')))
+  .use(express.static(path.join(__dirname , '../')))
+  .use(express.static(path.join(__dirname , '/bower_components')))
   .use(app.router)
   .listen(port);
 

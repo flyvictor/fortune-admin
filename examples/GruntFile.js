@@ -4,41 +4,45 @@ module.exports = function(grunt){
   grunt.initConfig({
 
     clean: {
-      lib: ['lib/*'],
-      tmp: ['lib/templates.js']
+      options:{
+        force: true
+      },
+      lib: ['../fortune-admin*'],
+      tmp: ['../templates.js']
     },
     html2js: {
       options: {
         rename: function(moduleName){
-          return '/' + moduleName;
+          moduleName = moduleName.replace('../../src', '');
+          return moduleName;
         }
       },
       main: {
-        src: ['src/templates/**/*.html', 'src/templates/**/**/*.html'],
-        dest: 'lib/templates.js'
+        src: ['../src/templates/**/*.html', '../src/templates/**/**/*.html'],
+        dest: '../templates.js'
       }
     },
     concat: {
-      'lib/fortune-admin.vendor.js': [
+      '../fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
         'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
         'bower_components/d3/d3.js'
       ],
-      'lib/fortune-admin.js': [
-        'lib/templates.js',
-        'src/fortune-admin.js',
-        'src/**/*.js'
+      '../fortune-admin.js': [
+        '../templates.js',
+        '../src/fortune-admin.js',
+        '../src/**/*.js'
       ],
-      'lib/fortune-admin.css': [
+      '../fortune-admin.css': [
         'bower_components/angular-xeditable/dist/css/xeditable.css',
-        'src/main.css'
+        '../src/main.css'
       ]
     },
     uglify: {
       target:{
         files: {
-          'lib/fortune-admin.vendor.min.js': ['lib/fortune-admin.vendor.js'],
-          'lib/fortune-admin.min.js': ['lib/fortune-admin.js']
+          '../fortune-admin.vendor.min.js': ['../fortune-admin.vendor.js'],
+          '../fortune-admin.min.js': ['../fortune-admin.js']
         }
       }
     }
@@ -48,11 +52,11 @@ module.exports = function(grunt){
 
   grunt.registerTask('addtemplates', function(){
     var fs = require('fs');
-    var main = fs.readFileSync('lib/fortune-admin.js', {encoding: 'utf-8'});
+    var main = fs.readFileSync('../fortune-admin.js', {encoding: 'utf-8'});
 
     main = main.replace("angular.module('fortuneAdmin', [", "angular.module('fortuneAdmin', [ 'templates-main', ");
 
-    fs.writeFileSync('lib/fortune-admin.js', main);
+    fs.writeFileSync('../fortune-admin.js', main);
   });
 };
 

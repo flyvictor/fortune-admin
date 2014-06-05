@@ -92,13 +92,24 @@ angular.module('fortuneAdmin.Controllers', [
         }
         var cmd = {};
         cmd[plurResourceName] = [newRow];
-        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd).success(function(data) {
+        var conf = {
+          params: {
+            userAuthToken: CONFIG.fortuneAdmin.authToken
+          }
+        };
+        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd, conf)
+          .success(function(data) {
           $scope.data.push(data[plurResourceName][0]);
         });
       };
 
       this.deleteRow = function(index, id){
-        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
+        var conf = {
+          params: {
+            userAuthToken: CONFIG.fortuneAdmin.authToken
+          }
+        };
+        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id, conf)
           .success(function (data, status) {
             $scope.data.splice(index, 1);
           })

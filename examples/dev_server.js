@@ -4,23 +4,19 @@
 var fortune = require('fortune')
   , express = fortune.express
   , RSVP = fortune.RSVP
-  , util = require('util');
+  , util = require('util')
+  , path = require('path');
 
 var container = express()
   , port = process.argv[2] || 1337;
 
-var fortuneConfig = {
+var app = fortune({
   db: 'fortune-admin',
   adapter: 'mongodb',
   namespace: '/api/v1'
-};
+})
 
-var app = fortune(fortuneConfig);
-
-require('./resources')(app);
-
-
-/*.resource("user", {
+.resource("user", {
   title : String,
   firstName : String,
   lastName : String,
@@ -51,9 +47,9 @@ require('./resources')(app);
 .resource("flight", {
   flightNumber: String,
   users: [{ref: "user", inverse: "flights", pkType : String}]
-}, { model: { pk: "flightNumber" }})*/
+}, { model: { pk: "flightNumber" }})
 
-app.transform(
+.transform(
 //  before
   function () {
     return this;
@@ -70,15 +66,15 @@ app.transform(
 )
 
 container
-  .use(express.static(__dirname + '/src'))
-  .use(express.static(__dirname + '/bower_components'))
+  .use(express.static(path.join(__dirname , '../src')))
+  .use(express.static(path.join(__dirname , '/bower_components')))
   .use(app.router)
   .listen(port);
 
 app.router.get('*', function(req, res, next){
-  var resources = /^\/resources.*/;
-  var api = new RegExp(fortuneConfig.namespace + '.+');
-  if (resources.test(req.url) || api.test(req.url)) return next();
+  var resource = /^\/resources.*/;
+  var api = /^\/api.+/;
+  if (resource.test(req.url) || api.test(req.url)) return next();
   res.redirect('/');
 });
 

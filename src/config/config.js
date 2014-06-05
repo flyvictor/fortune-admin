@@ -18,6 +18,7 @@
     routing: {
       html5Mode : true,
       prefix: ''
-    }
+    },
+    authToken: ''
   };
 })();

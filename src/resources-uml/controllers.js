@@ -5,7 +5,12 @@
   function UmlController($scope, $http){
     $scope.resources = [];
     $scope.render = false;
-    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+    var conf = {
+      params: {
+        userAuthToken: CONFIG.fortuneAdmin.authToken
+      }
+    };
+    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
       $scope.resources = data.resources;
       $scope.render = true;
     });

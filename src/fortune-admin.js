@@ -47,6 +47,9 @@
           CONFIG.fortuneAdmin.routing.html5Mode = !!use;
           CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
         },
+        setAuthToken: function(token){
+          CONFIG.fortuneAdmin.authToken = token;
+        },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
@@ -61,7 +64,12 @@
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                $http.get(config.baseEndpoint + '/resources').success(function(data){
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
+                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -69,7 +77,12 @@
               data: ['$q', '$http', '$route', function($q, $http, $route){
                 var resourceName = $route.current.params.name;
                 var d = $q.defer();
-                $http.get(config.getApiNamespace() + '/' + resourceName)
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
+                $http.get(config.getApiNamespace() + '/' + resourceName, conf)
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -84,7 +97,12 @@
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                $http.get(config.baseEndpoint + '/resources').success(function(data){
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
+                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -94,8 +112,13 @@
                 var inverse = $route.current.params.inverse;
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
                 $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId)
+                    '?filter[' + inverse + ']=' + parentId, conf)
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -141,6 +164,9 @@
             setApiNamespace: function(namespace){
               CONFIG.fortuneAdmin.apiNamespace = namespace;
             },
+            setAuthToken: function(token){
+              CONFIG.fortuneAdmin.authToken = token;
+            }
           }
         }
       }
