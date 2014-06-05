@@ -3,7 +3,14 @@
   <h4 class="text-center">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>
   <table class="table table-bordered">
     <tr>
-      <th ng-repeat="(name, type) in currentResource.schema | filterLinks">{{name}}</th>
+      <th ng-repeat="(name, type) in currentResource.schema | filterLinks">
+        <span>{{name}}</span>
+        <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
+        <span class="glyphicon glyphicon-remove" ng-show="showFilter" ng-click="showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)"></span>
+        <div ng-show="showFilter">
+          <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name)" typeahead-on-select="ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name)">
+        </div>
+      </th>
       <th ng-repeat="(linkName, link) in links">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>
       <th>Actions</th>
     </tr>

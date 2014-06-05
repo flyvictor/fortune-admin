@@ -57,7 +57,14 @@ angular.module("/templates/views/resources.html", []).run(["$templateCache", fun
     "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
     "  <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
-    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\">{{name}}</th>\n" +
+    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\">\n" +
+    "        <span>{{name}}</span>\n" +
+    "        <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
+    "        <span class=\"glyphicon glyphicon-remove\" ng-show=\"showFilter\" ng-click=\"showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)\"></span>\n" +
+    "        <div ng-show=\"showFilter\">\n" +
+    "          <input type=\"text\" class=\"form-control\" ng-model=\"taQuery\" typeahead=\"item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name)\" typeahead-on-select=\"ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name)\">\n" +
+    "        </div>\n" +
+    "      </th>\n" +
     "      <th ng-repeat=\"(linkName, link) in links\">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>\n" +
     "      <th>Actions</th>\n" +
     "    </tr>\n" +
@@ -346,6 +353,17 @@ angular.module('fortuneAdmin.Controllers', [
           currentResource = res;
         }
       });
+
+      //Flatten nested objects to get rid of index configuration
+      angular.forEach(currentResource.schema, function(res, key){
+        if (angular.isObject(res) && !angular.isArray(res)){
+          if (res.type){
+            currentResource.schema[key] = res.type;
+          }else{
+            delete currentResource.schema[key];
+          }
+        }
+      });
       var plurResourceName = Inflect.pluralize(currentResource.name);
 
       $scope.plurResourceName = plurResourceName;
@@ -432,6 +450,53 @@ angular.module('fortuneAdmin.Controllers', [
             console.error(data, status);
           });
 
+      };
+
+      $scope.filter = {};
+
+      this.getTypeaheadList = function(str, name){
+        var query = {};
+        query['filter[' + name + '][regex]'] = str;
+        query['filter[' + name + '][options'] = 'i';
+        console.log(query);
+        return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
+          params: query
+        })
+          .then(function(res){
+            console.log(res.data[plurResourceName]);
+            var cleanList = [];
+            var stored = [];
+            angular.forEach(res.data[plurResourceName], function(item){
+              if (stored.indexOf(item[name]) === -1){
+                stored.push(item[name]);
+                cleanList.push(item);
+              }
+            });
+            return cleanList;
+          });
+      };
+
+      this.applyFilter = function(selected, fieldName){
+        console.log('onselect: ', selected, fieldName);
+        $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+        $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+        runCurrentFilter();
+      };
+
+      this.dropFilter = function(fieldName){
+        delete $scope.filter['filter[' + fieldName + '][regex]'];
+        delete $scope.filter['filter[' + fieldName + '][options]'];
+        runCurrentFilter();
+      };
+
+      function runCurrentFilter(){
+        $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
+          params: $scope.filter
+        })
+          .success(function(data){
+            console.log(data);
+            $scope.data = data[plurResourceName];
+          });
       };
     }]);
 
