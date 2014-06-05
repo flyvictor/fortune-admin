@@ -1,8 +1,6 @@
-node_modules
-dist
 .tmp
 .sass-cache
-examples/bower_components
-public/app/bower_components
-public/.tmp
 **/.idea
+.idea
+examples/bower_components
+examples/node_modules

@@ -1,0 +1,30 @@
+{
+  "name": "fortune-admin",
+  "version": "0.0.1",
+  "description": "fortune-admin =============",
+  "main": "examples/app.js",
+  "start": "examples/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/flyvictor/fortune-admin.git"
+  },
+  "author": "Victor",
+  "bugs": {
+    "url": "https://github.com/flyvictor/fortune-admin/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.4.0",
+    "load-grunt-tasks": "~0.4.0",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-html2js": "~0.2.7"
+  },
+  "dependencies": {
+    "fortune": "git://github.com/flyvictor/fortune.git",
+    "fortune-mongodb": "git://github.com/flyvictor/fortune-mongodb.git"
+  }
+}

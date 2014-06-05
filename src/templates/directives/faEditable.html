@@ -1,0 +1,16 @@
+<section>
+  <div ng-switch="schemaType">
+    <div ng-switch-when="String">
+      <a href="#" onaftersave="apply(value)" editable-text="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Number">
+      <a href="#" onaftersave="apply(value)" editable-number="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Date">
+      <a href="#" onaftersave="apply(value)" editable-date="value">{{value || 'Not set.'}}</a>
+    </div>
+    <div ng-switch-when="Boolean">
+      <a href="#" onaftersave="apply(value)" editable-checkbox="value">{{value ? 'Yep' : 'Nope'}}</a>
+    </div>
+  </div>
+</section>
