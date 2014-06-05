@@ -13,7 +13,7 @@ fortune-admin
 
 ## Running as a plugin for existing app
 
-1) Add .css and .js files from /lib
+1) Add .css and .js fortune-admin files
 
 2) include `fortune-admin` to your app deps
 
@@ -57,7 +57,15 @@ fortuneAdminProvider has html5Mode method which accepts a boolean and optional h
 
 See examples/sampleApp for 'full-featured' app using plugin.
 
-To run example: `node examples/server.js`
+To run example:
+```
+    $ bower install
+    $ cd examples/
+    $ npm install
+    $ node server.js
+```
+
+To run dev server that serves uncompressed files run `examples/dev_server.js` instead of `examples/server.js`
 
 fortune-admin depends on d3, ui.bootstrap and angular-xeditable.
 You can either provide deps yourself or take fortune-admin.vendor.js file.
