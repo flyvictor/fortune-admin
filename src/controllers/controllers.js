@@ -136,7 +136,6 @@ angular.module('fortuneAdmin.Controllers', [
         var query = {};
         query['filter[' + name + '][regex]'] = str;
         query['filter[' + name + '][options'] = 'i';
-        console.log(query);
         return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
           params: query
         })
@@ -154,16 +153,31 @@ angular.module('fortuneAdmin.Controllers', [
           });
       };
 
-      this.applyFilter = function(selected, fieldName){
-        console.log('onselect: ', selected, fieldName);
-        $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-        $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+      this.applyFilter = function(selected, fieldName, type){
+        switch (type){
+          case 'String':
+            //Derived from typeahead
+            $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+            $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+            break;
+          case 'Number':
+          case 'Date':
+            $scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
+            $scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
+            break;
+          case 'Boolean':
+            $scope.filter['filter[' + fieldName + ']'] = selected;
+            break;
+        }
         runCurrentFilter();
       };
 
       this.dropFilter = function(fieldName){
         delete $scope.filter['filter[' + fieldName + '][regex]'];
         delete $scope.filter['filter[' + fieldName + '][options]'];
+        delete $scope.filter['filter[' + fieldName + '][gte]'];
+        delete $scope.filter['filter[' + fieldName + '][lte]'];
+        delete $scope.filter['filter[' + fieldName + ']'];
         runCurrentFilter();
       };
 

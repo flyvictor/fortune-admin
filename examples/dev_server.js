@@ -22,6 +22,8 @@ var app = fortune({
   lastName : String,
   role : String,
   someNumber: Number,
+  birthday: Date,
+  bool: Boolean,
   email : String,
   nationality: String,
   languageCode: String,

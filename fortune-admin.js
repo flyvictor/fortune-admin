@@ -57,12 +57,42 @@ angular.module("/templates/views/resources.html", []).run(["$templateCache", fun
     "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
     "  <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
-    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\">\n" +
-    "        <span>{{name}}</span>\n" +
-    "        <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
-    "        <span class=\"glyphicon glyphicon-remove\" ng-show=\"showFilter\" ng-click=\"showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)\"></span>\n" +
-    "        <div ng-show=\"showFilter\">\n" +
-    "          <input type=\"text\" class=\"form-control\" ng-model=\"taQuery\" typeahead=\"item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name)\" typeahead-on-select=\"ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name)\">\n" +
+    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\" ng-class=\"{'column-filter': showFilter}\">\n" +
+    "        <div>\n" +
+    "          <span>{{name}}</span>\n" +
+    "          <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
+    "          <span class=\"glyphicon glyphicon-remove\" ng-show=\"showFilter\" ng-click=\"showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)\"></span>\n" +
+    "        </div>\n" +
+    "        <div ng-switch=\"type\">\n" +
+    "          <div ng-switch-when=\"String\" ng-show=\"showFilter\">\n" +
+    "            <input type=\"text\" class=\"form-control\" ng-model=\"taQuery\" typeahead=\"item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name, type)\" typeahead-on-select=\"ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name, type)\">\n" +
+    "          </div>\n" +
+    "          <div ng-switch-when=\"Number\" ng-show=\"showFilter\">\n" +
+    "            <div class=\"input-group\">\n" +
+    "              <span class=\"input-group-addon\">From:</span>\n" +
+    "              <input type=\"number\" ng-model=\"Query.start\" class=\"form-control\" ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
+    "            </div>\n" +
+    "            <div class=\"input-group\">\n" +
+    "              <span class=\"input-group-addon\">To:</span>\n" +
+    "              <input class=\"form-control\" type=\"number\" ng-model=\"Query.end\"  ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "          <div ng-switch-when=\"Date\" ng-show=\"showFilter\">\n" +
+    "            <div class=\"input-group\">\n" +
+    "              <span class=\"input-group-addon\">From:</span>\n" +
+    "              <input type=\"date\" class=\"form-control\" ng-model=\"Query.start\" ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
+    "            </div>\n" +
+    "            <div class=\"input-group\">\n" +
+    "              <span class=\"input-group-addon\">To:</span>\n" +
+    "              <input type=\"date\" class=\"form-control\" ng-model=\"Query.end\"  ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
+    "          <div ng-switch-when=\"Boolean\" ng-show=\"showFilter\">\n" +
+    "            <div class=\"btn-group btn-group-sm\">\n" +
+    "              <button class=\"btn btn-sm\" ng-class=\"{'btn-default': !Query.yep, 'btn-info': Query.yep}\" type=\"button\" ng-click=\"Query.yep = true; Query.nope=false; ResourcesCtrl.applyFilter(true, name, type);\">Yep</button>\n" +
+    "              <button class=\"btn btn-sm\" ng-class=\"{'btn-default': !Query.nope, 'btn-info': Query.nope}\" type=\"button\" ng-click=\"Query.yep = false; Query.nope=true; ResourcesCtrl.applyFilter(false, name, type);\">Nope</button>\n" +
+    "            </div>\n" +
+    "          </div>\n" +
     "        </div>\n" +
     "      </th>\n" +
     "      <th ng-repeat=\"(linkName, link) in links\">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>\n" +
@@ -458,7 +488,6 @@ angular.module('fortuneAdmin.Controllers', [
         var query = {};
         query['filter[' + name + '][regex]'] = str;
         query['filter[' + name + '][options'] = 'i';
-        console.log(query);
         return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
           params: query
         })
@@ -476,16 +505,31 @@ angular.module('fortuneAdmin.Controllers', [
           });
       };
 
-      this.applyFilter = function(selected, fieldName){
-        console.log('onselect: ', selected, fieldName);
-        $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-        $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+      this.applyFilter = function(selected, fieldName, type){
+        switch (type){
+          case 'String':
+            //Derived from typeahead
+            $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+            $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+            break;
+          case 'Number':
+          case 'Date':
+            $scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
+            $scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
+            break;
+          case 'Boolean':
+            $scope.filter['filter[' + fieldName + ']'] = selected;
+            break;
+        }
         runCurrentFilter();
       };
 
       this.dropFilter = function(fieldName){
         delete $scope.filter['filter[' + fieldName + '][regex]'];
         delete $scope.filter['filter[' + fieldName + '][options]'];
+        delete $scope.filter['filter[' + fieldName + '][gte]'];
+        delete $scope.filter['filter[' + fieldName + '][lte]'];
+        delete $scope.filter['filter[' + fieldName + ']'];
         runCurrentFilter();
       };
 
