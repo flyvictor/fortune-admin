@@ -18,8 +18,8 @@
     }])
     .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
       $scope.params = {
-        host: '',
-        namespace: '/api/v1'
+        host: 'http://localhost:3012',
+        namespace: ''
       };
 
       $scope.start = function(){
