@@ -1,6 +1,5 @@
 'use strict';
 angular.module('fortuneAdmin.Directives', [
-    'fortuneAdmin.umlDiagram'
   ])
   .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
     return {

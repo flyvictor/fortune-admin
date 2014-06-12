@@ -1,7 +1,6 @@
 'use strict';
 angular.module('fortuneAdmin.Controllers', [
     'fortuneAdmin.Services',
-    'fortuneAdmin.Controllers.umlDiagram'
   ])
 
   .filter('filterLinks', [function(){

@@ -59,7 +59,7 @@
           serviceResources = tmp.concat(serviceResources);
           angular.forEach(serviceResources, function(resource, index){
             //Split resources by services here
-            var service = resource.service;
+            var service = resource.service || 'default';
             schema[service] = schema[service] || [];
             schema[service][index] = [];
             resources[service] = resources[service] || {};
