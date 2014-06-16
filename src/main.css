@@ -1,0 +1,28 @@
+/* Space out content a bit */
+#fortune-admin{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 60px;
+}
+
+/* Canvas elements styling */
+svg .resource{
+  font-size: 12px;
+  border: solid 1px;
+}
+svg .header{
+  border-bottom: solid 2px;
+  margin: 0;
+  background-color: #fff;
+}
+
+svg .pk{
+    background-color: #F00;
+}
+
+svg .field{
+    border-bottom: dotted 1px;
+}
+svg .ref {
+    background-color: #ececec;
+}
