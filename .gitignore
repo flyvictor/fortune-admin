@@ -4,3 +4,4 @@
 .idea
 examples/bower_components
 examples/node_modules
+npm-debug.log
