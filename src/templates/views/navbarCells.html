@@ -1,0 +1,16 @@
+<ul class="nav navbar-nav">
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle">Resources <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li ng-repeat="service in services">
+        <a ng-click="service.collapse = !service.collapse">{{service.name}}</a>
+        <div collapse="service.collapse">
+          <div ng-repeat="resource in service.resources | orderBy:'name'">
+            <a data-ng-href="{{ r('resource', {name: pluralize(resource.name) }) }}">{{ pluralize(resource.name) }}</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </li>
+  <li><a data-ng-href="{{ r('uml_diagram') }}">UML</a></li>
+</ul>

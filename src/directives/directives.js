@@ -4,16 +4,19 @@ angular.module('fortuneAdmin.Directives', [
   .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
     return {
       restrict: 'E',
-
       templateUrl: '/templates/views/mynavbar.html',
-
       replace: true,
-
       transclude: true,
-
-      scope: {},
-
-      link: function (scope, element, attrs) {
+      scope: {}
+    }
+  }])
+  .directive('fortuneAdminNavbarCells', ['$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect){
+    return {
+      restrict: 'E',
+      templateUrl: '/templates/views/navbarCells.html',
+      replace: true,
+      scope: true,
+      link: function(scope){
         scope.r = $rootScope.fortuneAdminRoute;
         scope.resources = [];
         var conf = {
@@ -23,13 +26,18 @@ angular.module('fortuneAdmin.Directives', [
         };
         $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
           scope.resources = data.resources;
+          scope.services = {};
+          angular.forEach(data.resources, function(r){
+            r.service = (r.service || 'default-service').split('-').join(' ');
+            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
+            scope.services[r.service].resources.push(r);
+          });
         });
 
         scope.pluralize = function(name){
           return Inflect.pluralize(name);
         };
       }
-
     }
   }])
   .controller('faEditableCtrl', ['$scope', '$http',
