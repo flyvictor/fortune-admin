@@ -19,12 +19,7 @@ angular.module('fortuneAdmin.Directives', [
       link: function(scope){
         scope.r = $rootScope.fortuneAdminRoute;
         scope.resources = [];
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
           scope.resources = data.resources;
           scope.services = {};
           angular.forEach(data.resources, function(r){

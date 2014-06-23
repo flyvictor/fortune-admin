@@ -102,24 +102,14 @@ angular.module('fortuneAdmin.Controllers', [
         }
         var cmd = {};
         cmd[plurResourceName] = [newRow];
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd, conf)
+        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd)
           .success(function(data) {
           $scope.data.push(data[plurResourceName][0]);
         });
       };
 
       this.deleteRow = function(index, id){
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id, conf)
+        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
           .success(function (data, status) {
             $scope.data.splice(index, 1);
           })
@@ -188,5 +178,5 @@ angular.module('fortuneAdmin.Controllers', [
             console.log(data);
             $scope.data = data[plurResourceName];
           });
-      };
+      }
     }]);

@@ -4,8 +4,8 @@
     'ngRoute',
     'fortuneAdmin'
   ])
-    .config(['$routeProvider', '$locationProvider', 'fortuneAdminProvider',
-      function($routeProvider, $locationProvider, fortuneAdminProvider){
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider',
+      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider){
         fortuneAdminProvider.mountTo($routeProvider, '');
         $routeProvider.when('/', {
           templateUrl: 'init.html',
@@ -15,6 +15,16 @@
           redirectTo: '/uml'
         });
         $locationProvider.html5Mode(true);
+
+        $httpProvider.interceptors.push(function(){
+          return {
+            request: function(config){
+              config.params = config.params || {};
+              config.params.iCanDoEnythingWithThisRequest = true;
+              return config;
+            }
+          }
+        });
     }])
     .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
       $scope.params = {
