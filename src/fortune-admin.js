@@ -69,7 +69,11 @@
               data: ['$q', '$http', '$route', function($q, $http, $route){
                 var resourceName = $route.current.params.name;
                 var d = $q.defer();
-                $http.get(config.getApiNamespace() + '/' + resourceName)
+                $http.get(config.getApiNamespace() + '/' + resourceName, {
+                  params: {
+                    limit: 20
+                  }
+                })
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -95,7 +99,7 @@
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
                 $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId)
+                    '?filter[' + inverse + ']=' + parentId + '&limit=20')
                   .success(function (data) {
                     d.resolve(data);
                   });
