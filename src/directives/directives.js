@@ -1,7 +1,7 @@
 'use strict';
 angular.module('fortuneAdmin.Directives', [
   ])
-  .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
+  .directive('fortuneAdminNavbar', [function() {
     return {
       restrict: 'E',
       templateUrl: '/templates/views/mynavbar.html',
@@ -10,7 +10,7 @@ angular.module('fortuneAdmin.Directives', [
       scope: {}
     }
   }])
-  .directive('fortuneAdminNavbarCells', ['$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect){
+  .directive('fortuneAdminNavbarCells', ['$http', '$rootScope', function($http, $rootScope){
     return {
       restrict: 'E',
       templateUrl: '/templates/views/navbarCells.html',
@@ -28,10 +28,6 @@ angular.module('fortuneAdmin.Directives', [
             scope.services[r.service].resources.push(r);
           });
         });
-
-        scope.pluralize = function(name){
-          return Inflect.pluralize(name);
-        };
       }
     }
   }])
@@ -49,10 +45,7 @@ angular.module('fortuneAdmin.Directives', [
         $http({
           method: 'PATCH',
           url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
-          data: cmd,
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
+          data: cmd
         }).catch(function(data, status){
             console.error(data, status);
           });
@@ -75,8 +68,8 @@ angular.module('fortuneAdmin.Directives', [
     }
   }])
 
-  .directive('faRef', ['$http', '$compile', 'Inflect',
-    function($http, $compile, Inflect){
+  .directive('faRef', ['$http', '$compile',
+    function($http, $compile){
       return {
         restrict: 'E',
         replace: false,
@@ -89,25 +82,23 @@ angular.module('fortuneAdmin.Directives', [
         controller: 'faEditableCtrl',
         link: function(scope, elt){
           var refTo = scope.path = scope.ref.ref;
-          var resources, currentResource;
+          var resources = scope.resources,
+            currentResource,
+            refRoute;
 
-          var conf = {
-            params: {
-              userAuthToken: CONFIG.fortuneAdmin.authToken
-            }
-          };
 
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
             resources = data.resources;
             angular.forEach(resources, function(resource){
-              if (resource.name === refTo){
+              if (resource.name === scope.ref.ref){
+                refRoute = resource.route;
                 currentResource = resource;
               }
             });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + Inflect.pluralize(refTo), conf)
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute)
               .success(function(data){
                 var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
-                scope.list = data[Inflect.pluralize(refTo)];
+                scope.list = data[refRoute];
                 var tpl = ['<a href="#" editable-select="value" ',
                   'e-ng-options="item.', PK || 'id',
                   ' as item.', PK || 'id',

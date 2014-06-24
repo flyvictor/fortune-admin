@@ -16,7 +16,7 @@
         });
         $locationProvider.html5Mode(true);
 
-        $httpProvider.interceptors.push(function(){
+        /*$httpProvider.interceptors.push(function(){
           return {
             request: function(config){
               config.params = config.params || {};
@@ -24,12 +24,12 @@
               return config;
             }
           }
-        });
+        });*/
     }])
     .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
       $scope.params = {
-        host: 'http://localhost:3012',
-        namespace: ''
+        host: 'http://localhost:1337',
+        namespace: '/api/v1'
       };
 
       $scope.start = function(){

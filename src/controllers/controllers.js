@@ -1,6 +1,6 @@
 'use strict';
 angular.module('fortuneAdmin.Controllers', [
-    'fortuneAdmin.Services',
+    'fortuneAdmin.Services'
   ])
 
   .filter('filterLinks', [function(){
@@ -18,21 +18,20 @@ angular.module('fortuneAdmin.Controllers', [
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',
-    'Inflect',
     '$routeParams',
     'resources',
     'data',
-    function ($scope, $http, Inflect, $routeParams, resources, data){
+    function ($scope, $http, $routeParams, resources, data){
 
       var currentResource = {};
       angular.forEach(resources, function(res){
-        if(res.name === $routeParams.name || Inflect.pluralize(res.name) === $routeParams.name){
+        if(res.name === $routeParams.name || res.route === $routeParams.name){
           currentResource = res;
         }
       });
 
       //Flatten nested objects to get rid of index configuration
-      angular.forEach(currentResource.schema, function(res, key){
+      /*angular.forEach(currentResource.schema, function(res, key){
         if (angular.isObject(res) && !angular.isArray(res)){
           if (res.type){
             currentResource.schema[key] = res.type;
@@ -40,11 +39,13 @@ angular.module('fortuneAdmin.Controllers', [
             delete currentResource.schema[key];
           }
         }
-      });
-      var plurResourceName = Inflect.pluralize(currentResource.name);
+      });*/
+      var plurResourceName = currentResource.route;
 
       $scope.plurResourceName = plurResourceName;
       $scope.currentResource = currentResource;
+
+      $scope.resources = resources;
 
       $scope.data = data[plurResourceName];
       $scope.links = data.links;
