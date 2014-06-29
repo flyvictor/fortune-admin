@@ -14,20 +14,26 @@ angular.module('fortuneAdmin.Directives', [
     return {
       restrict: 'E',
       templateUrl: '/templates/views/navbarCells.html',
-      replace: true,
       scope: true,
-      link: function(scope){
-        scope.r = $rootScope.fortuneAdminRoute;
-        scope.resources = [];
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-          scope.resources = data.resources;
-          scope.services = {};
-          angular.forEach(data.resources, function(r){
-            r.service = (r.service || 'default-service').split('-').join(' ');
-            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
-            scope.services[r.service].resources.push(r);
-          });
+      compile: function(tElt){
+        var parent = tElt.parent();
+        var substract = tElt.children();
+        angular.forEach(substract, function(item){
+          parent.append(item);
         });
+        return function(scope){
+          scope.r = $rootScope.fortuneAdminRoute;
+          scope.resources = [];
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+            scope.resources = data.resources;
+            scope.services = {};
+            angular.forEach(data.resources, function(r){
+              r.service = (r.service || 'default-service').split('-').join(' ');
+              scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
+              scope.services[r.service].resources.push(r);
+            });
+          });
+        }
       }
     }
   }])
