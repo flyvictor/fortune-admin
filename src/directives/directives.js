@@ -31,11 +31,15 @@ angular.module('fortuneAdmin.Directives', [
       }
     }
   }])
-  .directive('fortuneAdminUmlCells', [function(){
+  .directive('fortuneAdminUmlCells', ['$rootScope', function($rootScope){
     return {
       restrict: 'E',
       replace: true,
-      templateUrl: '/templates/views/umlCells.html'
+      templateUrl: '/templates/views/umlCells.html',
+      scope: true,
+      link: function(scope){
+        scope.r = $rootScope.fortuneAdminRoute;
+      }
     }
   }])
   .controller('faEditableCtrl', ['$scope', '$http',
