@@ -1,5 +1,7 @@
 <section id="fortune-admin">
-  <fortune-admin-navbar></fortune-admin-navbar>
+  <div ng-if="navbarEnabled">
+    <fortune-admin-navbar></fortune-admin-navbar>
+  </div>
   <h4 class="text-center">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>
   <table class="table table-bordered">
     <tr>

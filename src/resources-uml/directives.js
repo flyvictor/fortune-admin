@@ -222,7 +222,6 @@
           UmlElementsRegistry.add('resources', element, element.innerText);
         });
 
-
           //Create service boundary
           serviceSvg.append('rect')
             .attr('width', svgWidth - 10)

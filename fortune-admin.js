@@ -1,4 +1,4 @@
-angular.module('templates-main', ['/templates/directives/faEditable.html', '/templates/directives/uml/canvas.html', '/templates/views/mynavbar.html', '/templates/views/resources.html', '/templates/views/uml.html']);
+angular.module('templates-main', ['/templates/directives/faEditable.html', '/templates/directives/uml/canvas.html', '/templates/views/mynavbar.html', '/templates/views/resources.html', '/templates/views/resourcesCells.html', '/templates/views/uml.html', '/templates/views/umlCells.html']);
 
 angular.module("/templates/directives/faEditable.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/directives/faEditable.html",
@@ -34,15 +34,10 @@ angular.module("/templates/views/mynavbar.html", []).run(["$templateCache", func
     "            <a class=\"navbar-brand\" href=\"#\"><b>Fortune Admin</b></a>\n" +
     "        </div>\n" +
     "        <div class=\"collapse navbar-collapse\">\n" +
-    "            <ul class=\"nav navbar-nav\">\n" +
-    "                <li class=\"dropdown\">\n" +
-    "                    <a href=\"#\" class=\"dropdown-toggle\">Resources <b class=\"caret\"></b></a>\n" +
-    "                    <ul class=\"dropdown-menu\">\n" +
-    "                        <li ng-repeat=\"resource in resources\"><a data-ng-href=\"{{ r('resource', {name: pluralize(resource.name) }) }}\">{{ pluralize(resource.name) }}</a></li>\n" +
-    "                    </ul>\n" +
-    "                </li>\n" +
-    "                <li><a data-ng-href=\"{{ r('uml_diagram') }}\">UML</a></li>\n" +
-    "            </ul>\n" +
+    "          <ul class=\"nav navbar-nav\">\n" +
+    "            <fortune-admin-resources-cells></fortune-admin-resources-cells>\n" +
+    "            <fortune-admin-uml-cells></fortune-admin-uml-cells>\n" +
+    "          </ul>\n" +
     "        </div>\n" +
     "    </div>\n" +
     "</nav>\n" +
@@ -53,7 +48,9 @@ angular.module("/templates/views/mynavbar.html", []).run(["$templateCache", func
 angular.module("/templates/views/resources.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/views/resources.html",
     "<section id=\"fortune-admin\">\n" +
-    "  <fortune-admin-navbar></fortune-admin-navbar>\n" +
+    "  <div ng-if=\"navbarEnabled\">\n" +
+    "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
+    "  </div>\n" +
     "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
     "  <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
@@ -128,16 +125,40 @@ angular.module("/templates/views/resources.html", []).run(["$templateCache", fun
     "</section>");
 }]);
 
+angular.module("/templates/views/resourcesCells.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/templates/views/resourcesCells.html",
+    "<li class=\"dropdown\">\n" +
+    "  <a href=\"#\" class=\"dropdown-toggle\">Resources <b class=\"caret\"></b></a>\n" +
+    "  <ul class=\"dropdown-menu\">\n" +
+    "    <li ng-repeat=\"service in services\">\n" +
+    "      <a ng-click=\"service.collapse = !service.collapse; $event.stopPropagation();\">{{service.name}}</a>\n" +
+    "      <div collapse=\"service.collapse\">\n" +
+    "        <div ng-repeat=\"resource in service.resources | orderBy:'name'\">\n" +
+    "          <a data-ng-href=\"{{ r('resource', {name: resource.route }) }}\">{{ resource.route }}</a>\n" +
+    "        </div>\n" +
+    "      </div>\n" +
+    "    </li>\n" +
+    "  </ul>\n" +
+    "</li>");
+}]);
+
 angular.module("/templates/views/uml.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/views/uml.html",
     "<section id=\"fortune-admin\">\n" +
-    "  <fortune-admin-navbar></fortune-admin-navbar>\n" +
+    " <div ng-if=\"navbarEnabled\">\n" +
+    "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
+    "  </div>\n" +
     "  <section ng-if=\"resources.length !== 0\">\n" +
     "    <div ng-if=\"render\">\n" +
     "      <div resources-canvas resources=\"resources\"></div>\n" +
     "    </div>\n" +
     "  </section>\n" +
     "</section>");
+}]);
+
+angular.module("/templates/views/umlCells.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/templates/views/umlCells.html",
+    "<li><a data-ng-href=\"{{ r('uml_diagram') }}\">UML</a></li>");
 }]);
 
 
@@ -189,8 +210,8 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
           CONFIG.fortuneAdmin.routing.html5Mode = !!use;
           CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
         },
-        setAuthToken: function(token){
-          CONFIG.fortuneAdmin.authToken = token;
+        enableNavbar: function(){
+          CONFIG.fortuneAdmin.enableNavbar = true;
         },
         mountTo: function($routeProvider, mountPoint){
 
@@ -206,12 +227,7 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                var conf = {
-                  params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
-                  }
-                };
-                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
+                $http.get(config.baseEndpoint + '/resources').success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -219,12 +235,11 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
               data: ['$q', '$http', '$route', function($q, $http, $route){
                 var resourceName = $route.current.params.name;
                 var d = $q.defer();
-                var conf = {
+                $http.get(config.getApiNamespace() + '/' + resourceName, {
                   params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                    limit: 20
                   }
-                };
-                $http.get(config.getApiNamespace() + '/' + resourceName, conf)
+                })
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -239,12 +254,7 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                var conf = {
-                  params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
-                  }
-                };
-                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
+                $http.get(config.baseEndpoint + '/resources').success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -254,13 +264,8 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
                 var inverse = $route.current.params.inverse;
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
-                var conf = {
-                  params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
-                  }
-                };
                 $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId, conf)
+                    '?filter[' + inverse + ']=' + parentId + '&limit=20')
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -321,6 +326,7 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
       $rootScope.fortuneAdminRoute = function(url, args) {
         return prefix + fortuneAdmin.routePath(url, args);
       };
+      $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
 
       // bootstrap3 theme. Can be also 'bs2', 'default'
       editableOptions.theme = 'bs3';
@@ -352,7 +358,7 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
 
 'use strict';
 angular.module('fortuneAdmin.Controllers', [
-    'fortuneAdmin.Services',
+    'fortuneAdmin.Services'
   ])
 
   .filter('filterLinks', [function(){
@@ -370,21 +376,20 @@ angular.module('fortuneAdmin.Controllers', [
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',
-    'Inflect',
     '$routeParams',
     'resources',
     'data',
-    function ($scope, $http, Inflect, $routeParams, resources, data){
+    function ($scope, $http, $routeParams, resources, data){
 
       var currentResource = {};
       angular.forEach(resources, function(res){
-        if(res.name === $routeParams.name || Inflect.pluralize(res.name) === $routeParams.name){
+        if(res.name === $routeParams.name || res.route === $routeParams.name){
           currentResource = res;
         }
       });
 
       //Flatten nested objects to get rid of index configuration
-      angular.forEach(currentResource.schema, function(res, key){
+      /*angular.forEach(currentResource.schema, function(res, key){
         if (angular.isObject(res) && !angular.isArray(res)){
           if (res.type){
             currentResource.schema[key] = res.type;
@@ -392,11 +397,13 @@ angular.module('fortuneAdmin.Controllers', [
             delete currentResource.schema[key];
           }
         }
-      });
-      var plurResourceName = Inflect.pluralize(currentResource.name);
+      });*/
+      var plurResourceName = currentResource.route;
 
       $scope.plurResourceName = plurResourceName;
       $scope.currentResource = currentResource;
+
+      $scope.resources = resources;
 
       $scope.data = data[plurResourceName];
       $scope.links = data.links;
@@ -454,24 +461,14 @@ angular.module('fortuneAdmin.Controllers', [
         }
         var cmd = {};
         cmd[plurResourceName] = [newRow];
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd, conf)
+        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd)
           .success(function(data) {
           $scope.data.push(data[plurResourceName][0]);
         });
       };
 
       this.deleteRow = function(index, id){
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id, conf)
+        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
           .success(function (data, status) {
             $scope.data.splice(index, 1);
           })
@@ -540,41 +537,47 @@ angular.module('fortuneAdmin.Controllers', [
             console.log(data);
             $scope.data = data[plurResourceName];
           });
-      };
+      }
     }]);
 
 'use strict';
 angular.module('fortuneAdmin.Directives', [
   ])
-  .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
+  .directive('fortuneAdminNavbar', [function() {
     return {
       restrict: 'E',
-
       templateUrl: '/templates/views/mynavbar.html',
-
       replace: true,
-
       transclude: true,
-
-      scope: {},
-
-      link: function (scope, element, attrs) {
+      scope: {}
+    }
+  }])
+  .directive('fortuneAdminResourcesCells', ['$http', '$rootScope', function($http, $rootScope){
+    return {
+      restrict: 'E',
+      templateUrl: '/templates/views/resourcesCells.html',
+      replace: true,
+      scope: true,
+      link: function(scope){
         scope.r = $rootScope.fortuneAdminRoute;
         scope.resources = [];
-        var conf = {
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
-        };
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
           scope.resources = data.resources;
+          scope.services = {};
+          angular.forEach(data.resources, function(r){
+            r.service = (r.service || 'default-service').split('-').join(' ');
+            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
+            scope.services[r.service].resources.push(r);
+          });
         });
-
-        scope.pluralize = function(name){
-          return Inflect.pluralize(name);
-        };
       }
-
+    }
+  }])
+  .directive('fortuneAdminUmlCells', [function(){
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: '/templates/views/umlCells.html'
     }
   }])
   .controller('faEditableCtrl', ['$scope', '$http',
@@ -591,10 +594,7 @@ angular.module('fortuneAdmin.Directives', [
         $http({
           method: 'PATCH',
           url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
-          data: cmd,
-          params: {
-            userAuthToken: CONFIG.fortuneAdmin.authToken
-          }
+          data: cmd
         }).catch(function(data, status){
             console.error(data, status);
           });
@@ -617,8 +617,8 @@ angular.module('fortuneAdmin.Directives', [
     }
   }])
 
-  .directive('faRef', ['$http', '$compile', 'Inflect',
-    function($http, $compile, Inflect){
+  .directive('faRef', ['$http', '$compile',
+    function($http, $compile){
       return {
         restrict: 'E',
         replace: false,
@@ -631,25 +631,23 @@ angular.module('fortuneAdmin.Directives', [
         controller: 'faEditableCtrl',
         link: function(scope, elt){
           var refTo = scope.path = scope.ref.ref;
-          var resources, currentResource;
+          var resources = scope.resources,
+            currentResource,
+            refRoute;
 
-          var conf = {
-            params: {
-              userAuthToken: CONFIG.fortuneAdmin.authToken
-            }
-          };
 
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
             resources = data.resources;
             angular.forEach(resources, function(resource){
-              if (resource.name === refTo){
+              if (resource.name === scope.ref.ref){
+                refRoute = resource.route;
                 currentResource = resource;
               }
             });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + Inflect.pluralize(refTo), conf)
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute)
               .success(function(data){
                 var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
-                scope.list = data[Inflect.pluralize(refTo)];
+                scope.list = data[refRoute];
                 var tpl = ['<a href="#" editable-select="value" ',
                   'e-ng-options="item.', PK || 'id',
                   ' as item.', PK || 'id',
@@ -672,12 +670,7 @@ angular.module('fortuneAdmin.Directives', [
   function UmlController($scope, $http){
     $scope.resources = [];
     $scope.render = false;
-    var conf = {
-      params: {
-        userAuthToken: CONFIG.fortuneAdmin.authToken
-      }
-    };
-    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', conf).success(function(data){
+    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
       $scope.resources = data.resources;
       $scope.render = true;
     });
@@ -928,7 +921,6 @@ angular.module('fortuneAdmin.Directives', [
         angular.forEach(foo[0], function(element){
           UmlElementsRegistry.add('resources', element, element.innerText);
         });
-
 
           //Create service boundary
           serviceSvg.append('rect')
@@ -1895,8 +1887,9 @@ angular.module('fortuneAdmin.Services', [
     'ngRoute',
     'fortuneAdmin'
   ])
-    .config(['$routeProvider', '$locationProvider', 'fortuneAdminProvider',
-      function($routeProvider, $locationProvider, fortuneAdminProvider){
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider',
+      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider){
+        fortuneAdminProvider.enableNavbar();
         fortuneAdminProvider.mountTo($routeProvider, '');
         $routeProvider.when('/', {
           templateUrl: 'init.html',
@@ -1909,8 +1902,8 @@ angular.module('fortuneAdmin.Services', [
     }])
     .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
       $scope.params = {
-        host: 'http://localhost:3012',
-        namespace: ''
+        host: 'http://localhost:1337',
+        namespace: '/api/v1'
       };
 
       $scope.start = function(){

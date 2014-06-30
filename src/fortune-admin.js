@@ -47,6 +47,9 @@
           CONFIG.fortuneAdmin.routing.html5Mode = !!use;
           CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
         },
+        enableNavbar: function(){
+          CONFIG.fortuneAdmin.enableNavbar = true;
+        },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
@@ -160,6 +163,7 @@
       $rootScope.fortuneAdminRoute = function(url, args) {
         return prefix + fortuneAdmin.routePath(url, args);
       };
+      $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
 
       // bootstrap3 theme. Can be also 'bs2', 'default'
       editableOptions.theme = 'bs3';

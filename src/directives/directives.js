@@ -10,31 +10,32 @@ angular.module('fortuneAdmin.Directives', [
       scope: {}
     }
   }])
-  .directive('fortuneAdminNavbarCells', ['$http', '$rootScope', function($http, $rootScope){
+  .directive('fortuneAdminResourcesCells', ['$http', '$rootScope', function($http, $rootScope){
     return {
       restrict: 'E',
-      templateUrl: '/templates/views/navbarCells.html',
+      templateUrl: '/templates/views/resourcesCells.html',
+      replace: true,
       scope: true,
-      compile: function(tElt){
-        var parent = tElt.parent();
-        var substract = tElt.children();
-        angular.forEach(substract, function(item){
-          parent.append(item);
-        });
-        return function(scope){
-          scope.r = $rootScope.fortuneAdminRoute;
-          scope.resources = [];
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-            scope.resources = data.resources;
-            scope.services = {};
-            angular.forEach(data.resources, function(r){
-              r.service = (r.service || 'default-service').split('-').join(' ');
-              scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
-              scope.services[r.service].resources.push(r);
-            });
+      link: function(scope){
+        scope.r = $rootScope.fortuneAdminRoute;
+        scope.resources = [];
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+          scope.resources = data.resources;
+          scope.services = {};
+          angular.forEach(data.resources, function(r){
+            r.service = (r.service || 'default-service').split('-').join(' ');
+            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
+            scope.services[r.service].resources.push(r);
           });
-        }
+        });
       }
+    }
+  }])
+  .directive('fortuneAdminUmlCells', [function(){
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: '/templates/views/umlCells.html'
     }
   }])
   .controller('faEditableCtrl', ['$scope', '$http',
