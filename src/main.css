@@ -5,6 +5,10 @@
     margin-top: 60px;
 }
 
+#fortune-admin .column-filter{
+    max-width: 250px;
+}
+
 /* Canvas elements styling */
 svg .resource{
   font-size: 12px;

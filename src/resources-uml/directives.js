@@ -26,30 +26,60 @@
       link: function(scope, elt){
         UmlElementsRegistry.clear();
         scope.canvas = {};
-        var schema = [];
-        var resources = [];
+        var schema = {};
+        var resources = {};
 
         var height = 0;
         var elementsInARow = Math.floor(elt[0].clientWidth / config.columnWidth);
 
+        var tempStorage = {};
+        angular.forEach(scope.resources, function(resource){
+          tempStorage[resource.service] = tempStorage[resource.service] || [];
+          tempStorage[resource.service].push(resource);
+        });
+        scope.resources = angular.copy(tempStorage);
+        tempStorage = {};
+
         //Convert to D3 data structure
-        angular.forEach(scope.resources, function(resource, index){
-          schema[index] = [];
-          resources[index] = {
-            name: resource.name
-          };
-          if (resource.modelOptions && resource.modelOptions.pk){
-            resources[index].pk = resource.modelOptions.pk || 'id';
-          }
-          angular.forEach(resource.schema, function(fieldParams, fieldName){
-            schema[index].push({
-              name: fieldName,
-              params: fieldParams,
-              pk: resources[index].pk === fieldName
-            });
+        angular.forEach(scope.resources, function(serviceResources){
+          //Define tallest elt here to keep schema and resources in sync
+          //TODO: make an algo that will wisely place every element taking it's links into account
+          tempStorage = angular.copy(serviceResources);
+          var tallestElt = tempStorage[0]
+            , tallestHeight = Object.keys(tempStorage[0].schema).length
+            , tallestIndex = 0;
+          angular.forEach(tempStorage, function(resource, index){
+            if (Object.keys(resource.schema).length > tallestHeight){
+              tallestElt = resource;
+              tallestHeight = Object.keys(resource.schema).length;
+              tallestIndex = index;
+            }
           });
-          schema[index].sort(function(a,b){
-            return a.name > b.name ? 1: -1;
+          var tmp = serviceResources.splice(tallestIndex, 1);
+          serviceResources = tmp.concat(serviceResources);
+          angular.forEach(serviceResources, function(resource, index){
+            //Split resources by services here
+            var service = resource.service || 'default';
+            schema[service] = schema[service] || [];
+            schema[service][index] = [];
+            resources[service] = resources[service] || {};
+            resources[service][index] = {
+              name: resource.name,
+              service: resource.service
+            };
+            if (resource.modelOptions && resource.modelOptions.pk){
+              resources[service][index].pk = resource.modelOptions.pk || 'id';
+            }
+            angular.forEach(resource.schema, function(fieldParams, fieldName){
+              schema[service][index].push({
+                name: fieldName,
+                params: fieldParams,
+                pk: resources[service][index].pk === fieldName
+              });
+            });
+            schema[service][index].sort(function(a,b){
+              return a.name > b.name ? 1: -1;
+            });
           });
         });
         scope.resources = schema;
@@ -68,34 +98,54 @@
 
         (function setupLayout(){
           for (var i = 0; i < elementsInARow; i++){
-            UmlElementsRegistry.bottomLine.push(10);
+            //Initialize 30px top margin
+            //This will create top margin for the first row of resources
+            UmlElementsRegistry.bottomLine.push(30);
           }
 
-          angular.forEach(schema, function(resource, index){
-            var elementHeight = resource.length * config.fieldHeight + config.headerHeight;
+          //Iterate resources of the same service here. Then move to the next service
+          angular.forEach(schema, function(service, serviceName){
+            angular.forEach(service, function(resource, index){
+              definePosition(resource, index);
+            });
+            function definePosition(resource, index){
+              var elementHeight = resource.length * config.fieldHeight + config.headerHeight;
+              var coords = getBottom();
 
-            var coords = getBottom();
+              var eltPosition = {
+                x: coords[0] * config.columnWidth,
+                y: coords[1],
+                height: elementHeight,
+                column: coords[0]
+              };
 
-            var eltPosition = {
-              x: coords[0] * config.columnWidth,
-              y: coords[1],
-              height: elementHeight,
-              column: coords[0]
-            };
+              //Update bottom line
+              UmlElementsRegistry.bottomLine[coords[0]] += elementHeight + config.vgap;
 
-            //Update bottom line
-            UmlElementsRegistry.bottomLine[coords[0]] += elementHeight + config.vgap;
+              //Store element position
+              UmlElementsRegistry.positions[serviceName] = UmlElementsRegistry.positions[serviceName] || [];
+              UmlElementsRegistry.positions[serviceName][index] = eltPosition;
 
-            UmlElementsRegistry.positions[index] = eltPosition;
-
+            }
+            //Flatten bottom line before proceeding to the next service
+            var bott = UmlElementsRegistry.bottomLine[0];
+            angular.forEach(UmlElementsRegistry.bottomLine, function(colHeight){
+              if (colHeight > bott){
+                bott = colHeight;
+              }
+            });
+            for (var j = UmlElementsRegistry.bottomLine.length; j >= 0; j--){
+              UmlElementsRegistry.bottomLine[j] = bott;
+            }
           });
         })();
 
-        function nextPosition(d, index){
-          return UmlElementsRegistry.positions[index];
+        function nextPosition(serviceName, index){
+          return UmlElementsRegistry.positions[serviceName][index];
         }
 
         for (var i = 0; i < UmlElementsRegistry.bottomLine.length; i++){
+          //Add bottom margin to the main canvas
           if (UmlElementsRegistry.bottomLine[i] > height) height = UmlElementsRegistry.bottomLine[i] + 100;
         }
 
@@ -107,11 +157,27 @@
           .style('width', '100%');
 
         var svgOffset = svg[0][0].offsetTop;
+        var svgWidth = svg[0][0].clientWidth;
         UmlElementsRegistry.setBase(svgOffset);
 
+        angular.forEach(schema, function(sch, serviceName){
+          //find full service height
+          var lowestElement = UmlElementsRegistry.positions[serviceName][0];
+          lowestElement = lowestElement.y + lowestElement.height;
+          angular.forEach(UmlElementsRegistry.positions[serviceName], function(pos){
+            if (pos.y + pos.height > lowestElement){
+              lowestElement = pos.y + pos.height;
+            }
+          });
 
-        var foo = svg.selectAll('g')
-          .data(schema)
+          var serviceSvg = svg
+            .append('svg')
+            .attr('id', serviceName)
+            .attr('height', lowestElement)
+            .style('width', '100%');
+
+        var foo = serviceSvg.selectAll('g')
+          .data(sch)
           .enter().append('g')
           .attr('height', function(d){
             return d.length * config.fieldHeight;
@@ -122,10 +188,10 @@
           .attr('fill', '#ffffff')
           .append('foreignObject')
           .attr('x', function(d, i){
-            return nextPosition(d,i).x + config.vgap;
+            return nextPosition(serviceName, i).x + config.vgap;
           })
           .attr('y', function(d,i){
-            return nextPosition(d,i).y;
+            return nextPosition(serviceName, i).y;
           })
           .attr('height', function(d){
             return d.length * config.fieldHeight + config.headerHeight;
@@ -136,11 +202,11 @@
 
         //Create resource name
         var headers = foo.append('xhtml:div')
-          .attr('class', 'header')
-          .append('xhtml:h4')
+          .attr('class', 'header');
+          headers.append('xhtml:h4')
           .attr('class', 'text-center')
           .text(function(d, i){
-            return resources[i].name;
+            return resources[serviceName][i].name;
           });
 
         //create resource containers
@@ -149,11 +215,36 @@
           .append('xhtml:div')
           .attr('resource-class', '')
           .attr('resource', function(d, i){
-            return 'resources[' + i + ']';
+            return 'resources["' + serviceName + '"][' + i + ']';
           });
 
         angular.forEach(foo[0], function(element){
           UmlElementsRegistry.add('resources', element, element.innerText);
+        });
+
+          //Create service boundary
+          serviceSvg.append('rect')
+            .attr('width', svgWidth - 10)
+            .attr('x', 5)
+            .attr('y', foo[0][0].offsetTop - 10 - 75)
+            .attr('height', lowestElement - foo[0][0].offsetTop + 85)
+            .attr('fill', 'none')
+            .attr('stroke', 'red');
+
+          //Create service label
+          serviceSvg.append('rect')
+            .attr('width', config.fieldWidth)
+            .attr('height', config.fieldHeight)
+            .attr('x', 0)
+            .attr('y', foo[0][0].offsetTop - 20 - 85)
+            .attr('fill', 'black');
+          serviceSvg.append('text')
+            .attr('width', config.fieldWidth)
+            .attr('height', config.fieldHeight)
+            .attr('x', 0)
+            .attr('y', foo[0][0].offsetTop - 20 - 70)
+            .attr('fill', 'white')
+            .text(serviceName);
         });
 
         elt.removeAttr('resources-canvas');
@@ -285,7 +376,12 @@
               //TODO: fix this when fortune supports nested schemas
               elt.text(scope.field.name + ' [Nested]');
             }else{
-              elt.text(scope.field.name + ' [' + scope.field.params.substr(0, 3) + ']');
+              try{
+                elt.text(scope.field.name + ' [' + scope.field.params.substr(0, 3) + ']');
+              }catch(e){
+                //This will prevent app from crashing in case of typos in resources configuration
+                console.log('caugth error: ', e);
+              }
             }
           }
         }
@@ -350,10 +446,12 @@
           while(nextCol !== targetCol){
             //Select elements from current column
             var columnSelection = [];
-            angular.forEach(UmlElementsRegistry.positions, function(e){
-              if (e.column == nextCol) {
-                columnSelection.push(e);
-              }
+            angular.forEach(UmlElementsRegistry.positions, function(service){
+              angular.forEach(service, function(e){
+                if (e.column == nextCol) {
+                  columnSelection.push(e);
+                }
+              });
             });
 
             var nearestElement = columnSelection[0];

@@ -24,7 +24,6 @@
     "grunt-html2js": "~0.2.7"
   },
   "dependencies": {
-    "fortune": "git://github.com/flyvictor/fortune.git",
-    "fortune-mongodb": "git://github.com/flyvictor/fortune-mongodb.git"
+    "fortune": "git://github.com/flyvictor/fortune.git#v1.2.3"
   }
 }
