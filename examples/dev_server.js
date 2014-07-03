@@ -1,7 +1,7 @@
 /**
  * Created by aldo on 5/4/14.
  */
-var fortune = require('fortune')
+var fortune = require('../lib/fortune')
   , express = fortune.express
   , RSVP = fortune.RSVP
   , util = require('util')
