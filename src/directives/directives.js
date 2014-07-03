@@ -79,8 +79,8 @@ angular.module('fortuneAdmin.Directives', [
     }
   }])
 
-  .directive('faRef', ['$http', '$compile',
-    function($http, $compile){
+  .directive('faRef', ['$http', '$compile', '$cacheFactory',
+    function($http, $compile, $cacheFactory){
       return {
         restrict: 'E',
         replace: false,
@@ -96,9 +96,12 @@ angular.module('fortuneAdmin.Directives', [
           var resources = scope.resources,
             currentResource,
             refRoute;
+          scope.$on('$routeChangeStart', function(){
+            var $httpCache = $cacheFactory.get('$http');
+            $httpCache.removeAll();
+          });
 
-
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', {cache: true}).success(function(data){
             resources = data.resources;
             angular.forEach(resources, function(resource){
               if (resource.name === scope.ref.ref){
@@ -106,7 +109,7 @@ angular.module('fortuneAdmin.Directives', [
                 currentResource = resource;
               }
             });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute)
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute, {cache: true})
               .success(function(data){
                 var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
                 scope.list = data[refRoute];

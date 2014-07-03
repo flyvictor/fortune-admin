@@ -1,16 +1,6 @@
 fortune-admin
 =============
 
-## Running as a standalone app
-
-1) npm install
-
-2) bower install
-
-3) node app.js [port]
-
-4) open your browser
-
 ## Running as a plugin for existing app
 
 1) Add .css and .js fortune-admin files
@@ -37,11 +27,24 @@ fortune-admin
         fortuneAdminProvider.setApiNamespace('/api/v2');
         //3. Mount plugin to any route of your choice
         fortuneAdminProvider.mountTo($routeProvider, '/admin');
+        //optional 4. If you're running the app standalone use this to render native navbar
+        //There's no need to manually set up navbar in this case
+        fortuneAdminProvider.enableNavbar();
 
         //fortune-admin defaults to use html5Mode
         $locationProvider.html5Mode(true);
      });
 ```
+
+## Pluggable menu
+
+There are two directives that allow you to integrate navbars and make use of fortune-admin as a plugin simple and fun.
+
+`<fortune-admin-resources-cells></fortune-admin-resources-cells>` this will insert resources dropdown with `<li>` as a root element
+
+`<fortune-admin-uml-cells></fortune-admin-uml-cells>` this will insert simple link to UML diagram. Again, the root element is `<li>`
+
+See /src/templates/views/mynavbar.html for usage example
 
 ## Running with html5Mode disabled
 
