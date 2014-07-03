@@ -54,18 +54,18 @@ fortuneAdminProvider has html5Mode method which accepts a boolean and optional h
 
 ```
 
+To run example: `node examples/dev_server.js`
 
-See examples/sampleApp for 'full-featured' app using plugin.
-
-To run example:
-```
-    $ bower install
-    $ cd examples/
-    $ npm install
-    $ node server.js
-```
-
-To run dev server that serves uncompressed files run `examples/dev_server.js` instead of `examples/server.js`
+git clone
+git submodule init
+git submodule update
+cd lib/fortune
+npm install
+cd ../../
+bower install
+cd examples
+npm install
+node examples/dev_server.js
 
 fortune-admin depends on d3, ui.bootstrap and angular-xeditable.
 You can either provide deps yourself or take fortune-admin.vendor.js file.
