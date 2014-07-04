@@ -79,7 +79,8 @@
                 var d = $q.defer();
                 var conf = {
                   params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                    userAuthToken: CONFIG.fortuneAdmin.authToken,
+                    sortBy: 'firstName'
                   }
                 };
                 $http.get(config.getApiNamespace() + '/' + resourceName, conf)

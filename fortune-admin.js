@@ -1,4 +1,4 @@
-angular.module('templates-main', ['/templates/directives/faEditable.html', '/templates/directives/uml/canvas.html', '/templates/views/mynavbar.html', '/templates/views/resources.html', '/templates/views/uml.html']);
+angular.module('templates-main', ['/templates/directives/faEditable.html', '/templates/directives/uml/canvas.html', '/templates/views/mynavbar.html', '/templates/views/resources.html', '/templates/views/uml.html', '/templates/directives/sortBy.html']);
 
 angular.module("/templates/directives/faEditable.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/directives/faEditable.html",
@@ -57,7 +57,9 @@ angular.module("/templates/views/resources.html", []).run(["$templateCache", fun
     "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
     "  <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
-    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\">{{name}}</th>\n" +
+    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\">\n" +
+    "      <sort-by onsort=\"onSort\" sortdir=\"filterCriteria.sortDir\" sortedby=\"filterCriteria.sortedBy\" sortvalue=\"{{ name }}\">{{ name }}</sort-by>\n" +
+    "       </th>\n" +
     "      <th ng-repeat=\"(linkName, link) in links\">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>\n" +
     "      <th>Actions</th>\n" +
     "    </tr>\n" +
@@ -81,6 +83,10 @@ angular.module("/templates/views/resources.html", []).run(["$templateCache", fun
     "      </td>\n" +
     "    </tr>\n" +
     "  </table>\n" +
+    "<div class=\"align-center\">\n" +
+    "<pagination num-pages=\"totalPages\" current-page=\"filterCriteria.pageNumber\" max-size=\"1\" class=\"\"\n" + 
+    "  boundary-links=\"true\" on-select-page=\"ResourcesCtrl.selectPage(page)\"></pagination>\n" +
+    "<div>\n" +
     "  <div class=\"col-md-3\">\n" +
     "    <div ng-hide=\"PK === 'id'\">\n" +
     "      <label>Enter {{ PK }} for new {{ currentResource.name }}</label>\n" +
@@ -101,6 +107,16 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
     "    </div>\n" +
     "  </section>\n" +
     "</section>");
+}]);
+
+angular.module("/templates/directives/sortBy.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/templates/directives/sortBy.html",
+      "<a ng-click=\"sort(sortvalue)\">\n" +
+      "<span ng-transclude=\"\"></span>\n" +
+      "<span ng-show=\"sortedby == sortvalue\">\n" +
+      "<i ng-class=\"{true: 'icon-arrow-up', false: 'icon-arrow-down'}[sortdir == '']\"></i>\n" +
+      "</span>\n" +
+      "</a>\n");
 }]);
 
 
@@ -184,7 +200,8 @@ angular.module("/templates/views/uml.html", []).run(["$templateCache", function(
                 var d = $q.defer();
                 var conf = {
                   params: {
-                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                    userAuthToken: CONFIG.fortuneAdmin.authToken,
+                    sort: '-firstName'
                   }
                 };
                 $http.get(config.getApiNamespace() + '/' + resourceName, conf)
@@ -318,7 +335,7 @@ angular.module('fortuneAdmin.Controllers', [
     'fortuneAdmin.Services',
     'fortuneAdmin.Controllers.umlDiagram'
   ])
-
+  
   .filter('filterLinks', [function(){
     return function(input){
       var nonLinks = {};
@@ -330,7 +347,6 @@ angular.module('fortuneAdmin.Controllers', [
       return nonLinks;
     }
   }])
-
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',
@@ -433,7 +449,65 @@ angular.module('fortuneAdmin.Controllers', [
           });
 
       };
-    }]);
+    //call back function that we passed to our custom directive sortBy, will be called when clicking on any field to sort
+      $scope.filterCriteria = {
+          sortDir: '',
+          sortedBy: 'firstName',
+          page: '1'
+        };
+      
+      $scope.fetchResult = function(){
+        var resourceName = $routeParams.name;
+        var conf = {
+            params: {
+              sort: $scope.filterCriteria.sortDir + $scope.filterCriteria.sortedBy,
+              page: $scope.filterCriteria.pageNumber
+            }
+        };
+        $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + resourceName, conf)
+                          .success(function (data) {
+                            $scope.data = data[plurResourceName];
+                          });
+      };
+      
+      $scope.selectPage = function (page) {
+        $scope.filterCriteria.pageNumber = page;
+        $scope.fetchResult();
+      };
+      
+      $scope.onSort = function (sortedBy, sortDir) {
+        $scope.filterCriteria.sortDir = sortDir;
+        $scope.filterCriteria.sortedBy = sortedBy;
+        $scope.filterCriteria.pageNumber = 1;
+        $scope.fetchResult();
+      };
+    }])
+    
+    .directive('sortBy', [function() {
+    return {
+      templateUrl: '/templates/directives/sortBy.html',
+      restrict: 'E',
+      transclude: true,
+      replace: true,
+      scope: {
+        sortdir: '=',
+        sortedby: '=',
+        sortvalue: '@',
+        onsort: '='
+      },
+      link: function (scope, element, attrs) {
+        scope.sort = function () {
+          if (scope.sortedby == scope.sortvalue)
+            scope.sortdir = scope.sortdir == '' ? '-' : '';
+          else {
+            scope.sortedby = scope.sortvalue;
+            scope.sortdir = '';
+          }
+          scope.onsort(scope.sortedby, scope.sortdir);
+        }
+      }
+    };
+  }]);
 
 angular.module('fortuneAdmin.Controllers.umlDiagram', [
     'fortuneAdmin.umlDiagram.services'
@@ -495,6 +569,7 @@ angular.module('fortuneAdmin.Controllers.umlDiagram', [
 angular.module('fortuneAdmin.Directives', [
     'fortuneAdmin.umlDiagram'
   ])
+  
   .directive('fortuneAdminNavbar', [ '$http', '$rootScope', 'Inflect', function($http, $rootScope, Inflect) {
     return {
       restrict: 'E',
@@ -614,7 +689,7 @@ angular.module('fortuneAdmin.Directives', [
         }
       }
     }]);
-angular.module('fortuneAdmin.umlDiagram', [
+  angular.module('fortuneAdmin.umlDiagram', [
     'fortuneAdmin.umlDiagram.services'
   ])
   .directive('umlCanvas', ['umlData',

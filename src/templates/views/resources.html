@@ -3,7 +3,9 @@
   <h4 class="text-center">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>
   <table class="table table-bordered">
     <tr>
-      <th ng-repeat="(name, type) in currentResource.schema | filterLinks">{{name}}</th>
+      <th ng-repeat="(name, type) in currentResource.schema | filterLinks">
+      <sort-by onsort="ResourcesCtrl.onSort" sortdir="filterCriteria.sortDir" sortedby="filterCriteria.sortedBy" sortvalue="{{ name }}">{{ name }}</sort-by>
+      </th>
       <th ng-repeat="(linkName, link) in links">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>
       <th>Actions</th>
     </tr>
@@ -27,6 +29,11 @@
       </td>
     </tr>
   </table>
+  <div ng-show="totalPages > 1" class="align-center">
+  <pagination num-pages="totalPages" current-page="filterCriteria.pageNumber" max-size="1" class="" 
+    boundary-links="true" on-select-page="selectPage(page)"></pagination>
+  <div>
+  </div>
   <div class="col-md-3">
     <div ng-hide="PK === 'id'">
       <label>Enter {{ PK }} for new {{ currentResource.name }}</label>
