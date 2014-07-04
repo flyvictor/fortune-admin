@@ -9,7 +9,7 @@
     };
     var baseOffset = 0;
 
-    this.positions = {};
+    this.positions = [];
     this.bottomLine = [];
 
     this.setBase = function(offset){
@@ -55,7 +55,7 @@
         resources: [],
         fields: []
       };
-      this.positions = {};
+      this.positions = [];
       this.bottomLine = [];
     }
   }
