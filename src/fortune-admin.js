@@ -47,8 +47,8 @@
           CONFIG.fortuneAdmin.routing.html5Mode = !!use;
           CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
         },
-        enableNavbar: function(){
-          CONFIG.fortuneAdmin.enableNavbar = true;
+        setAuthToken: function(token){
+          CONFIG.fortuneAdmin.authToken = token;
         },
         mountTo: function($routeProvider, mountPoint){
 
@@ -64,7 +64,12 @@
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                $http.get(config.baseEndpoint + '/resources').success(function(data){
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
+                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -72,11 +77,13 @@
               data: ['$q', '$http', '$route', function($q, $http, $route){
                 var resourceName = $route.current.params.name;
                 var d = $q.defer();
-                $http.get(config.getApiNamespace() + '/' + resourceName, {
+                var conf = {
                   params: {
-                    limit: 20
+                    userAuthToken: CONFIG.fortuneAdmin.authToken,
+                    sortBy: 'firstName'
                   }
-                })
+                };
+                $http.get(config.getApiNamespace() + '/' + resourceName, conf)
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -91,7 +98,12 @@
             resolve: {
               resources: ['$q', '$http', function($q, $http){
                 var d = $q.defer();
-                $http.get(config.baseEndpoint + '/resources').success(function(data){
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
+                $http.get(config.baseEndpoint + '/resources', conf).success(function(data){
                   d.resolve(data.resources);
                 });
                 return d.promise;
@@ -101,8 +113,13 @@
                 var inverse = $route.current.params.inverse;
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
+                var conf = {
+                  params: {
+                    userAuthToken: CONFIG.fortuneAdmin.authToken
+                  }
+                };
                 $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId + '&limit=20')
+                    '?filter[' + inverse + ']=' + parentId, conf)
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -163,7 +180,6 @@
       $rootScope.fortuneAdminRoute = function(url, args) {
         return prefix + fortuneAdmin.routePath(url, args);
       };
-      $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
 
       // bootstrap3 theme. Can be also 'bs2', 'default'
       editableOptions.theme = 'bs3';

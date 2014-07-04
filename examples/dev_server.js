@@ -1,7 +1,7 @@
 /**
  * Created by aldo on 5/4/14.
  */
-var fortune = require('../lib/fortune')
+var fortune = require('fortune')
   , express = fortune.express
   , RSVP = fortune.RSVP
   , util = require('util')
@@ -25,13 +25,7 @@ var app = fortune({
   nationality: String,
   languageCode: String,
   addresses: [{ref: "address", inverse: "user"}],
-  flights: [{ref: "flight", inverse: "users", pkType: String}],
-  additionalDetails : {
-    legacyContactDetailsID: Number,
-    notificationData: Object,
-    primaryRelationshipLegacyId: Number,
-    legacyID: { type: Number, index : true }
-  }
+  flights: [{ref: "flight", inverse: "users", pkType: String}]
 }, {
   model: {pk: "email"}
 })

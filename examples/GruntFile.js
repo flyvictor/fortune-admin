@@ -49,7 +49,6 @@ module.exports = function(grunt){
   });
 
   grunt.registerTask('build', ['clean:lib', 'html2js', 'concat', 'addtemplates', 'clean:tmp', 'uglify']);
-  grunt.registerTask('default', ['build']);
 
   grunt.registerTask('addtemplates', function(){
     var fs = require('fs');
