@@ -3,6 +3,7 @@
 .sass-cache
 **/.idea
 .idea
+.project
 examples/bower_components
 examples/node_modules
 npm-debug.log
