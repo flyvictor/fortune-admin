@@ -47,7 +47,7 @@ angular.module("/templates/views/mynavbar.html", []).run(["$templateCache", func
 
 angular.module("/templates/views/resources.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/views/resources.html",
-    "<section id=\"fortune-admin\">\n" +
+    "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
     "  <div ng-if=\"navbarEnabled\">\n" +
     "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
     "  </div>\n" +
@@ -144,7 +144,7 @@ angular.module("/templates/views/resourcesCells.html", []).run(["$templateCache"
 
 angular.module("/templates/views/uml.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/templates/views/uml.html",
-    "<section id=\"fortune-admin\">\n" +
+    "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
     " <div ng-if=\"navbarEnabled\">\n" +
     "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
     "  </div>\n" +
