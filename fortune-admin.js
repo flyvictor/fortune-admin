@@ -165,7 +165,7 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [ 'templates-main', 
 
-      ,  'ui.bootstrap'
+        'ui.bootstrap'
       , 'xeditable'
       , 'fortuneAdmin.Controllers'
       , 'fortuneAdmin.Directives'
@@ -331,6 +331,7 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
       // bootstrap3 theme. Can be also 'bs2', 'default'
       editableOptions.theme = 'bs3';
     }]);
+
 (function(){
   if (!window.CONFIG) window.CONFIG = {};
 

@@ -2,7 +2,7 @@
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [
 
-      ,  'ui.bootstrap'
+        'ui.bootstrap'
       , 'xeditable'
       , 'fortuneAdmin.Controllers'
       , 'fortuneAdmin.Directives'
