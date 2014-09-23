@@ -1,7 +1,7 @@
 /**
  * Created by aldo on 5/4/14.
  */
-var fortune = require('fortune')
+var fortune = require('./lib/fortune')
   , express = fortune.express
   , RSVP = fortune.RSVP
   , util = require('util')
@@ -21,13 +21,17 @@ var app = fortune({
   firstName : String,
   lastName : String,
   role : String,
-  birthday: Date,
-  bool: Boolean,
   email : String,
   nationality: String,
   languageCode: String,
   addresses: [{ref: "address", inverse: "user"}],
-  flights: [{ref: "flight", inverse: "users", pkType: String}]
+  flights: [{ref: "flight", inverse: "users", pkType: String}],
+  additionalDetails : {
+    legacyContactDetailsID: Number,
+    notificationData: Object,
+    primaryRelationshipLegacyId: Number,
+    legacyID: { type: Number, index : true }
+  }
 }, {
   model: {pk: "email"}
 })
@@ -68,8 +72,7 @@ var app = fortune({
 )
 
 container
-  .use(express.static(path.join(__dirname , '/')))
-  .use(express.static(path.join(__dirname , '../')))
+  .use(express.static(path.join(__dirname , '../src')))
   .use(express.static(path.join(__dirname , '/bower_components')))
   .use(app.router)
   .listen(port);
