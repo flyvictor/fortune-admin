@@ -9,7 +9,13 @@ Build date: 2014-01-10
 #fortune-admin{
     padding-top: 20px;
     padding-bottom: 20px;
+}
+#fortune-admin.wmargin{
     margin-top: 60px;
+}
+
+#fortune-admin .column-filter{
+    max-width: 250px;
 }
 
 /* Canvas elements styling */

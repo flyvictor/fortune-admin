@@ -4,8 +4,9 @@
     'ngRoute',
     'fortuneAdmin'
   ])
-    .config(['$routeProvider', '$locationProvider', 'fortuneAdminProvider',
-      function($routeProvider, $locationProvider, fortuneAdminProvider){
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider',
+      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider){
+        fortuneAdminProvider.enableNavbar();
         fortuneAdminProvider.mountTo($routeProvider, '');
         $routeProvider.when('/', {
           templateUrl: 'init.html',
@@ -18,7 +19,7 @@
     }])
     .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
       $scope.params = {
-        host: '',
+        host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
 

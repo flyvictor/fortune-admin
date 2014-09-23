@@ -22,8 +22,5 @@
     "load-grunt-tasks": "~0.4.0",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-html2js": "~0.2.7"
-  },
-  "dependencies": {
-    "fortune": "git://github.com/flyvictor/fortune.git"
-  }
+  }    
 }

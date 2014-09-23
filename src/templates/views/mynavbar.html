@@ -4,15 +4,10 @@
             <a class="navbar-brand" href="#"><b>Fortune Admin</b></a>
         </div>
         <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Resources <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li ng-repeat="resource in resources"><a data-ng-href="{{ r('resource', {name: pluralize(resource.name) }) }}">{{ pluralize(resource.name) }}</a></li>
-                    </ul>
-                </li>
-                <li><a data-ng-href="{{ r('uml_diagram') }}">UML</a></li>
-            </ul>
+          <ul class="nav navbar-nav">
+            <fortune-admin-resources-cells></fortune-admin-resources-cells>
+            <fortune-admin-uml-cells></fortune-admin-uml-cells>
+          </ul>
         </div>
     </div>
 </nav>
