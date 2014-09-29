@@ -12,7 +12,6 @@ var container = express()
 
 var app = fortune({
   db: 'fortune-admin',
-  adapter: 'mongodb',
   namespace: '/api/v1'
 })
 
@@ -27,7 +26,7 @@ var app = fortune({
   addresses: [{ref: "address", inverse: "user"}],
   flights: [{ref: "flight", inverse: "users", pkType: String}],
   additionalDetails : {
-    legacyContactDetailsID: Number,
+    testNumber: Number,
     notificationData: Object,
     primaryRelationshipLegacyId: Number,
     legacyID: { type: Number, index : true }
@@ -53,23 +52,7 @@ var app = fortune({
 .resource("flight", {
   flightNumber: String,
   users: [{ref: "user", inverse: "flights", pkType : String}]
-}, { model: { pk: "flightNumber" }})
-
-.transform(
-//  before
-  function () {
-    return this;
-  },
-//  after
-  function (request) {
-    if (request.body.addresses) {
-      findUser(request.body.addresses[0].user).then(function (user) {
-        user.addresses.push(this._id);
-      });
-    }
-    return this;
-  }
-)
+}, { model: { pk: "flightNumber" }});
 
 container
   .use(express.static(path.join(__dirname , '../src')))
