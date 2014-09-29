@@ -1,3 +1,3 @@
 [submodule "examples/lib/fortune"]
 	path = examples/lib/fortune
-	url = https://github.com/flyvictor/fortune.git
+	url = git@github.com:flyvictor/fortune.git
