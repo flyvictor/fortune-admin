@@ -1,0 +1,30 @@
+<section id="fortune-admin" ng-class="{wmargin: navbarEnabled}">
+    <div ng-if="navbarEnabled">
+        <fortune-admin-navbar></fortune-admin-navbar>
+    </div>
+    <div id="guide" ng-if="resources.length !== 0" ng-class="{ 'stick': selected !== undefined }">
+        <div ng-if="render">
+            <div class="list-group">
+                <a href class="list-group-item" ng-class="itemClass(resource.name)" ng-repeat="resource in resources"
+                   ng-click="select(resource.name)">
+                    {{ resource.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="api-docs" ng-if="render">
+        <div id="methods">
+            <!--<ul class="nav nav-pills" id="language">
+                <li ng-repeat="language in languages" ng-class="languageClass(language)" ng-click="selectLanguage(language)">
+                    <a href="#">{{language | uppercase}}</a>
+                </li>
+            </ul>-->
+            <div id="{{resource.name}}" ng-repeat="resource in resources" class="method anchor">
+                <div class="method-section">
+                    <method-description resource="resource"></method-description>
+                    <method-example resource="resource"></method-example>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

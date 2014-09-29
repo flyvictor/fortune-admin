@@ -42,6 +42,17 @@ angular.module('fortuneAdmin.Directives', [
       }
     }
   }])
+    .directive('fortuneAdminDocsCells', ['$rootScope', function($rootScope){
+        return {
+            restrict: 'E',
+            replace: true,
+            templateUrl: '/templates/views/docsCells.html',
+            scope: true,
+            link: function(scope){
+                scope.r = $rootScope.fortuneAdminRoute;
+            }
+        }
+    }])
   .controller('faEditableCtrl', ['$scope', '$http',
     function($scope, $http){
       $scope.apply = function(value){
@@ -124,4 +135,18 @@ angular.module('fortuneAdmin.Directives', [
           });
         }
       }
-    }]);
+    }])
+    /*.directive('scrollTo', function ($location, $anchorScroll) {
+        return function (scope, element, attrs) {
+            element.bind('click', function (event) {
+                event.stopPropagation();
+                var off = scope.$on('$locationChangeStart', function (ev) {
+                    off();
+                    ev.preventDefault();
+                });
+                var location = attrs.scrollTo;
+                $location.hash(location);
+                $anchorScroll();
+            });
+        }
+    });*/

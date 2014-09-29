@@ -1,0 +1,13 @@
+<div class="method-example">
+    <h4>{{ resource.name+' object example' | uppercase }}</h4>
+    <span>
+       &#123;<br/>
+       <span ng-repeat="attrName in notSorted(resource.schema)" ng-init="attrValue = resource.schema[attrName]">
+           &ensp;&ensp;
+           <span>&#34;{{attrName}}&#34;:</span>
+           <span>&#34;{{attrValue['docs:example']}}&#34;</span>
+           <span ng-if="!$last">,<br/></span>
+       </span>
+       <br/>&#125;
+    </span>
+</div>

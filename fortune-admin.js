@@ -171,6 +171,7 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
       , 'fortuneAdmin.Directives'
       , 'fortuneAdmin.Services'
       , 'fortuneAdmin.Uml'
+      , 'fortuneAdmin.Docs'
     ])
     .provider('fortuneAdmin', [function(){
 
@@ -219,6 +220,11 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
             templateUrl : config.prepareViewTemplateUrl('uml'),
             controller: 'UmlCtrl as UmlCtrl'
           });
+
+            ROUTER.when('docs_page', mountPoint + '/docs', {
+                templateUrl : config.prepareViewTemplateUrl('docs'),
+                controller:'DocsCtrl as DocsCtrl'
+            });
 
           //Resolve necessary data here to simplify controller
           ROUTER.when('resource', mountPoint + '/:name', {
@@ -1261,6 +1267,13 @@ angular.module('fortuneAdmin.Directives', [
     'fortuneAdmin.Uml.D3',
     'fortuneAdmin.Uml.Directives'
   ]);
+})(angular);
+
+(function(angular){
+    angular.module('fortuneAdmin.Docs', [
+        'fortuneAdmin.Docs.Controllers',
+        'fortuneAdmin.Docs.Directives'
+    ]);
 })(angular);
 
 (function(angular){
