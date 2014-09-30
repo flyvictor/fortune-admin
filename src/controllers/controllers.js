@@ -15,6 +15,16 @@ angular.module('fortuneAdmin.Controllers', [
     }
   }])
 
+  // filter prevents alphabetical sort of object keys
+  .filter('notSorted', [function(){
+    return function(object){
+        if (!object) {
+            return [];
+        }
+        return Object.keys(object);
+    }
+  }])
+
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',

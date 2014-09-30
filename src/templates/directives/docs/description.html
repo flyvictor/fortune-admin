@@ -2,7 +2,7 @@
     <h4><strong>The {{resource.name}} object</strong></h4>
     <h5><strong>Attributes</strong></h5>
     <table>
-        <tr ng-repeat="attrName in notSorted(resource.schema)" ng-init="attrValue = resource.schema[attrName]">
+        <tr ng-repeat="attrName in resource.schema | notSorted" ng-init="attrValue = resource.schema[attrName]">
             <td><strong>{{attrName}}:</strong></td>
             <td>
                 {{attrValue.type || attrValue}}

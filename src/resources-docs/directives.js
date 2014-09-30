@@ -7,15 +7,6 @@
               templateUrl: '/templates/directives/docs/description.html',
               scope: {
                   resource: '='
-              },
-              link: function ($scope) {
-                  // to prevent alphabetical sort in object keys
-                  $scope.notSorted = function(obj){
-                      if (!obj) {
-                          return [];
-                      }
-                      return Object.keys(obj);
-                  }
               }
           }
       })
@@ -26,15 +17,6 @@
               templateUrl: '/templates/directives/docs/example.html',
               scope: {
                   resource: '='
-              },
-              link: function ($scope) {
-                  // to prevent alphabetical sort in object keys
-                  $scope.notSorted = function(obj){
-                      if (!obj) {
-                          return [];
-                      }
-                      return Object.keys(obj);
-                  }
               }
           }
       })

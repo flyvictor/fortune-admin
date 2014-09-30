@@ -1,18 +1,10 @@
 (function(angular){
     angular.module('fortuneAdmin.Docs.Controllers', [])
-        .controller('DocsCtrl', ['$scope', '$http', '$location', '$anchorScroll', '$window', DocsController]);
+        .controller('DocsCtrl', ['$scope', '$location', '$anchorScroll', 'resources', DocsController]);
 
-    function DocsController($scope, $http, $location, $anchorScroll){
-        $scope.resources = [];
-        $scope.render = false;
-        /*$scope.languages = ['curl', 'ruby', 'python', 'php', 'java', 'node', 'go'];*/
-
-        // get resources
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-            $scope.resources = data.resources;
-            $scope.selected = $scope.resources.length ? $scope.resources[0].name : undefined;
-            $scope.render = true;
-        });
+    function DocsController($scope, $location, $anchorScroll, resources){
+        $scope.resources = resources;
+        $scope.selected = $scope.resources.length ? $scope.resources[0].name : undefined;
 
         // select api item
         $scope.select = function (item) {

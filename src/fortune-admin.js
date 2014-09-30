@@ -60,7 +60,16 @@
 
           ROUTER.when('docs_page', mountPoint + '/docs', {
             templateUrl : config.prepareViewTemplateUrl('docs'),
-            controller:'DocsCtrl as DocsCtrl'
+            controller:'DocsCtrl as DocsCtrl',
+            resolve: {
+                resources: ['$q', '$http', function($q, $http){
+                    var d = $q.defer();
+                    $http.get(config.baseEndpoint + '/resources').success(function(data){
+                        d.resolve(data.resources);
+                    });
+                    return d.promise;
+                }]
+            }
           });
 
           //Resolve necessary data here to simplify controller
