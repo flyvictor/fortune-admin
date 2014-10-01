@@ -3,27 +3,33 @@ fortune-admin
 
 Fortune admin is an angular component that provides a CRUD UI, and an ERD for a fortune instance. It's designed to be used as a bower module included in a host app, however for testing we also provide a node JS host app (examples/server.js) with a simple Angular/HTML container (examples/index.html).
 
-## Start here : Running as a standalone app
+## Start here : To run the example as a standalone app
 
-0) bower install in the root of the repository
+* cd into the root of this repository
 
-1) cd into examples
+* git submodule init
 
-2) npm install
+* git submodule update
 
-3) node server.js
+* bower install
 
-4) open your browser and navigate the interface; the top navigation has links to the UML
+* cd into examples
+
+* npm install
+
+* node server.js
+
+* open your browser and navigate the interface; the top navigation has links to the UML
 
 ## To include the angular component as a plugin for existing app
 
-1) Add .css and .js fortune-admin files
+* Add .css and .js fortune-admin files
 
-2) include `fortune-admin` to your app deps
+* include `fortune-admin` to your app deps
 
-3) set mount point in your routes configuration
+* set mount point in your routes configuration
 
-4) add a menu link pointing to where you mount fortune-admin + '/uml'
+* add a menu link pointing to where you mount fortune-admin + '/uml'
 
 ```js
 
