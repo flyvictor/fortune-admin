@@ -1,0 +1,15 @@
+<div class="method-description">
+    <h4><strong>The {{resource.name}} object</strong></h4>
+    <h5><strong>Attributes</strong></h5>
+    <table>
+        <tr ng-repeat="attrName in resource.schema | notSorted" ng-init="attrValue = resource.schema[attrName]">
+            <td><strong>{{attrName}}:</strong></td>
+            <td>
+                {{attrValue.type || attrValue}}
+                <p ng-if="attrValue['docs:description']">
+                    {{attrValue['docs:description']}}
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>

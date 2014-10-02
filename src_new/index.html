@@ -16,7 +16,8 @@
     <link rel="stylesheet" href="/angular-xeditable/dist/css/xeditable.css" />
     <!-- endbower -->
     <!-- endbuild -->
-    <link rel="stylesheet" href="/main.css" />
+    <!--<link rel="stylesheet" href="/main.css" />-->
+      <link rel="stylesheet" href="/styles/main.css" />
   </head>
   <body ng-app="fortuneAdmin.Standalone">
     <!--[if lt IE 7]>
@@ -39,7 +40,7 @@
     <script src="/angular-xeditable/dist/js/xeditable.js"></script>
     <script src="/d3/d3.js"></script>
 
-    <script src="/config/config.js"></script>
+    <!--<script src="/config/config.js"></script>
     <script src="/controllers/controllers.js"></script>
     <script src="/directives/directives.js"></script>
     <script src="/services/inflect.js"></script>
@@ -53,6 +54,35 @@
     <script src="/resources-docs/directives.js"></script>
     <script src="/resources-docs/index.js"></script>
     <script src="/fortune-admin.js"></script>
-    <script src="/src_new/scripts/standalone.js"></script>
+    <script src="/scripts/standalone.js"></script>-->
+
+
+    <!-- shared -->
+    <script src="modules/shared/config.js"></script>
+    <script src="modules/shared/directives.js"></script>
+    <script src="modules/shared/filters.js"></script>
+    <script src="modules/shared/sharedElementsModule.js"></script>
+
+    <!-- fortune admin uml -->
+    <script src="modules/fortune-admin/config.js"></script>
+    <script src="modules/fortune-admin/resources-uml/controllers.js"></script>
+    <script src="modules/fortune-admin/resources-uml/d3.js"></script>
+    <script src="modules/fortune-admin/resources-uml/directives.js"></script>
+    <script src="modules/fortune-admin/resources-uml/services.js"></script>
+    <script src="modules/fortune-admin/resources-uml/index.js"></script>
+    <!-- fortune admin module -->
+    <script src="modules/fortune-admin/inflect.js"></script>
+    <script src="modules/fortune-admin/services.js"></script>
+    <script src="modules/fortune-admin/controllers.js"></script>
+    <script src="modules/fortune-admin/directives.js"></script>
+    <script src="modules/fortune-admin/fortuneAdminModule.js"></script>
+
+    <!-- docs module -->
+    <script src="modules/docs/config.js"></script>
+    <script src="modules/docs/controllers.js"></script>
+    <script src="modules/docs/directives.js"></script>
+    <script src="modules/docs/docsModule.js"></script>
+
+    <script src="/scripts/standalone.js"></script>
   </body>
 </html>

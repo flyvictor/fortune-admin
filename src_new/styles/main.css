@@ -1,0 +1,92 @@
+/* Space out content a bit */
+#fortune-admin{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+#fortune-admin.wmargin{
+    margin-top: 60px;
+}
+
+#fortune-admin .column-filter{
+    max-width: 250px;
+}
+
+/* Canvas elements styling */
+svg .resource{
+  font-size: 12px;
+  border: solid 1px;
+}
+svg .header{
+  border-bottom: solid 2px;
+  margin: 0;
+  background-color: #fff;
+}
+
+svg .pk{
+    background-color: #F00;
+}
+
+svg .field{
+    border-bottom: dotted 1px;
+}
+svg .ref {
+    background-color: #ececec;
+}
+
+/* Docs elements styling  */
+#fortune-admin #guide {
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 50px;
+    width: 200px;
+}
+#fortune-admin #guide.stick {
+    position: fixed;
+}
+#fortune-admin #api-docs {
+    margin-left: 200px;
+    min-width: 750px;
+}
+#fortune-admin #api-docs #methods {
+    margin-left: 50%;
+    position: relative;
+}
+#fortune-admin #api-docs #methods .method .method-section {
+    position: relative;
+    padding-top: 45px;
+}
+#fortune-admin #api-docs #methods .method .method-section {
+    clear: left;
+    margin-left: -100%;
+    position: relative;
+    padding-top: 45px;
+    min-height: 400px;
+}
+#fortune-admin #api-docs #methods .method .method-section .method-description {
+    float: left;
+    width: 50%;
+    padding: 0 30px;
+}
+#fortune-admin #api-docs #methods .method .method-section .method-description table td {
+    vertical-align: top;
+    padding: 10px;
+}
+#fortune-admin #api-docs #methods .method .method-section .method-description table td:first-child {
+    text-align: right;
+}
+
+#fortune-admin #api-docs #methods .method .method-section .method-example {
+    position: relative;
+    margin-left: 50%;
+    width: 50%;
+}
+
+#fortune-admin .anchor{
+    padding-top: 40px;
+    margin-top: -40px;
+}
+
+

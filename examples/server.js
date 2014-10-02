@@ -47,7 +47,7 @@ var app = fortune({
   region: { type: String, "docs:example": "North East" },
   postCode: { type: String, "docs:example": "NE1 AB" },
   country: { type: String, "docs:example": "UK" },
-  dateDeleted: { type: Date, "docs:example": "123" },
+  dateDeleted: { type: Date, "docs:example": "" },
   user: {ref: "user", inverse: "addresses", pkType: String}
 })
 
@@ -73,7 +73,8 @@ var app = fortune({
 )
 
 container
-  .use(express.static(path.join(__dirname , '../src')))
+  //.use(express.static(path.join(__dirname , '../src')))
+  .use(express.static(path.join(__dirname , '../src_new')))
   .use(express.static(path.join(__dirname , '/bower_components')))
   .use(app.router)
   .listen(port);
