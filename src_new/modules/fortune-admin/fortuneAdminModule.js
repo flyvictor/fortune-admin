@@ -50,13 +50,18 @@
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
-            templateUrl : config.prepareViewTemplateUrl('uml'),
-            controller: 'UmlCtrl as UmlCtrl'
+            templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
+            controller: 'UmlCtrl as UmlCtrl',
+            resolve: {
+              test: function(){
+                console.log('resolving uml');
+              }
+            }
           });
 
           //Resolve necessary data here to simplify controller
           ROUTER.when('resource', mountPoint + '/:name', {
-            templateUrl: config.prepareViewTemplateUrl('resources'),
+            templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
               resources: ['$q', '$http', function($q, $http){
@@ -83,7 +88,7 @@
           });
 
           ROUTER.when('subresource', mountPoint + '/:parent/:id/:name/refby/:inverse', {
-            templateUrl: config.prepareViewTemplateUrl('resources'),
+            templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
               resources: ['$q', '$http', function($q, $http){

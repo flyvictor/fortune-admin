@@ -8,35 +8,47 @@
     .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider', 'docsProvider',
       function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider, docsProvider){
         fortuneAdminProvider.enableNavbar();
-        fortuneAdminProvider.mountTo($routeProvider, '');
+        fortuneAdminProvider.mountTo($routeProvider, '/admin');
 
         docsProvider.enableNavbar();
-        docsProvider.mountTo($routeProvider, '');
+        docsProvider.mountTo($routeProvider, '/docs');
 
         $routeProvider.when('/', {
           templateUrl: 'init.html',
           controller: 'initCtrl'
         });
         $routeProvider.otherwise({
-          redirectTo: '/uml'
+          redirectTo: '/'
         });
         $locationProvider.html5Mode(true);
     }])
-    .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', 'docs', function($scope, $location, fortuneAdmin, docs){
+    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', function($scope, $rootScope, $location, fortuneAdmin, docs){
       $scope.params = {
         host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
 
-      $scope.start = function(){
-        fortuneAdmin.setApiHost($scope.params.host);
-        fortuneAdmin.setApiNamespace($scope.params.namespace);
+      $rootScope.$on('$locationChangeStart', function(){
+        console.log('location change started ', arguments);
+      });
 
+      $rootScope.$on('$locationChangeSuccess', function(){
+        console.log('location change error ', arguments);
+      });
+
+      $scope.startDocs = function(){
         docs.setApiHost($scope.params.host);
         docs.setApiNamespace($scope.params.namespace);
 
-        $location.url('/uml');
+        $location.url('/docs/docs');
+      };
+
+      $scope.startFA = function(){
+        fortuneAdmin.setApiHost($scope.params.host);
+        fortuneAdmin.setApiNamespace($scope.params.namespace);
+
+
+        $location.url('/admin/uml');
       };
     }]);
 })(angular);
-

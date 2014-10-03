@@ -32,22 +32,22 @@ angular.module('docs', [
     var config = window.CONFIG.docs;
     return {
         setApiHost: function(host){
-            CONFIG.fortuneAdmin.baseEndpoint = host;
+            CONFIG.docs.baseEndpoint = host;
         },
         setApiNamespace: function(namespace){
-            CONFIG.fortuneAdmin.apiNamespace = namespace;
+            CONFIG.docs.apiNamespace = namespace;
         },
         html5Mode: function(use, prefix){
-            CONFIG.fortuneAdmin.routing.html5Mode = !!use;
-            CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+            CONFIG.docs.routing.html5Mode = !!use;
+            CONFIG.docs.routing.urlPrefix = prefix || '';
         },
         enableNavbar: function(){
-            CONFIG.fortuneAdmin.enableNavbar = true;
+            CONFIG.docs.enableNavbar = true;
         },
         mountTo: function($routeProvider, mountPoint){
 
             ROUTER.when('docs_page', mountPoint + '/docs', {
-                templateUrl : config.prepareViewTemplateUrl('docs'),
+                templateUrl : config.prepareViewTemplateUrl('docs', 'docs'),
                 controller:'DocsCtrl as DocsCtrl',
                 resolve: {
                     resources: ['$q', '$http', function($q, $http){
@@ -88,17 +88,17 @@ angular.module('docs', [
                     if(url && args) {
                         url = this.replaceUrlParams(url, args);
                     }
-                    return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
+                    return CONFIG.docs.routing.html5Mode ? url : '/#' + CONFIG.docs.routing.urlPrefix + url;
                 },
 
                 setApiHost: function(host){
-                    CONFIG.fortuneAdmin.baseEndpoint = host;
+                    CONFIG.docs.baseEndpoint = host;
                 },
                 setApiNamespace: function(namespace){
-                    CONFIG.fortuneAdmin.apiNamespace = namespace;
+                    CONFIG.docs.apiNamespace = namespace;
                 },
                 setAuthToken: function(token){
-                    CONFIG.fortuneAdmin.authToken = token;
+                    CONFIG.docs.authToken = token;
                 }
             }
         }
@@ -109,10 +109,10 @@ angular.module('docs', [
     function($rootScope, $location, docs, editableOptions) {
         var prefix = '';
 
-        $rootScope.fortuneAdminRoute = function(url, args) {
+        $rootScope.docsRoute = function(url, args) {
             return prefix + docs.routePath(url, args);
         };
-        $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
+        $rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;
 
         // bootstrap3 theme. Can be also 'bs2', 'default'
         editableOptions.theme = 'bs3';

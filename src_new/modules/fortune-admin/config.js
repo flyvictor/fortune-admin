@@ -12,7 +12,8 @@
     appVersion: 1,
     viewUrlPrefix: '/views/',
     templateFileSuffix: '.html',
-    prepareViewTemplateUrl: function(url){
+    prepareViewTemplateUrl: function(mod, url){
+      console.log('resolved template url ', '/' + mod + this.viewUrlPrefix + url + this.templateFileSuffix);
       return this.viewUrlPrefix + url + this.templateFileSuffix;
     },
     routing: {
