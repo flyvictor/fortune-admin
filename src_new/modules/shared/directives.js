@@ -34,7 +34,7 @@ angular.module('sharedElements.Directives', [])
     return {
       restrict: 'E',
       replace: true,
-      templateUrl: window.CONFIG.shared.prepareViewTemplateUrl('umlCells'),
+      templateUrl: CONFIG.shared.prepareViewTemplateUrl('umlCells'),
       scope: true,
       link: function(scope){
         scope.r = $rootScope.fortuneAdminRoute;
@@ -45,7 +45,7 @@ angular.module('sharedElements.Directives', [])
         return {
             restrict: 'E',
             replace: true,
-            templateUrl:  window.CONFIG.shared.prepareViewTemplateUrl('docsCells'),
+            templateUrl: CONFIG.shared.prepareViewTemplateUrl('docsCells'),
             scope: true,
             link: function(scope){
                 scope.r = $rootScope.fortuneAdminRoute;

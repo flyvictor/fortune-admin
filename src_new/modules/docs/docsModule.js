@@ -32,17 +32,17 @@ angular.module('docs', [
     var config = window.CONFIG.docs;
     return {
         setApiHost: function(host){
-            CONFIG.fortuneAdmin.baseEndpoint = host;
+            config.baseEndpoint = host;
         },
         setApiNamespace: function(namespace){
-            CONFIG.fortuneAdmin.apiNamespace = namespace;
+            config.apiNamespace = namespace;
         },
         html5Mode: function(use, prefix){
-            CONFIG.fortuneAdmin.routing.html5Mode = !!use;
-            CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+            config.routing.html5Mode = !!use;
+            config.routing.urlPrefix = prefix || '';
         },
         enableNavbar: function(){
-            CONFIG.fortuneAdmin.enableNavbar = true;
+            config.enableNavbar = true;
         },
         mountTo: function($routeProvider, mountPoint){
 
@@ -88,17 +88,17 @@ angular.module('docs', [
                     if(url && args) {
                         url = this.replaceUrlParams(url, args);
                     }
-                    return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
+                    return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
                 },
 
                 setApiHost: function(host){
-                    CONFIG.fortuneAdmin.baseEndpoint = host;
+                    config.baseEndpoint = host;
                 },
                 setApiNamespace: function(namespace){
-                    CONFIG.fortuneAdmin.apiNamespace = namespace;
+                    config.apiNamespace = namespace;
                 },
                 setAuthToken: function(token){
-                    CONFIG.fortuneAdmin.authToken = token;
+                    config.authToken = token;
                 }
             }
         }
@@ -112,7 +112,7 @@ angular.module('docs', [
         $rootScope.fortuneAdminRoute = function(url, args) {
             return prefix + docs.routePath(url, args);
         };
-        $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
+        $rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;
 
         // bootstrap3 theme. Can be also 'bs2', 'default'
         editableOptions.theme = 'bs3';
