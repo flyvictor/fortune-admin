@@ -47,7 +47,7 @@ angular.module('docs', [
         mountTo: function($routeProvider, mountPoint){
 
             ROUTER.when('docs_page', mountPoint + '/docs', {
-                templateUrl : config.prepareViewTemplateUrl('docs'),
+                templateUrl : config.prepareViewTemplateUrl('docs', 'docs'),
                 controller:'DocsCtrl as DocsCtrl',
                 resolve: {
                     resources: ['$q', '$http', function($q, $http){
@@ -109,7 +109,7 @@ angular.module('docs', [
     function($rootScope, $location, docs, editableOptions) {
         var prefix = '';
 
-        $rootScope.fortuneAdminRoute = function(url, args) {
+        $rootScope.docsRoute = function(url, args) {
             return prefix + docs.routePath(url, args);
         };
         $rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;

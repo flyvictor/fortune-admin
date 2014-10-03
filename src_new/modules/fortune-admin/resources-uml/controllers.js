@@ -3,6 +3,7 @@
     .controller('UmlCtrl', ['$scope', '$http', UmlController]);
 
   function UmlController($scope, $http){
+    console.log('initializing uml');
     $scope.resources = [];
     $scope.render = false;
     $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
