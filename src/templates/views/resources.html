@@ -6,43 +6,8 @@
   <table class="table table-bordered">
     <tr>
       <th ng-repeat="(name, type) in currentResource.schema | filterLinks" ng-class="{'column-filter': showFilter}">
-        <div>
-          <span>{{name}}</span>
-          <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
-          <span class="glyphicon glyphicon-remove" ng-show="showFilter" ng-click="showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)"></span>
-        </div>
-        <div ng-switch="type">
-          <div ng-switch-when="String" ng-show="showFilter">
-            <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name, type)" typeahead-on-select="ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name, type)">
-          </div>
-          <div ng-switch-when="Number" ng-show="showFilter">
-            <div class="input-group">
-              <span class="input-group-addon">From:</span>
-              <input type="number" ng-model="Query.start" class="form-control" ng-change="ResourcesCtrl.applyFilter(Query, name, type)"/>
-            </div>
-            <div class="input-group">
-              <span class="input-group-addon">To:</span>
-              <input class="form-control" type="number" ng-model="Query.end"  ng-change="ResourcesCtrl.applyFilter(Query, name, type)"/>
-            </div>
-          </div>
-          <div ng-switch-when="Date" ng-show="showFilter">
-            <div class="input-group">
-              <span class="input-group-addon">From:</span>
-              <input type="date" class="form-control" ng-model="Query.start" ng-change="ResourcesCtrl.applyFilter(Query, name, type)"/>
-            </div>
-            <div class="input-group">
-              <span class="input-group-addon">To:</span>
-              <input type="date" class="form-control" ng-model="Query.end"  ng-change="ResourcesCtrl.applyFilter(Query, name, type)"/>
-            </div>
-          </div>
-          <div ng-switch-when="Boolean" ng-show="showFilter">
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-sm" ng-class="{'btn-default': !Query.yep, 'btn-info': Query.yep}" type="button" ng-click="Query.yep = true; Query.nope=false; ResourcesCtrl.applyFilter(true, name, type);">Yep</button>
-              <button class="btn btn-sm" ng-class="{'btn-default': !Query.nope, 'btn-info': Query.nope}" type="button" ng-click="Query.yep = false; Query.nope=true; ResourcesCtrl.applyFilter(false, name, type);">Nope</button>
-            </div>
-          </div>
-        </div>
-      </th>
+      <sort-by onsort="ResourcesCtrl.onSort" sortdir="filterCriteria.sortDir" sortedby="filterCriteria.sortedBy" sortvalue="{{ name }}">{{ name }}</sort-by>
+  	</th>
       <th ng-repeat="(linkName, link) in links">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>
       <th>Actions</th>
     </tr>
@@ -66,6 +31,11 @@
       </td>
     </tr>
   </table>
+  <div ng-show="totalPages > 1" class="align-center">
+  <pagination num-pages="totalPages" current-page="filterCriteria.pageNumber" max-size="1" class="" 
+    boundary-links="true" on-select-page="selectPage(page)"></pagination>
+  <div>
+  </div>
   <div class="col-md-3">
     <div ng-hide="PK === 'id'">
       <label>Enter {{ PK }} for new {{ currentResource.name }}</label>
