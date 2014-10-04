@@ -3,7 +3,7 @@ angular.module('sharedElements.Directives', [])
   .directive('fortuneAdminNavbar', [function() {
     return {
       restrict: 'E',
-      templateUrl: 'views/mynavbar.html',
+      templateUrl:  CONFIG.shared.prepareViewTemplateUrl('mynavbar'),
       replace: true,
       transclude: true,
       scope: {}
@@ -12,7 +12,7 @@ angular.module('sharedElements.Directives', [])
   .directive('fortuneAdminResourcesCells', ['$http', '$rootScope', function($http, $rootScope){
     return {
       restrict: 'E',
-      templateUrl: window.CONFIG.shared.prepareViewTemplateUrl('resourcesCells'),
+      templateUrl: CONFIG.shared.prepareViewTemplateUrl('resourcesCells'),
       replace: true,
       scope: true,
       link: function(scope){
@@ -48,7 +48,7 @@ angular.module('sharedElements.Directives', [])
             templateUrl: CONFIG.shared.prepareViewTemplateUrl('docsCells'),
             scope: true,
             link: function(scope){
-                scope.r = $rootScope.fortuneAdminRoute;
+                scope.r = $rootScope.docsRoute;
             }
         }
     }]);

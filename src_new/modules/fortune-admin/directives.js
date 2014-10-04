@@ -11,7 +11,7 @@ angular.module('fortuneAdmin.Directives', [])
         resourceName: '@',
         resourceId: '@'
       },
-      templateUrl: window.CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faEditable'),
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faEditable'),
       controller: 'faEditableCtrl'
     }
   }])

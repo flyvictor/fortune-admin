@@ -1,7 +1,7 @@
 (function(angular){
-  var config = window.CONFIG.docs;
-  angular.module('docs.Directives', [])
-      .directive('methodDescription', function(){
+  //var config = window.CONFIG.docs;
+  angular.module('docs.Directives', ['docs.Config'])
+      .directive('methodDescription', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
               replace: true,
@@ -10,8 +10,8 @@
                   resource: '='
               }
           }
-      })
-      .directive('methodExample', function(){
+      }])
+      .directive('methodExample', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
               replace: true,
@@ -20,5 +20,5 @@
                   resource: '='
               }
           }
-      })
+      }])
 })(angular);

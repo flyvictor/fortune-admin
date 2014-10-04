@@ -7,7 +7,7 @@
         'fortuneAdmin.Services',
         'fortuneAdmin.Uml'
     ])
-    .provider('fortuneAdmin', [function(){
+    .provider('fortuneAdmin', function(){
       var lookup = {};
       var otherwiseLookup = null;
 
@@ -50,7 +50,8 @@
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
-            templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
+            //templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
+            templateUrl : config.prepareViewTemplateUrl('uml'),
             controller: 'UmlCtrl as UmlCtrl',
             resolve: {
               test: function(){
@@ -61,7 +62,8 @@
 
           //Resolve necessary data here to simplify controller
           ROUTER.when('resource', mountPoint + '/:name', {
-            templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
+            //templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
+            templateUrl: config.prepareViewTemplateUrl('resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
               resources: ['$q', '$http', function($q, $http){
@@ -88,7 +90,7 @@
           });
 
           ROUTER.when('subresource', mountPoint + '/:parent/:id/:name/refby/:inverse', {
-            templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
+            templateUrl: config.prepareViewTemplateUrl('resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
               resources: ['$q', '$http', function($q, $http){
@@ -156,8 +158,7 @@
           }
         }
       }
-    }])
-
+    })
     .run(['$rootScope', '$location', 'fortuneAdmin', 'editableOptions',
       function($rootScope, $location, fortuneAdmin, editableOptions) {
       var prefix = '';

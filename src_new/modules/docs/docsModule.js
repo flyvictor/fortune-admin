@@ -1,10 +1,11 @@
 
 angular.module('docs', [
     'sharedElements',
+    'docs.Config',
     'docs.Controllers',
     'docs.Directives'
 ])
-.provider('docs', [function(){
+.provider('docs', [ 'docsConfigConstant', function(config){
     var lookup = {};
     var otherwiseLookup = null;
 
@@ -29,7 +30,7 @@ angular.module('docs', [
         }
     };
 
-    var config = window.CONFIG.docs;
+    //var config = CONFIG.docs;
     return {
         setApiHost: function(host){
             config.baseEndpoint = host;
@@ -63,7 +64,7 @@ angular.module('docs', [
             ROUTER.install($routeProvider);
         },
 
-        $get: function(){
+        $get: ['docsConfigConstant', function(config){
             return {
 
                 getRoute: function(key) {
@@ -101,18 +102,19 @@ angular.module('docs', [
                     config.authToken = token;
                 }
             }
-        }
+        }]
     }
 }])
 
-.run(['$rootScope', '$location', 'docs', 'editableOptions',
-    function($rootScope, $location, docs, editableOptions) {
+.run(['$rootScope', '$location', 'docs', 'editableOptions', 'docsConfigConstant',
+    function($rootScope, $location, docs, editableOptions, config) {
         var prefix = '';
 
         $rootScope.docsRoute = function(url, args) {
             return prefix + docs.routePath(url, args);
         };
-        $rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;
+        //$rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;
+        $rootScope.navbarEnabled = config.enableNavbar;
 
         // bootstrap3 theme. Can be also 'bs2', 'default'
         editableOptions.theme = 'bs3';
