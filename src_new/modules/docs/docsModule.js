@@ -52,6 +52,7 @@ angular.module('docs', [
                 controller:'DocsCtrl as DocsCtrl',
                 resolve: {
                     resources: ['$q', '$http', function($q, $http){
+                        /*angular.forEach(data.resources, function(item){ if (!item.service) item.service = “default”});*/
                         var d = $q.defer();
                         $http.get(config.baseEndpoint + '/resources').success(function(data){
                             d.resolve(data.resources);

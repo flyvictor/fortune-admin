@@ -1,0 +1,21 @@
+<div>
+    <!-- string -->
+    <div ng-if="value.type == 'String'">
+        <input type="text" ng-model="data[name]" class="form-control" />
+    </div>
+
+    <!-- date -->
+    <div ng-if="value.type == 'Date' || value == 'Date'">
+        <input type="date" class="form-control" ng-model="data[name]" />
+    </div>
+
+    <!-- link to another resource -->
+    <div ng-if="value.ref">
+        link to {{value.ref}}
+    </div>
+
+    <!-- array of links to another resources -->
+    <div ng-if="value[0].ref">
+        array of links to {{value[0].ref}}
+    </div>
+</div>

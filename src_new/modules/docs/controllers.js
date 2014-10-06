@@ -1,8 +1,8 @@
 (function(angular){
-    angular.module('docs.Controllers', [])
-        .controller('DocsCtrl', ['$scope', '$location', '$anchorScroll', 'resources', DocsController]);
+    angular.module('docs.Controllers', ['docs.Config'])
+        .controller('DocsCtrl', ['$scope', '$location', '$anchorScroll', 'resources', 'docsConfigConstant', DocsController]);
 
-    function DocsController($scope, $location, $anchorScroll, resources){
+    function DocsController($scope, $location, $anchorScroll, resources, config){
         $scope.resources = resources;
         $scope.selected = $scope.resources.length ? $scope.resources[0].name : undefined;
 
