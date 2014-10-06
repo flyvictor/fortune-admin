@@ -1,16 +1,13 @@
 
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [
-
-        'ui.bootstrap'
-      , 'xeditable'
-      , 'fortuneAdmin.Controllers'
-      , 'fortuneAdmin.Directives'
-      , 'fortuneAdmin.Services'
-      , 'fortuneAdmin.Uml'
+        'sharedElements',
+        'fortuneAdmin.Controllers',
+        'fortuneAdmin.Directives',
+        'fortuneAdmin.Services',
+        'fortuneAdmin.Uml'
     ])
-    .provider('fortuneAdmin', [function(){
-
+    .provider('fortuneAdmin', function(){
       var lookup = {};
       var otherwiseLookup = null;
 
@@ -38,27 +35,34 @@
       var config = window.CONFIG.fortuneAdmin;
       return {
         setApiHost: function(host){
-          CONFIG.fortuneAdmin.baseEndpoint = host;
+            config.baseEndpoint = host;
         },
         setApiNamespace: function(namespace){
-          CONFIG.fortuneAdmin.apiNamespace = namespace;
+            config.apiNamespace = namespace;
         },
         html5Mode: function(use, prefix){
-          CONFIG.fortuneAdmin.routing.html5Mode = !!use;
-          CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+            config.routing.html5Mode = !!use;
+            config.routing.urlPrefix = prefix || '';
         },
         enableNavbar: function(){
-          CONFIG.fortuneAdmin.enableNavbar = true;
+            config.enableNavbar = true;
         },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
+            //templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
             templateUrl : config.prepareViewTemplateUrl('uml'),
-            controller: 'UmlCtrl as UmlCtrl'
+            controller: 'UmlCtrl as UmlCtrl',
+            resolve: {
+              test: function(){
+                console.log('resolving uml');
+              }
+            }
           });
 
           //Resolve necessary data here to simplify controller
           ROUTER.when('resource', mountPoint + '/:name', {
+            //templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
             templateUrl: config.prepareViewTemplateUrl('resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
@@ -139,23 +143,22 @@
               if(url && args) {
                 url = this.replaceUrlParams(url, args);
               }
-              return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
+              return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
             },
 
             setApiHost: function(host){
-              CONFIG.fortuneAdmin.baseEndpoint = host;
+                config.baseEndpoint = host;
             },
             setApiNamespace: function(namespace){
-              CONFIG.fortuneAdmin.apiNamespace = namespace;
+                config.apiNamespace = namespace;
             },
             setAuthToken: function(token){
-              CONFIG.fortuneAdmin.authToken = token;
+                config.authToken = token;
             }
           }
         }
       }
-    }])
-
+    })
     .run(['$rootScope', '$location', 'fortuneAdmin', 'editableOptions',
       function($rootScope, $location, fortuneAdmin, editableOptions) {
       var prefix = '';

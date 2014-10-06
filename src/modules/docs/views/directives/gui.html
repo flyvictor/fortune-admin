@@ -1,0 +1,14 @@
+<div class="resource-giu">
+    <h4><strong>/{{resource.name}}:</strong> Operations about {{resource.name}} </h4>
+
+    <!-- Methods menu -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-default" ng-repeat="httpMethod in httpMethods"
+                ng-class="{'active':selectedMethod == httpMethod}"
+                ng-click="selectMethod(httpMethod)">
+            {{httpMethod | uppercase }}
+        </button>
+    </div>
+
+    <request-response-container resource="resource" method="selectedMethod"></request-response-container>
+</div>

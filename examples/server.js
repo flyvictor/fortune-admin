@@ -16,46 +16,51 @@ var app = fortune({
 })
 
 .resource("user", {
-  title : String,
-  firstName : String,
-  lastName : String,
-  role : String,
-  email : String,
-  nationality: String,
-  languageCode: String,
+  title : { type: String, "docs:example": 'Mr' },
+  firstName : { type: String, "docs:example": 'Peter' },
+  lastName : { type: String, "docs:example": 'Pan' },
+  role : { type: String, "docs:example": 'admin' },
+  email : { type: String, "docs:example" : 'peter.pan@neverland.com' },
+  nationality: { type: String, "docs:example": 'British' },
+  languageCode: { type: String, "docs:description": 'An IETF language tag, e.g en-GB', "docs:example": 'en-GB' },
   addresses: [{ref: "address", inverse: "user"}],
   flights: [{ref: "flight", inverse: "users", pkType: String}],
   additionalDetails : {
     testNumber: Number,
     notificationData: Object,
     primaryRelationshipLegacyId: Number,
-    legacyID: { type: Number, index : true }
+    legacyID: Number
   }
 }, {
-  model: {pk: "email"}
+  model: {pk: "email"},
+  "docs:description": 'A user contains the information about different types of users from the system.'
 })
 
 .resource("address", {
-  type: String,
-  addressLine1: String,
-  addressLine2: String,
-  addressLine3: String,
-  addressLine4: String,
-  city: String,
-  region: String,
-  postCode: String,
-  country: String,
-  dateDeleted: Date,
+  type: { type: String, "docs:example": "home" },
+  addressLine1: { type: String, "docs:example": "61" },
+  addressLine2: { type: String, "docs:example": "Wellfield Road" },
+  addressLine3: { type: String, "docs:example": "appt." },
+  addressLine4: { type: String, "docs:example": "17" },
+  city: { type: String, "docs:example": "Newcastle upon Tyne" },
+  region: { type: String, "docs:example": "North East" },
+  postCode: { type: String, "docs:example": "NE1 AB" },
+  country: { type: String, "docs:example": "UK" },
+  dateDeleted: { type: Date, "docs:example": "" },
   user: {ref: "user", inverse: "addresses", pkType: String}
 })
 
 .resource("flight", {
-  flightNumber: String,
+  flightNumber: { type: String, "docs:example": 554 },
   users: [{ref: "user", inverse: "flights", pkType : String}]
 }, { model: { pk: "flightNumber" }});
 
 container
+  //.use(express.static(path.join(__dirname , '../src')))
   .use(express.static(path.join(__dirname , '../src')))
+  .use(express.static(path.join(__dirname,  '../src/modules/docs')))
+  .use(express.static(path.join(__dirname, '../src/modules/fortune-admin')))
+  .use(express.static(path.join(__dirname, '../src/modules/shared')))
   .use(express.static(path.join(__dirname , '/bower_components')))
   .use(app.router)
   .listen(port);

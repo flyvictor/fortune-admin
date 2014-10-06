@@ -1,0 +1,36 @@
+<section id="fortune-admin" ng-class="{wmargin: navbarEnabled}">
+    <div ng-if="navbarEnabled">
+        <fortune-admin-navbar></fortune-admin-navbar>
+    </div>
+    <div id="guide" ng-if="resources.length !== 0" ng-class="{ 'stick': selected !== undefined }">
+        <div>
+            <div class="list-group">
+                <a href class="list-group-item" ng-class="itemClass(resource.name)" ng-repeat="resource in resources"
+                   ng-click="select(resource.name)">
+                    {{ resource.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="api-docs" ng-init="selectedMode = 'example'">
+        <ul class="nav nav-tabs" role="tablist">
+            <li ng-class="{ 'active': selectedMode == 'example' }" ng-click="selectedMode='example'">
+                <a href="#">Example</a>
+            </li>
+            <li ng-class="{ 'active': selectedMode == 'interaction' }" ng-click="selectedMode='interaction'">
+                <a href="#">Interaction</a>
+            </li>
+        </ul>
+        <div class="tab-content" ng-if="selectedMode == 'example'">
+            <div class="single-resource" id="{{resource.name}}" ng-repeat="resource in resources">
+                <resource-description resource="resource"></resource-description>
+                <resource-example resource="resource"></resource-example>
+            </div>
+        </div>
+        <div class="tab-content" ng-if="selectedMode == 'interaction'">
+            <div class="single-resource" id="{{resource.name}}" ng-repeat="resource in resources">
+                <resource-gui resource="resource"></resource-gui>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,8 +1,8 @@
 (function(){
   if (!window.CONFIG) window.CONFIG = {};
 
-   window.CONFIG.fortuneAdmin =  {
-    templateDirectory: '/templates/',
+   window.CONFIG.shared =  {
+    templateDirectory: '/views/',
     baseEndpoint: '',
     apiNamespace: '/api/v1',
     getApiNamespace: function(){
@@ -10,7 +10,7 @@
     },
     mountPoint: '',
     appVersion: 1,
-    viewUrlPrefix: '/templates/views/',
+    viewUrlPrefix: '/views/',
     templateFileSuffix: '.html',
     prepareViewTemplateUrl: function(url){
       return this.viewUrlPrefix + url + this.templateFileSuffix;

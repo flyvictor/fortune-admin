@@ -19,7 +19,7 @@
   function resourcesCanvas($compile, UmlElementsRegistry){
     return {
       restrict: 'A',
-      templateUrl: '/templates/directives/uml/canvas.html',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/uml/canvas'),
       scope: {
         resources: '='
       },

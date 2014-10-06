@@ -2,19 +2,6 @@
 angular.module('fortuneAdmin.Controllers', [
     'fortuneAdmin.Services'
   ])
-
-  .filter('filterLinks', [function(){
-    return function(input){
-      var nonLinks = {};
-      angular.forEach(input, function(field, name){
-        if (!angular.isObject(field)){
-          nonLinks[name] = field;
-        }
-      });
-      return nonLinks;
-    }
-  }])
-
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',
@@ -180,4 +167,24 @@ angular.module('fortuneAdmin.Controllers', [
             $scope.data = data[plurResourceName];
           });
       }
-    }]);
+    }])
+    .controller('faEditableCtrl', ['$scope', '$http',
+        function($scope, $http){
+            $scope.apply = function(value){
+                //Send PATCH to the server
+                var cmd = [];
+                cmd.push({
+                    op: 'replace',
+                    path: '/' + $scope.resourceName + '/0/links/' + $scope.path,
+                    value: value
+                });
+
+                $http({
+                    method: 'PATCH',
+                    url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
+                    data: cmd
+                }).catch(function(data, status){
+                    console.error(data, status);
+                });
+            };
+        }]);
