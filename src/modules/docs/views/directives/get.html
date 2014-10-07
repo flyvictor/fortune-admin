@@ -1,0 +1,36 @@
+<div class="request">
+    <div ng-if="view == 'gui'">
+        <table class="table" ng-if="request.params.ids.length">
+            <tr>
+                <td>Parameter</td>
+                <td>Value</td>
+                <td>Actions</td>
+            </tr>
+            <tr ng-repeat="id in request.params.ids">
+                <td>{{PK}}</td>
+                <td>{{id}}</td>
+                <td>
+                    <a href ng-click="removeRequestParameter(id)"><span class="glyphicon glyphicon-remove"></span></a>
+                </td>
+            </tr>
+        </table>
+        <table class="table">
+            <tr>
+                <td>{{PK}}</td>
+                <td><input type="text" class="form-control" ng-model="id" /></td>
+                <td><button type="button" ng-click="addRequestParameter(id)" class="btn btn-default btn-sm">Add {{resource.name}}</button></td>
+            </tr>
+            <tr ng-if="request.params.ids.length == 1">
+                <td>Related resource name (one level deep):</td>
+                <td><input type="text" class="form-control" ng-model="relatedResource.name"/><td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <div ng-if="view == 'json'">
+        <pre>{{ request | json}}</pre>
+    </div>
+
+    <button type="button" ng-click="" class="btn btn-default btn-primary">Send request</button>
+</div>

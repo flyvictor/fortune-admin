@@ -1,0 +1,16 @@
+<div class="request">
+    <div ng-if="view == 'gui'">
+        <table class="table">
+            <tr>
+                <td>{{PK}}</td>
+                <td><input type="text" class="form-control" ng-model="id"/></td>
+            </tr>
+        </table>
+    </div>
+
+    <div ng-if="view == 'json'">
+        <pre>{{ request | json }}</pre>
+    </div>
+
+    <button type="button" ng-click="" class="btn btn-default btn-primary">Send request</button>
+</div>

@@ -31,50 +31,62 @@
               link: function ($scope) {
                   $scope.httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
                   $scope.selectedMethod = $scope.httpMethods[0];
-
                   $scope.selectMethod = function (method) {
                       $scope.selectedMethod = method;
                   };
+
+                  $scope.request = {};
+                  angular.forEach($scope.httpMethods, function (method) {
+                      $scope.request[method] = {};
+                  });
+
+                  $scope.requestViews = ['gui', 'json' ];
+                  $scope.selectedRequestView = $scope.requestViews[0];
+                  $scope.selectRequestView = function (view) {
+                      $scope.selectedRequestView = view;
+                  };
+
+                  $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
               }
           }
       }])
-      .directive('requestResponseContainer', ['docsConfigConstant', '$http', function(config, $http){
+      /*.directive('requestResponseContainer', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
               replace: true,
               templateUrl: config.prepareViewTemplateUrl('directives/requestResponse'),
-              scope: {
-                  resource: '=',
-                  method: '='
-              },
+              scope: false,
               link: function ($scope) {
+                  $scope.request = {};
+                  $scope.request[$scope.selectedMethod] = {};
+                  $scope.resource = $scope.$parent.resource;
+
+                  $scope.requestViews = ['gui', 'json' ];
+                  $scope.selectedRequestView = $scope.requestViews[0];
+                  $scope.selectRequestView = function (view) {
+                      $scope.selectedRequestView = view;
+                  };
+
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
-                  $scope.ids = [];
-                  $scope.relatedResource = {};
-                  $scope.response = {};
 
-                  $scope.addRequestParameter = function (id) {
-                      if (id && $scope.ids.indexOf(id) == -1) $scope.ids.push(id);
-                  };
-
-                  $scope.removeRequestParameter = function (id) {
-                      var index = $scope.ids.indexOf(id);
-                      $scope.ids.splice(index, 1);
-                  };
-
-                  $scope.sendGETRequest = function (resource, ids, relatedResourceName) {
+                  $scope.sendGETRequest = function (resource, ids, relatedResource) {
                       var requestConfig = {
                           method: $scope.method,
                           url: config.getApiNamespace() + '/' + resource.route
                       };
 
-                      if (ids.length) {
-                          if (ids.length == 1) requestConfig.url += '/' + ids[0];
-                          if (ids.length > 1) requestConfig.params = { ids: ids.join(',') };
-                          if (relatedResourceName) requestConfig.url += '/' + relatedResourceName;
-                      }
+                      var data = requestData;
+                      data.method = $scope.method;
+                      data.url = config.getApiNamespace() + '/' + resource.route;
+                      data.params = data.params || {};
 
-                      $http(requestConfig)
+                      if (params.ids && params.ids.length) {
+                          if (data.params.ids.length == 1) data.url += '/' + data.params.ids[0];
+                          else data.params.ids = data.params.ids.join(',');
+                      }
+                      if (relatedResource) data.url += '/' + relatedResource;
+
+                      $http(data)
                           .success(function (data, status, headers, config) {
                               $scope.response[resource.name] = $scope.response[resource.name] || {};
                               $scope.response[resource.name][$scope.method] = { body: data, status: status };
@@ -124,14 +136,48 @@
                   };
               }
           }
-      }])
-      .directive('response', ['docsConfigConstant', function(config){
+      }])*/
+      .directive('getRequest', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
               replace: true,
-              templateUrl: config.prepareViewTemplateUrl('directives/response'),
+              templateUrl: config.prepareViewTemplateUrl('directives/get'),
               scope: {
-                  response: '='
+                  request: '=',
+                  view: '='
+              },
+              link: function ($scope) {
+                  $scope.PK = $scope.PK || $scope.$parent.PK;
+
+                  $scope.addRequestParameter = function (id) {
+                      if (!id) return;
+
+                      $scope.request.params = $scope.request.params || {};
+                      $scope.request.params.ids = $scope.request.params.ids || [];
+                      if ($scope.request.params.ids.indexOf(id) == -1)
+                          $scope.request.params.ids.push(id);
+                  };
+
+                  $scope.removeRequestParameter = function (id) {
+                      var index = $scope.request.params.ids.indexOf(id);
+                      $scope.request.params.ids.splice(index, 1);
+                  };
+              }
+          }
+      }])
+      .directive('postRequest', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/post'),
+              scope: {
+                request: '=',
+                view: '='
+              },
+              link: function ($scope) {
+                  $scope.PK = $scope.PK || $scope.$parent.PK;
+                  $scope.resource = $scope.$parent.resource;
+                  $scope.request.data = $scope.request.data || {};
               }
           }
       }])
@@ -140,12 +186,30 @@
               restrict: 'E',
               replace: true,
               templateUrl: config.prepareViewTemplateUrl('directives/attribute'),
+              scope: false
+          }
+      }])
+      .directive('deleteRequest', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/delete'),
               scope: {
-                  name: '=',
-                  value: '='
+                  request: '=',
+                  view: '='
               },
               link: function ($scope) {
-                  $scope.data = $scope.$parent.data;
+                  $scope.PK = $scope.PK || $scope.$parent.PK;
+              }
+          }
+      }])
+      .directive('response', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/response'),
+              scope: {
+                  response: '='
               }
           }
       }])

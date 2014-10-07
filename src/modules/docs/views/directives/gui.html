@@ -1,7 +1,7 @@
-<div class="resource-giu">
+<div class="resource-gui">
     <h4><strong>/{{resource.name}}:</strong> Operations about {{resource.name}} </h4>
 
-    <!-- Methods menu -->
+    <!-- HTTP methods menu -->
     <div class="btn-group">
         <button type="button" class="btn btn-default" ng-repeat="httpMethod in httpMethods"
                 ng-class="{'active':selectedMethod == httpMethod}"
@@ -10,5 +10,31 @@
         </button>
     </div>
 
-    <request-response-container resource="resource" method="selectedMethod"></request-response-container>
+    <div class="request col-md-12" ng-switch="selectedMethod">
+        <h3>Request</h3>
+        <div class="btn-group toggle-request-view">
+            <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                {{ selectedRequestView | uppercase }} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="view in requestViews" ng-if="view !== selectedRequestView">
+                    <a href ng-click="selectRequestView(view)">{{ view | uppercase }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div ng-switch-when="get">
+            <get-request request="request[selectedMethod]" view="selectedRequestView"></get-request>
+        </div>
+
+        <div ng-switch-when="post">
+            <post-request request="request[selectedMethod]" view="selectedRequestView"></post-request>
+        </div>
+
+        <div ng-switch-when="delete">
+            <delete-request request="request[selectedMethod]" view="selectedRequestView" ></delete-request>
+        </div>
+
+        <!--<response ng-if="response[resource.name][method]" response="response[resource.name][method]"></response>-->
+    </div>
 </div>

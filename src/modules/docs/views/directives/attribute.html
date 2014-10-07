@@ -1,12 +1,12 @@
-<div>
+<div ng-init="value=resource.schema[attrName]">
     <!-- string -->
     <div ng-if="value.type == 'String'">
-        <input type="text" ng-model="data[name]" class="form-control" />
+        <input type="text" ng-model="request.data[attrName]" class="form-control" />
     </div>
 
     <!-- date -->
     <div ng-if="value.type == 'Date' || value == 'Date'">
-        <input type="date" class="form-control" ng-model="data[name]" />
+        <input type="date" class="form-control" ng-model="request.data[attrName]" />
     </div>
 
     <!-- link to another resource -->
