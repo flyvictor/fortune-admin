@@ -1,5 +1,8 @@
 (function(angular){
-  angular.module('docs.Directives', ['docs.Config'])
+  angular.module('docs.Directives', [
+      'docs.Config',
+      'docs.Services'
+  ])
       .directive('resourceDescription', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
@@ -20,7 +23,7 @@
               }
           }
       }])
-      .directive('resourceGui', ['docsConfigConstant', '$http', function(config){
+      .directive('resourceGui', ['docsConfigConstant', 'docsHTTP', function(config, docsHTTPService){
           return {
               restrict: 'E',
               replace: true,
@@ -47,96 +50,19 @@
                   };
 
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
+
+                  $scope.response = {};
+                  $scope.sendRequest = function (method, route, request) {
+                      docsHTTPService.sendRequest(method, route, request, function (data, status, headers, config) {
+                          $scope.response[method] = {
+                              status: status,
+                              body: data
+                          }
+                      });
+                  }
               }
           }
       }])
-      /*.directive('requestResponseContainer', ['docsConfigConstant', function(config){
-          return {
-              restrict: 'E',
-              replace: true,
-              templateUrl: config.prepareViewTemplateUrl('directives/requestResponse'),
-              scope: false,
-              link: function ($scope) {
-                  $scope.request = {};
-                  $scope.request[$scope.selectedMethod] = {};
-                  $scope.resource = $scope.$parent.resource;
-
-                  $scope.requestViews = ['gui', 'json' ];
-                  $scope.selectedRequestView = $scope.requestViews[0];
-                  $scope.selectRequestView = function (view) {
-                      $scope.selectedRequestView = view;
-                  };
-
-                  $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
-
-                  $scope.sendGETRequest = function (resource, ids, relatedResource) {
-                      var requestConfig = {
-                          method: $scope.method,
-                          url: config.getApiNamespace() + '/' + resource.route
-                      };
-
-                      var data = requestData;
-                      data.method = $scope.method;
-                      data.url = config.getApiNamespace() + '/' + resource.route;
-                      data.params = data.params || {};
-
-                      if (params.ids && params.ids.length) {
-                          if (data.params.ids.length == 1) data.url += '/' + data.params.ids[0];
-                          else data.params.ids = data.params.ids.join(',');
-                      }
-                      if (relatedResource) data.url += '/' + relatedResource;
-
-                      $http(data)
-                          .success(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
-                          })
-                          .error(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
-                          });
-                  };
-
-                  $scope.sendPOSTRequest = function (resource, data) {
-                      var requestConfig = {
-                          method: $scope.method,
-                          url: config.getApiNamespace() + '/' + resource.route,
-                          headers: {
-                              "Content-Type": "application/json"
-                          },
-                          data: data
-                      };
-
-                      $http(requestConfig)
-                          .success(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
-                          })
-                          .error(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
-                          });
-                  };
-
-                  $scope.sendDELETERequest = function (resource, id) {
-                      var requestConfig = {
-                          method: $scope.method,
-                          url: config.getApiNamespace() + '/' + resource.route + '/' + id
-                      };
-
-                      $http(requestConfig)
-                          .success(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
-                          })
-                          .error(function (data, status, headers, config) {
-                              $scope.response[resource.name] = $scope.response[resource.name] || {};
-                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
-                          });
-                  };
-              }
-          }
-      }])*/
       .directive('getRequest', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',
@@ -148,13 +74,16 @@
                   headers: '='
               },
               link: function ($scope) {
-                  $scope.PK = $scope.PK || $scope.$parent.PK;
+                  $scope.PK = $scope.$parent.PK;
+                  $scope.route = $scope.$parent.resource.route;
+                  $scope.resourceName = $scope.$parent.resource.name;
 
                   $scope.addRequestParameter = function (id) {
                       if (!id) return;
 
                       $scope.request.params = $scope.request.params || {};
                       $scope.request.params.ids = $scope.request.params.ids || [];
+
                       if ($scope.request.params.ids.indexOf(id) == -1)
                           $scope.request.params.ids.push(id);
                   };
@@ -163,6 +92,10 @@
                       var index = $scope.request.params.ids.indexOf(id);
                       $scope.request.params.ids.splice(index, 1);
                   };
+
+                  $scope.getResponse = function (method) {
+                      return $scope.$parent.response[method];
+                  }
               }
           }
       }])
@@ -177,9 +110,15 @@
                 headers: '='
               },
               link: function ($scope) {
-                  $scope.PK = $scope.PK || $scope.$parent.PK;
+                  $scope.PK = $scope.$parent.PK;
                   $scope.resource = $scope.$parent.resource;
+                  $scope.route = $scope.$parent.resource.route;
+
                   $scope.request.data = $scope.request.data || {};
+
+                  $scope.getResponse = function (method) {
+                      return $scope.$parent.response[method];
+                  }
               }
           }
       }])
@@ -203,6 +142,11 @@
               },
               link: function ($scope) {
                   $scope.PK = $scope.PK || $scope.$parent.PK;
+                  $scope.route = $scope.$parent.resource.route;
+
+                  $scope.getResponse = function (method) {
+                      return $scope.$parent.response[method];
+                  }
               }
           }
       }])

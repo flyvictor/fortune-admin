@@ -18,13 +18,13 @@
             <tr>
                 <td>{{PK}}</td>
                 <td><input type="text" class="form-control" ng-model="id" /></td>
-                <td><button type="button" ng-click="addRequestParameter(id)" class="btn btn-default btn-sm">Add {{resource.name}}</button></td>
+                <td><button type="button" ng-click="addRequestParameter(id)" class="btn btn-default btn-sm">Add {{resourceName}}</button></td>
             </tr>
-            <tr ng-if="request.params.ids.length == 1">
+            <!--<tr ng-if="request.params.ids.length == 1">
                 <td>Related resource name (one level deep):</td>
-                <td><input type="text" class="form-control" ng-model="relatedResource.name"/><td>
+                <td><input type="text" class="form-control" ng-model="request.id"/><td>
                 <td></td>
-            </tr>
+            </tr>-->
         </table>
     </div>
 
@@ -32,5 +32,9 @@
         <pre>{{ request | json}}</pre>
     </div>
 
-    <button type="button" ng-click="" class="btn btn-default btn-primary">Send request</button>
+    <button type="button" ng-click="$parent.sendRequest('get', route, request)" class="btn btn-default btn-primary">Send request</button>
+
+    <div ng-if="$parent.response['get']">
+        <response response="getResponse('get')"></response>
+    </div>
 </div>
