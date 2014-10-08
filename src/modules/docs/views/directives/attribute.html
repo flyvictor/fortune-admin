@@ -1,21 +1,45 @@
-<div ng-init="value=resource.schema[attrName]">
-    <!-- string -->
-    <div ng-if="value.type == 'String'">
-        <input type="text" ng-model="request.data[attrName]" class="form-control" />
-    </div>
+<div>
+    <div ng-if="value.type">
+        <div ng-switch="value.type">
+            <!-- string -->
+            <div ng-switch-when='String'>
+                <input type="text" ng-model="request.data[attrName]" class="form-control" />
+            </div>
 
-    <!-- date -->
-    <div ng-if="value.type == 'Date' || value == 'Date'">
-        <input type="date" class="form-control" ng-model="request.data[attrName]" />
-    </div>
+            <!-- number -->
+            <div ng-switch-when="Number">
+                <input type="text" ng-model="request.data[attrName]" class="form-control" />
+            </div>
 
-    <!-- link to another resource -->
-    <div ng-if="value.ref">
-        link to {{value.ref}}
-    </div>
+            <div ng-switch-when="Date">
+                <input type="date" class="form-control" ng-model="request.data[attrName]" />
+            </div>
 
-    <!-- array of links to another resources -->
-    <div ng-if="value[0].ref">
-        array of links to {{value[0].ref}}
+            <div ng-switch-default="">
+                Unrecognised type
+            </div>
+        </div>
+    </div>
+    <div ng-if="!value.type">
+        <!-- link to another resource -->
+        <div ng-if="value.ref">
+            link to {{value.ref}}
+        </div>
+
+        <!-- array of links to another resources -->
+        <div ng-if="value[0].ref">
+            array of links to {{value[0].ref}}
+        </div>
+
+        <div ng-if="value !== 'Date' && !value.ref && !value[0].ref">
+            <table class="table borderless">
+                <tr ng-repeat="name in value | notSorted">
+                    <td>{{name}}</td>
+                    <td>
+                        <resource-attribute value="value[name]"></resource-attribute>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>

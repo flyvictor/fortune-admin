@@ -1,4 +1,4 @@
-<div class="resource-gui" ng-init="customHeaders = {}">
+<div class="resource-gui">
     <h4><strong>/{{resource.name}}:</strong> Operations about {{resource.name}} </h4>
 
     <!-- HTTP methods menu -->
@@ -10,38 +10,51 @@
         </button>
     </div>
 
-    <div class="request col-md-12" ng-switch="selectedMethod">
-        <h4>Request</h4>
+    <div class="col-md-12 request-response" ng-switch="selectedMethod">
+        <table class="table table-condensed">
+            <tr>
+                <td><h4>Request</h4></td>
+                <td><h4>Response</h4></td>
+            </tr>
+            <tr>
+                <td>
+                    <custom-headers headers="request.headers"></custom-headers>
 
-        <custom-headers headers="customHeaders"></custom-headers>
+                    <div class="btn-group toggle-request-view">
+                        <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                            {{ selectedRequestView | uppercase }} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat="view in requestViews" ng-if="view !== selectedRequestView">
+                                <a href ng-click="selectRequestView(view)">{{ view | uppercase }}</a>
+                            </li>
+                        </ul>
+                    </div>
 
-        <div class="btn-group toggle-request-view">
-            <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
-                {{ selectedRequestView | uppercase }} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                <li ng-repeat="view in requestViews" ng-if="view !== selectedRequestView">
-                    <a href ng-click="selectRequestView(view)">{{ view | uppercase }}</a>
-                </li>
-            </ul>
-        </div>
+                    <div ng-switch-when="get">
+                        <get-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></get-request>
+                    </div>
 
-        <div ng-switch-when="get">
-            <get-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></get-request>
-        </div>
+                    <div ng-switch-when="post">
+                        <post-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></post-request>
+                    </div>
 
-        <div ng-switch-when="post">
-            <post-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></post-request>
-        </div>
+                    <div ng-switch-when="put">
+                        <put-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></put-request>
+                    </div>
 
-        <div ng-switch-when="put">
-            <put-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></put-request>
-        </div>
+                    <div ng-switch-when="delete">
+                        <delete-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></delete-request>
+                    </div>
 
-        <div ng-switch-when="delete">
-            <delete-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></delete-request>
-        </div>
-
-        <!--<response ng-if="response[resource.name][method]" response="response[resource.name][method]"></response>-->
+                    <button type="button" ng-click="sendRequest(selectedMethod, resource.route, request[selectedMethod])" class="btn btn-default btn-primary">Send request</button>
+                </td>
+                <td>
+                    <div ng-if="response[selectedMethod]">
+                        <response response="response[selectedMethod]"></response>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>

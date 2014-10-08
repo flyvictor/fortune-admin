@@ -54,21 +54,25 @@
     margin-top: -40px;
 }
 
+
 #fortune-admin #api-docs .single-resource .resource-gui {
-    width: 600px;
+    width: 90%;
 }
 
-#fortune-admin #api-docs .single-resource .resource-gui .request {
+#fortune-admin #api-docs .single-resource .resource-gui .request-response{
     padding: 20px 0 0 0;
 }
 
-#fortune-admin #api-docs .single-resource .resource-gui .response {
-    clear: left;
-    padding-top: 30px;
+#fortune-admin #api-docs .single-resource .resource-gui .request-response td {
+    width: 50%;
 }
 
 #fortune-admin #api-docs .single-resource .resource-gui .toggle-request-view {
     padding: 10px 0 10px 0;
+}
+
+.borderless tbody tr td, .borderless thead tr th {
+    border: none;
 }
 
 

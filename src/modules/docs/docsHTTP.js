@@ -7,10 +7,12 @@ angular.module('docs.Services.docsHTTP', [
                 var httpRequest = {};
                 httpRequest.method = method;
                 httpRequest.url = docsConfig.getApiNamespace() + '/' + route;
-                if (request.id) httpRequest.url += '/' + request.id;
-
                 if (request.headers) httpRequest.headers = request.headers;
 
+                // for delete and put methods
+                if (request.id) httpRequest.url += '/' + request.id;
+
+                // for post and put (requests with body)
                 if (request.data) {
                     httpRequest.headers["Content-Type"] = 'application/json';
                 }
@@ -30,10 +32,7 @@ angular.module('docs.Services.docsHTTP', [
 
                 if (request.data) {
                     httpRequest.data = {};
-                    /*if (request.data.id) {
-                        httpRequest.data = request.data;
-                    }*/
-                    /*else*/ httpRequest.data[route] = [request.data];
+                    httpRequest.data[route] = [request.data];
                 }
 
                 $http(httpRequest)

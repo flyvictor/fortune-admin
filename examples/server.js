@@ -26,10 +26,10 @@ var app = fortune({
   addresses: [{ref: "address", inverse: "user"}],
   flights: [{ref: "flight", inverse: "users", pkType: String}],
   additionalDetails : {
-    testNumber: Number,
-    notificationData: Object,
-    primaryRelationshipLegacyId: Number,
-    legacyID: Number
+    testNumber: { type: Number, "docs:example": 1 },
+    notificationData: { type: Object, "docs:example": {} },
+    primaryRelationshipLegacyId: { type: Number, "docs:example": 1 },
+    legacyID: { type: Number, "docs:example": 1 }
   }
 }, {
   model: {pk: "email"},

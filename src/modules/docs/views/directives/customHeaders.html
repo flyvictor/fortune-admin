@@ -2,9 +2,9 @@
     <div class="panel-heading">
         <h3 class="panel-title"><a href ng-click="show = !show">Custom headers</a></h3>
     </div>
-    <div class="panel-body">
-        <div ng-if="show">
-            <table class="table">
+    <div>
+        <div ng-if="show" class="panel-body">
+            <table ng-if="headers" class="table-condensed">
                 <tr ng-repeat="(headerName, headerValue) in headers">
                     <td>{{headerName}}</td>
                     <td>{{headerValue}}</td>
@@ -13,15 +13,17 @@
                     </td>
                 </tr>
             </table>
-            <table class="table">
+            <table class="table-condensed">
                 <tr>
-                    <td>name:</td>
+                    <td>name</td>
                     <td><input type="text" class="form-control" ng-model="name" /></td>
-                    <td>value:</td>
+                </tr>
+                <tr>
+                    <td>value</td>
                     <td><input type="text" class="form-control" ng-model="value" /></td>
-                    <td><button type="button" ng-click="addHeader(name, value)" class="btn btn-default btn-sm">Add</button></td>
                 </tr>
             </table>
+            <button type="button" ng-click="addHeader(name, value)" class="btn btn-default btn-sm">Add</button>
         </div>
     </div>
 </div>
