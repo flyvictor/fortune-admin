@@ -1,0 +1,28 @@
+<div class="request" ng-init="request.headers=headers">
+    <div ng-if="view == 'gui'">
+        <table class="table">
+            <tr>
+                <td>id</td>
+                <td>
+                    <input type="text" ng-model="request.id" class="form-control" />
+                </td>
+            </tr>
+            <tr ng-repeat="attrName in resource.schema | notSorted">
+                <td>{{attrName}} <span ng-if="PK == attrName">(primary key)</span></td>
+                <td>
+                    <resource-attribute></resource-attribute>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div ng-if="view == 'json'">
+        <pre>{{ request | json }}</pre>
+    </div>
+
+    <button type="button" ng-click="$parent.sendRequest('put', route, request)" class="btn btn-default btn-primary">Send request</button>
+
+    <div ng-if="$parent.response['put']">
+        <response response="getResponse('put')"></response>
+    </div>
+</div>

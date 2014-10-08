@@ -122,6 +122,29 @@
               }
           }
       }])
+      .directive('putRequest', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/put'),
+              scope: {
+                  request: '=',
+                  view: '=',
+                  headers: '='
+              },
+              link: function ($scope) {
+                  $scope.PK = $scope.$parent.PK;
+                  $scope.resource = $scope.$parent.resource;
+                  $scope.route = $scope.$parent.resource.route;
+
+                  $scope.request.data = $scope.request.data || {};
+
+                  $scope.getResponse = function (method) {
+                      return $scope.$parent.response[method];
+                  }
+              }
+          }
+      }])
       .directive('resourceAttribute', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',

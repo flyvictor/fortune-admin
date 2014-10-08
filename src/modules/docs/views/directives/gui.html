@@ -34,6 +34,10 @@
             <post-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></post-request>
         </div>
 
+        <div ng-switch-when="put">
+            <put-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></put-request>
+        </div>
+
         <div ng-switch-when="delete">
             <delete-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></delete-request>
         </div>
