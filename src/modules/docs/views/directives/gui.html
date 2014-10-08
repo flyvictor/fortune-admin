@@ -1,4 +1,4 @@
-<div class="resource-gui">
+<div class="resource-gui" ng-init="customHeaders = {}">
     <h4><strong>/{{resource.name}}:</strong> Operations about {{resource.name}} </h4>
 
     <!-- HTTP methods menu -->
@@ -11,7 +11,10 @@
     </div>
 
     <div class="request col-md-12" ng-switch="selectedMethod">
-        <h3>Request</h3>
+        <h4>Request</h4>
+
+        <custom-headers headers="customHeaders"></custom-headers>
+
         <div class="btn-group toggle-request-view">
             <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
                 {{ selectedRequestView | uppercase }} <span class="caret"></span>
@@ -24,15 +27,15 @@
         </div>
 
         <div ng-switch-when="get">
-            <get-request request="request[selectedMethod]" view="selectedRequestView"></get-request>
+            <get-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></get-request>
         </div>
 
         <div ng-switch-when="post">
-            <post-request request="request[selectedMethod]" view="selectedRequestView"></post-request>
+            <post-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></post-request>
         </div>
 
         <div ng-switch-when="delete">
-            <delete-request request="request[selectedMethod]" view="selectedRequestView" ></delete-request>
+            <delete-request request="request[selectedMethod]" view="selectedRequestView" headers="customHeaders"></delete-request>
         </div>
 
         <!--<response ng-if="response[resource.name][method]" response="response[resource.name][method]"></response>-->

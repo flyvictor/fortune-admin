@@ -144,7 +144,8 @@
               templateUrl: config.prepareViewTemplateUrl('directives/get'),
               scope: {
                   request: '=',
-                  view: '='
+                  view: '=',
+                  headers: '='
               },
               link: function ($scope) {
                   $scope.PK = $scope.PK || $scope.$parent.PK;
@@ -172,7 +173,8 @@
               templateUrl: config.prepareViewTemplateUrl('directives/post'),
               scope: {
                 request: '=',
-                view: '='
+                view: '=',
+                headers: '='
               },
               link: function ($scope) {
                   $scope.PK = $scope.PK || $scope.$parent.PK;
@@ -196,10 +198,33 @@
               templateUrl: config.prepareViewTemplateUrl('directives/delete'),
               scope: {
                   request: '=',
-                  view: '='
+                  view: '=',
+                  headers: '='
               },
               link: function ($scope) {
                   $scope.PK = $scope.PK || $scope.$parent.PK;
+              }
+          }
+      }])
+      .directive('customHeaders', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/customHeaders'),
+              scope: {
+                  headers: '='
+              },
+              link: function ($scope) {
+                  $scope.show = false;
+
+                  $scope.addHeader = function(name, value) {
+                      if (!name) return;
+                      if (!$scope.headers[name]) $scope.headers[name] = value;
+                  };
+
+                  $scope.removeHeader = function(name) {
+                      delete $scope.headers[name];
+                  };
               }
           }
       }])

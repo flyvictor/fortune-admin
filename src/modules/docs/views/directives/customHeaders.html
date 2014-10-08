@@ -1,0 +1,27 @@
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title"><a href ng-click="show = !show">Custom headers</a></h3>
+    </div>
+    <div class="panel-body">
+        <div ng-if="show">
+            <table class="table">
+                <tr ng-repeat="(headerName, headerValue) in headers">
+                    <td>{{headerName}}</td>
+                    <td>{{headerValue}}</td>
+                    <td>
+                        <a href ng-click="removeHeader(headerName)"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
+                <tr>
+                    <td>name:</td>
+                    <td><input type="text" class="form-control" ng-model="name" /></td>
+                    <td>value:</td>
+                    <td><input type="text" class="form-control" ng-model="value" /></td>
+                    <td><button type="button" ng-click="addHeader(name, value)" class="btn btn-default btn-sm">Add</button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
