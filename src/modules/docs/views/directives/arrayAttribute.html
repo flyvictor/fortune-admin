@@ -1,0 +1,10 @@
+<table class="table table-condensed borderless">
+    <tr ng-if="data.length" ng-repeat="(index, value) in data">
+        <td><input type="text" ng-model="data[index]" class="form-control" /></td>
+        <td><a href ng-click="removeItem(data[index])"><span class="glyphicon glyphicon-remove"></span></a></td>
+    </tr>
+    <tr>
+        <td><input type="text" ng-model="newItem" class="form-control" /></td>
+        <td><button type="button" ng-click="addItem(newItem)" class="btn btn-default btn-sm">Add</button></td>
+    </tr>
+</table>

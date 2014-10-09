@@ -3,7 +3,7 @@ angular.module('docs.Services.docsHTTP', [
 ])
     .service('docsHTTP', ['docsConfigConstant', '$http',
         function docsHTTP(docsConfig, $http) {
-            this.sendRequest = function (method, route, request, callback) {
+            this.sendRequest = function (method, route, request) {
                 var httpRequest = {};
                 httpRequest.method = method;
                 httpRequest.url = docsConfig.getApiNamespace() + '/' + route;
@@ -35,9 +35,7 @@ angular.module('docs.Services.docsHTTP', [
                     httpRequest.data[route] = [request.data];
                 }
 
-                $http(httpRequest)
-                    .success(callback)
-                    .error(callback);
+                return $http(httpRequest);
             }
         }
     ]);

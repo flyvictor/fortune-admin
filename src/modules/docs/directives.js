@@ -52,12 +52,19 @@
 
                   $scope.response = {};
                   $scope.sendRequest = function (method, route, request) {
-                      docsHTTPService.sendRequest(method, route, request, function (data, status, headers, config) {
-                          $scope.response[method] = {
-                              status: status,
-                              body: data
-                          }
-                      });
+                      docsHTTPService.sendRequest(method, route, request)
+                          .success(function (data, status, headers, config) {
+                              $scope.response[method] = {
+                                  status: status,
+                                  body: data
+                              }
+                          })
+                          .error(function (data, status, headers, config) {
+                              $scope.response[method] = {
+                                  status: status,
+                                  body: data
+                              }
+                          });
                   }
               }
           }
@@ -157,6 +164,29 @@
               },
               compile: function(element) {
                   return RecursionHelper.compile(element);
+              }
+          }
+      }])
+      .directive('resourceArrayAttribute', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/arrayAttribute'),
+              scope: {
+                  data: '='
+              },
+              link: function ($scope) {
+                  $scope.addItem = function (item) {
+                      $scope.data = $scope.data || [];
+
+                      if (item && $scope.data.indexOf(item) == -1)
+                        $scope.data.push(item);
+                  };
+
+                  $scope.removeItem = function (item) {
+                      var index = $scope.data.indexOf(item);
+                      $scope.data.splice(index, 1);
+                  };
               }
           }
       }])

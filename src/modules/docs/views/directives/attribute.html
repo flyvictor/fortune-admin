@@ -23,12 +23,12 @@
     <div ng-if="!attrValue.type">
         <!-- link to another resource -->
         <div ng-if="attrValue.ref">
-            link to {{attrValue.ref}}
+            <input type="text" ng-model="data[attrName]" class="form-control" />
         </div>
 
         <!-- array of links to another resources -->
         <div ng-if="attrValue[0].ref">
-            array of links to {{attrValue[0].ref}}
+            <resource-array-attribute data="data[attrName]"></resource-array-attribute>
         </div>
 
         <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
