@@ -1,18 +1,18 @@
 <div>
-    <div ng-if="value.type">
-        <div ng-switch="value.type">
+    <div ng-if="attrValue.type">
+        <div ng-switch="attrValue.type">
             <!-- string -->
             <div ng-switch-when='String'>
-                <input type="text" ng-model="request.data[attrName]" class="form-control" />
+                <input type="text" ng-model="data[attrName]" class="form-control" />
             </div>
 
             <!-- number -->
             <div ng-switch-when="Number">
-                <input type="text" ng-model="request.data[attrName]" class="form-control" />
+                <input type="text" ng-model="data[attrName]" class="form-control" />
             </div>
 
             <div ng-switch-when="Date">
-                <input type="date" class="form-control" ng-model="request.data[attrName]" />
+                <input type="date" class="form-control" ng-model="data[attrName]" />
             </div>
 
             <div ng-switch-default="">
@@ -20,23 +20,23 @@
             </div>
         </div>
     </div>
-    <div ng-if="!value.type">
+    <div ng-if="!attrValue.type">
         <!-- link to another resource -->
-        <div ng-if="value.ref">
-            link to {{value.ref}}
+        <div ng-if="attrValue.ref">
+            link to {{attrValue.ref}}
         </div>
 
         <!-- array of links to another resources -->
-        <div ng-if="value[0].ref">
-            array of links to {{value[0].ref}}
+        <div ng-if="attrValue[0].ref">
+            array of links to {{attrValue[0].ref}}
         </div>
 
-        <div ng-if="value !== 'Date' && !value.ref && !value[0].ref">
+        <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
             <table class="table borderless">
-                <tr ng-repeat="name in value | notSorted">
+                <tr ng-repeat="name in attrValue | notSorted">
                     <td>{{name}}</td>
-                    <td>
-                        <resource-attribute value="value[name]"></resource-attribute>
+                    <td ng-init="data[attrName] = data[attrName] || {}">
+                        <resource-attribute attr-value="attrValue[name]" attr-name="name" data="data[attrName]"></resource-attribute>
                     </td>
                 </tr>
             </table>

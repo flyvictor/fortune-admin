@@ -151,7 +151,9 @@
               replace: true,
               templateUrl: config.prepareViewTemplateUrl('directives/attribute'),
               scope: {
-                  value: '='
+                  attrValue: '=',
+                  attrName: '=',
+                  data: '='
               },
               compile: function(element) {
                   return RecursionHelper.compile(element);
