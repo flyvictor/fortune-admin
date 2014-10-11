@@ -63,7 +63,7 @@
     padding: 20px 0 0 0;
 }
 
-#fortune-admin #api-docs .single-resource .resource-gui .request-response td {
+#fortune-admin #api-docs .single-resource .resource-gui .request-response td.first{
     width: 50%;
 }
 

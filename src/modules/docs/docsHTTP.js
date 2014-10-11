@@ -30,10 +30,7 @@ angular.module('docs.Services.docsHTTP', [
                     }
                 }
 
-                if (request.data) {
-                    httpRequest.data = {};
-                    httpRequest.data[route] = [request.data];
-                }
+                if(request.data) httpRequest.data = request.data;
 
                 return $http(httpRequest);
             }

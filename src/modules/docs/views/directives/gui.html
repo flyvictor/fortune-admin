@@ -17,7 +17,7 @@
                 <td><h4>Response</h4></td>
             </tr>
             <tr>
-                <td>
+                <td class="first">
                     <custom-headers headers="request.headers"></custom-headers>
 
                     <div class="btn-group toggle-request-view">
@@ -43,13 +43,17 @@
                         <put-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></put-request>
                     </div>
 
+                    <div ng-switch-when="patch">
+                        <patch-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></patch-request>
+                    </div>
+
                     <div ng-switch-when="delete">
                         <delete-request resource="resource" request="request[selectedMethod]" headers="request.headers" view="{{selectedRequestView}}"></delete-request>
                     </div>
 
                     <button type="button" ng-click="sendRequest(selectedMethod, resource.route, request[selectedMethod])" class="btn btn-default btn-primary">Send request</button>
                 </td>
-                <td>
+                <td class="first">
                     <div ng-if="response[selectedMethod]">
                         <response response="response[selectedMethod]"></response>
                     </div>

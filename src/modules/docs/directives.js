@@ -113,7 +113,11 @@
               },
               link: function ($scope) {
                   $scope.request.headers = $scope.headers || {};
-                  $scope.request.data = $scope.request.data || {};
+                  var dataDefault = {};
+                  dataDefault[$scope.resource.route] = [];
+                  dataDefault[$scope.resource.route][0] = {};
+
+                  $scope.request.data = $scope.request.data || dataDefault;
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
               }
           }
@@ -131,8 +135,70 @@
               },
               link: function ($scope) {
                   $scope.request.headers = $scope.headers || {};
-                  $scope.request.data = $scope.request.data || {};
+
+                  var dataDefault = {};
+                  dataDefault[$scope.resource.route] = [];
+                  dataDefault[$scope.resource.route][0] = {};
+
+                  $scope.request.data = $scope.request.data || dataDefault;
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
+              }
+          }
+      }])
+      .directive('patchRequest', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/patch'),
+              scope: {
+                  resource: '=',
+                  request: '=',
+                  headers: '=',
+                  view: '@'
+              },
+              link: function ($scope) {
+                  $scope.request.headers = $scope.headers || {};
+                  $scope.field = {};
+
+                  var dataDefault = [{
+                      op: '',
+                      path: '',
+                      value: ''
+                  }];
+                  $scope.request.data = $scope.request.data || dataDefault;
+                  $scope.data = $scope.request.data[0];
+
+                  $scope.methods = ['add', 'replace', 'remove'];
+                  $scope.selectMethod = function (method) {
+                      $scope.data.op = method;
+                      $scope.onChange();
+                  };
+
+                  $scope.attributes = $scope.resource.schema;
+                  $scope.selectAttribute = function (attribute) {
+                      $scope.field.name = attribute;
+                      $scope.onChange();
+                  };
+
+                  $scope.onChange = function() {
+                      var data = $scope.data;
+                      data.path = '/';
+                      if (data.op == 'add') {
+                          data.path += '-';
+                          if ($scope.field.name) {
+                              data.value = {};
+                              data.value[$scope.field.name] = $scope.field.value || "";
+                          }
+                      }
+                      else if(data.op == 'replace') {
+                          data.path += $scope.field.name;
+                          data.value = $scope.field.value;
+                      }
+                      else if(data.op == 'remove') {
+                          data.path += $scope.field.name;
+                          delete data.value;
+                      }
+                  }
               }
           }
       }])
@@ -149,6 +215,7 @@
               },
               link: function ($scope) {
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
+                  $scope.request.headers = $scope.headers || {};
               }
           }
       }])

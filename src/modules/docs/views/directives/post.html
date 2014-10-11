@@ -4,7 +4,7 @@
             <tr ng-repeat="attrName in resource.schema | notSorted">
                 <td>{{attrName}} <span ng-if="PK == attrName">(primary key)</span></td>
                 <td>
-                    <resource-attribute attr-value="resource.schema[attrName]" attr-name="attrName" data="request.data"></resource-attribute>
+                    <resource-attribute attr-value="resource.schema[attrName]" attr-name="attrName" data="request.data[resource.route][0]"></resource-attribute>
                 </td>
             </tr>
         </table>
