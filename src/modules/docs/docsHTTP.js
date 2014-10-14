@@ -23,7 +23,8 @@ angular.module('docs.Services.docsHTTP', [
                         if (request.params.hasOwnProperty(param)) {
                             var paramValue = request.params[param];
                             if (Array.isArray(paramValue)) {
-                                httpRequest.params[param] = paramValue.join(',');
+                                //httpRequest.params[param] = paramValue.join(',');
+                                httpRequest.url += '/' + paramValue.join(',');
                             }
                             else httpRequest.params[param] = paramValue;
                         }
