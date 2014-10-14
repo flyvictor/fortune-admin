@@ -71,6 +71,11 @@
     padding: 10px 0 10px 0;
 }
 
+#fortune-admin #api-docs .single-resource .resource-gui .request-response .response .response-json{
+    width: auto;
+    max-width: 500px;
+}
+
 .borderless tbody tr td, .borderless thead tr th {
     border: none;
 }

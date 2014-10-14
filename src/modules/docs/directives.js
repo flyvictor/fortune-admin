@@ -182,20 +182,18 @@
 
                   $scope.onChange = function() {
                       var data = $scope.data;
-                      data.path = '/';
+                      data.path = '/' + $scope.resource.route + '/0/' + $scope.field.name;
                       if (data.op == 'add') {
-                          data.path += '-';
+                          data.path += '/-';
                           if ($scope.field.name) {
                               data.value = {};
                               data.value[$scope.field.name] = $scope.field.value || "";
                           }
                       }
                       else if(data.op == 'replace') {
-                          data.path += $scope.field.name;
                           data.value = $scope.field.value;
                       }
                       else if(data.op == 'remove') {
-                          data.path += $scope.field.name;
                           delete data.value;
                       }
                   }
