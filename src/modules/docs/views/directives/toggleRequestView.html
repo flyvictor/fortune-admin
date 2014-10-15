@@ -1,0 +1,10 @@
+<div class="btn-group toggle-request-view">
+    <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+        {{ selectedRequestView | uppercase }} <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li ng-repeat="view in views" ng-if="view !== selectedRequestView">
+            <a href ng-click="selectRequestView(view)">{{ view | uppercase }}</a>
+        </li>
+    </ul>
+</div>

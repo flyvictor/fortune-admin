@@ -1,34 +1,40 @@
-<div class="request" ng-switch="view">
-    <div ng-switch-when="gui">
-        <table class="table" ng-if="request.params.ids.length">
-            <tr>
-                <td>Parameter</td>
-                <td>Value</td>
-                <td>Actions</td>
-            </tr>
-            <tr ng-repeat="id in request.params.ids">
-                <td>{{PK}}</td>
-                <td>{{id}}</td>
-                <td>
-                    <a href ng-click="removeRequestParameter(id)"><span class="glyphicon glyphicon-remove"></span></a>
-                </td>
-            </tr>
-        </table>
-        <table class="table">
-            <tr>
-                <td>{{PK}}</td>
-                <td><input type="text" class="form-control" ng-model="id" /></td>
-                <td><button type="button" ng-click="addRequestParameter(id)" class="btn btn-default btn-sm">Add {{resource.name}}</button></td>
-            </tr>
-            <!--<tr ng-if="request.params.ids.length == 1">
-                <td>Related resource name (one level deep):</td>
-                <td><input type="text" class="form-control" ng-model="request.id"/><td>
-                <td></td>
-            </tr>-->
-        </table>
-    </div>
+<div>
+    <div class="request" ng-switch="selectedRequestView">
+        <toggle-request-view></toggle-request-view>
 
-    <div ng-switch-when="json">
-        <pre>{{ request.headers | json}}</pre>
+        <div ng-switch-when="gui">
+            <custom-headers headers="globalRequest.headers"></custom-headers>
+
+            <table class="table" ng-if="request.params.ids.length">
+                <tr>
+                    <td>Parameter</td>
+                    <td>Value</td>
+                    <td>Actions</td>
+                </tr>
+                <tr ng-repeat="id in request.params.ids">
+                    <td>{{PK}}</td>
+                    <td>{{id}}</td>
+                    <td>
+                        <a href ng-click="removeRequestParameter(id)"><span class="glyphicon glyphicon-remove"></span></a>
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
+                <tr>
+                    <td>{{PK}}</td>
+                    <td><input type="text" class="form-control" ng-model="id" /></td>
+                    <td><button type="button" ng-click="addRequestParameter(id)" class="btn btn-default btn-sm">Add {{resource.name}}</button></td>
+                </tr>
+                <!--<tr ng-if="request.params.ids.length == 1">
+                    <td>Related resource name (one level deep):</td>
+                    <td><input type="text" class="form-control" ng-model="request.id"/><td>
+                    <td></td>
+                </tr>-->
+            </table>
+        </div>
+
+        <div ng-switch-when="json">
+            <json-request object="globalRequest.headers"></json-request>
+        </div>
     </div>
 </div>

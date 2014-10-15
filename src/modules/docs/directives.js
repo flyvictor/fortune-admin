@@ -45,10 +45,6 @@
                   });
 
                   $scope.requestViews = ['gui', 'json' ];
-                  $scope.selectedRequestView = $scope.requestViews[0];
-                  $scope.selectRequestView = function (view) {
-                      $scope.selectedRequestView = view;
-                  };
 
                   $scope.response = {};
                   $scope.sendRequest = function (method, route, request) {
@@ -65,7 +61,7 @@
                                   body: data
                               }
                           });
-                  }
+                  };
               }
           }
       }])
@@ -77,14 +73,15 @@
               scope: {
                   resource: '=',
                   request: '=',
-                  headers: '=',
-                  view: '@'
+                  globalRequest: '=',
+                  views: '='
               },
               link: function ($scope) {
                   $scope.request.params = $scope.request.params || {};
                   $scope.request.params.ids = $scope.request.params.ids || [];
-                  $scope.request.headers = $scope.headers || {};
+                  $scope.request.headers = $scope.globalRequest.headers || {};
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
+                  $scope.selectedRequestView = $scope.selectedRequestView || $scope.views[0];
 
                   $scope.addRequestParameter = function (id) {
                       if (!id) return;
@@ -108,11 +105,13 @@
               scope: {
                   resource: '=',
                   request: '=',
-                  headers: '=',
-                  view: '@'
+                  globalRequest: '=',
+                  views: '='
               },
               link: function ($scope) {
-                  $scope.request.headers = $scope.headers || {};
+                  $scope.request.headers = $scope.globalRequest.headers || {};
+                  $scope.selectedRequestView = $scope.selectedRequestView || $scope.views[0];
+
                   var dataDefault = {};
                   dataDefault[$scope.resource.route] = [];
                   dataDefault[$scope.resource.route][0] = {};
@@ -130,11 +129,12 @@
               scope: {
                   resource: '=',
                   request: '=',
-                  headers: '=',
-                  view: '@'
+                  globalRequest: '=',
+                  views: '='
               },
               link: function ($scope) {
-                  $scope.request.headers = $scope.headers || {};
+                  $scope.request.headers = $scope.globalRequest.headers || {};
+                  $scope.selectedRequestView = $scope.selectedRequestView || $scope.views[0];
 
                   var dataDefault = {};
                   dataDefault[$scope.resource.route] = [];
@@ -153,11 +153,12 @@
               scope: {
                   resource: '=',
                   request: '=',
-                  headers: '=',
-                  view: '@'
+                  globalRequest: '=',
+                  views: '='
               },
               link: function ($scope) {
-                  $scope.request.headers = $scope.headers || {};
+                  $scope.request.headers = $scope.globalRequest.headers || {};
+                  $scope.selectedRequestView = $scope.selectedRequestView || $scope.views[0];
                   $scope.field = {};
 
                   var dataDefault = [{
@@ -166,11 +167,11 @@
                       value: ''
                   }];
                   $scope.request.data = $scope.request.data || dataDefault;
-                  $scope.data = $scope.request.data[0];
 
                   $scope.methods = ['add', 'replace', 'remove'];
                   $scope.selectMethod = function (method) {
-                      $scope.data.op = method;
+                      var data = $scope.request.data[0];
+                      data.op = method;
                       $scope.onChange();
                   };
 
@@ -181,7 +182,7 @@
                   };
 
                   $scope.onChange = function() {
-                      var data = $scope.data;
+                      var data = $scope.request.data[0];
                       data.path = '/' + $scope.resource.route + '/0/' + $scope.field.name;
                       if (data.op == 'add') {
                           data.path += '/-';
@@ -208,12 +209,13 @@
               scope: {
                   resource: '=',
                   request: '=',
-                  headers: '=',
-                  view: '@'
+                  globalRequest: '=',
+                  views: '='
               },
               link: function ($scope) {
                   $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
-                  $scope.request.headers = $scope.headers || {};
+                  $scope.request.headers = $scope.globalRequest.headers || {};
+                  $scope.selectedRequestView = $scope.selectedRequestView || $scope.views[0];
               }
           }
       }])
@@ -284,6 +286,41 @@
               templateUrl: config.prepareViewTemplateUrl('directives/response'),
               scope: {
                   response: '='
+              }
+          }
+      }])
+      .directive('toggleRequestView', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/toggleRequestView'),
+              scope: false,
+              link: function($scope) {
+                  $scope.selectRequestView = function (view) {
+                      $scope.selectedRequestView = view;
+                  };
+              }
+          }
+      }])
+      .directive('jsonRequest', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/jsonRequest'),
+              scope: {
+                  object: '='
+              },
+              link: function($scope) {
+                  $scope.textAreaModel = angular.toJson($scope.object, true);
+
+                  $scope.$watch('textAreaModel', function () {
+                      try {
+                          $scope.object = JSON.parse($scope.textAreaModel);
+                      } catch(exp) {
+                          //Exception handler
+                          console.log('Error while parsing object: '+$scope.textAreaModel);
+                      };
+                  });
               }
           }
       }])

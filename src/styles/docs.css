@@ -76,6 +76,10 @@
     max-width: 500px;
 }
 
+#fortune-admin #api-docs .single-resource .resource-gui .request {
+    padding-bottom: 20px;
+}
+
 .borderless tbody tr td, .borderless thead tr th {
     border: none;
 }

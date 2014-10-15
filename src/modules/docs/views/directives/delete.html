@@ -1,14 +1,20 @@
-<div class="request" ng-switch="view">
-    <div ng-switch-when="gui">
-        <table class="table">
-            <tr>
-                <td>{{PK}}</td>
-                <td><input type="text" class="form-control" ng-model="request.id" /></td>
-            </tr>
-        </table>
-    </div>
+<div>
+    <toggle-request-view></toggle-request-view>
 
-    <div ng-switch-when="json">
-        <pre>{{ request.headers | json }}</pre>
+    <div class="request" ng-switch="selectedRequestView">
+        <div ng-switch-when="gui">
+            <custom-headers headers="globalRequest.headers"></custom-headers>
+
+            <table class="table">
+                <tr>
+                    <td>{{PK}}</td>
+                    <td><input type="text" class="form-control" ng-model="request.id" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <div ng-switch-when="json">
+            <json-request object="globalRequest.headers"></json-request>
+        </div>
     </div>
 </div>
