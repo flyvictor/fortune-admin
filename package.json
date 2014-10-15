@@ -1,0 +1,46 @@
+{
+  "name": "fortune",
+  "description": "Web framework for prototyping hypermedia APIs.",
+  "version": "0.2.2",
+  "license": "MIT",
+  "author": {
+    "name": "Dali Zheng",
+    "email": "dali@series.ac"
+  },
+  "homepage": "http://fortunejs.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daliwali/fortune"
+  },
+  "dependencies": {
+    "mkdirp": "~0.3.5",
+    "express": "~3.5.1",
+    "nedb": "~0.10.4",
+    "rsvp": "~3.0.6",
+    "i": "~0.3.2",
+    "lodash": "~2.4.1",
+    "mongoose": "~3.8.14",
+    "moment": "~2.6.0"
+  },
+  "devDependencies": {
+    "fortune-mongodb": "git://github.com/flyvictor/fortune-mongodb.git#v1.1.5",
+    "istanbul": "~0.2.4",
+    "mocha": "~1.19.0",
+    "should": "~2.0.2",
+    "sinon": "^1.10.3",
+    "supertest": "~0.8.0"
+  },
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha --recursive -R spec"
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "keywords": [
+    "json",
+    "api",
+    "framework",
+    "rest",
+    "restful"
+  ]
+}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 .tmp
 .sass-cache
@@ -7,3 +8,12 @@
 examples/bower_components
 examples/node_modules
 npm-debug.log
+=======
+node_modules/
+data/
+report/
+*.log
+TAGS
+coverage
+.idea
+>>>>>>> d0e19067dba18dd9cc3877ffc8dc824a17f1b9f6
