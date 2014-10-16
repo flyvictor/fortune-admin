@@ -257,6 +257,19 @@
               }
           }
       }])
+      .directive('resourceAttributeDescription', ['docsConfigConstant', 'RecursionHelper', '$location', '$anchorScroll', function(config, RecursionHelper, $location, $anchorScroll){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/attributeDescription'),
+              scope: {
+                  attrValue: '='
+              },
+              compile: function(element) {
+                  return RecursionHelper.compile(element);
+              }
+          }
+      }])
       .directive('customHeaders', ['docsConfigConstant', function(config){
           return {
               restrict: 'E',

@@ -33,10 +33,17 @@
 
         <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
             <table class="table borderless">
-                <tr ng-repeat="name in attrValue | notSorted">
+                <!--<tr ng-repeat="name in attrValue">
                     <td>{{name}}</td>
                     <td ng-init="data[attrName] = data[attrName] || {}">
                         <resource-attribute attr-value="attrValue[name]" attr-name="name" data="data[attrName]"></resource-attribute>
+                    </td>
+                </tr>-->
+
+                <tr ng-repeat="(name, value) in attrValue">
+                    <td>{{name}}</td>
+                    <td ng-init="data[attrName] = data[attrName] || {}">
+                        <resource-attribute attr-value="value" attr-name="name" data="data[attrName]"></resource-attribute>
                     </td>
                 </tr>
             </table>

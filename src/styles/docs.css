@@ -84,4 +84,8 @@
     border: none;
 }
 
+.text-left {
+    text-align: left !important;
+}
+
 

@@ -1,0 +1,30 @@
+<div>
+    <div ng-if="attrValue.type">
+        {{attrValue.type}}
+    </div>
+    <div ng-if="!attrValue.type">
+        <!-- link to another resource -->
+        <div ng-if="attrValue.ref">
+            <a href="#{{attrValue.ref}}">{{attrValue.ref}}</a>
+        </div>
+
+        <!-- array of links to another resources -->
+        <div ng-if="attrValue[0].ref">
+            <a href="#{{attrValue[0].ref}}">{{attrValue[0].ref}}</a>
+        </div>
+
+        <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
+            <table class="table borderless">
+                <tr ng-repeat="(name, value) in attrValue">
+                    <td class="text-left">{{name}}:</td>
+                    <td class="text-left">
+                        <resource-attribute-description attr-value="value"></resource-attribute-description>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <p ng-if="attrValue['docs:description']">
+        {{attrValue['docs:description']}}
+    </p>
+</div>
