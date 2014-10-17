@@ -21,32 +21,50 @@
         </div>
     </div>
     <div ng-if="!attrValue.type">
-        <!-- link to another resource -->
-        <div ng-if="attrValue.ref">
-            <input type="text" ng-model="data[attrName]" class="form-control" />
-        </div>
+        <div ng-switch="attrValue">
+            <!-- string -->
+            <div ng-switch-when='String'>
+                <input type="text" ng-model="data[attrName]" class="form-control" />
+            </div>
 
-        <!-- array of links to another resources -->
-        <div ng-if="attrValue[0].ref">
-            <resource-array-attribute data="data[attrName]"></resource-array-attribute>
-        </div>
+            <!-- number -->
+            <div ng-switch-when="Number">
+                <input type="text" ng-model="data[attrName]" class="form-control" />
+            </div>
 
-        <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
-            <table class="table borderless">
-                <!--<tr ng-repeat="name in attrValue">
-                    <td>{{name}}</td>
-                    <td ng-init="data[attrName] = data[attrName] || {}">
-                        <resource-attribute attr-value="attrValue[name]" attr-name="name" data="data[attrName]"></resource-attribute>
-                    </td>
-                </tr>-->
+            <div ng-switch-when="Date">
+                <input type="date" class="form-control" ng-model="data[attrName]" />
+            </div>
 
-                <tr ng-repeat="(name, value) in attrValue">
-                    <td>{{name}}</td>
-                    <td ng-init="data[attrName] = data[attrName] || {}">
-                        <resource-attribute attr-value="value" attr-name="name" data="data[attrName]"></resource-attribute>
-                    </td>
-                </tr>
-            </table>
+            <div ng-switch-default="">
+                <!-- link to another resource -->
+                <div ng-if="attrValue.ref">
+                    <input type="text" ng-model="data[attrName]" class="form-control" />
+                </div>
+
+                <!-- array of links to another resources -->
+                <div ng-if="attrValue[0].ref">
+                    <resource-array-attribute data="data[attrName]"></resource-array-attribute>
+                </div>
+
+                <div ng-if="attrValue !== 'Date' && !attrValue.ref && !attrValue[0].ref">
+                    <table class="table borderless">
+                        <!--<tr ng-repeat="name in attrValue">
+                            <td>{{name}}</td>
+                            <td ng-init="data[attrName] = data[attrName] || {}">
+                                <resource-attribute attr-value="attrValue[name]" attr-name="name" data="data[attrName]"></resource-attribute>
+                            </td>
+                        </tr>-->
+
+                        <!--<tr ng-repeat="(name, value) in attrValue track by $index">
+                            <td>{{name}}</td>
+                            <td ng-init="data[attrName] = data[attrName] || {}">
+                                <resource-attribute attr-value="value" attr-name="name" data="data[attrName]"></resource-attribute>
+                            </td>
+                        </tr>-->
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
