@@ -1,180 +1,675 @@
-angular.module('templates-main', ['/templates/directives/faEditable.html', '/templates/directives/uml/canvas.html', '/templates/views/mynavbar.html', '/templates/views/resources.html', '/templates/views/resourcesCells.html', '/templates/views/uml.html', '/templates/views/umlCells.html']);
+angular.module('templates-main', []);
 
-angular.module("/templates/directives/faEditable.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/directives/faEditable.html",
-    "<section>\n" +
-    "  <div ng-switch=\"schemaType\">\n" +
-    "    <div ng-switch-when=\"String\">\n" +
-    "      <a href=\"#\" onaftersave=\"apply(value)\" editable-text=\"value\">{{value || 'Not set.'}}</a>\n" +
-    "    </div>\n" +
-    "    <div ng-switch-when=\"Number\">\n" +
-    "      <a href=\"#\" onaftersave=\"apply(value)\" editable-number=\"value\">{{value || 'Not set.'}}</a>\n" +
-    "    </div>\n" +
-    "    <div ng-switch-when=\"Date\">\n" +
-    "      <a href=\"#\" onaftersave=\"apply(value)\" editable-date=\"value\">{{value || 'Not set.'}}</a>\n" +
-    "    </div>\n" +
-    "    <div ng-switch-when=\"Boolean\">\n" +
-    "      <a href=\"#\" onaftersave=\"apply(value)\" editable-checkbox=\"value\">{{value ? 'Yep' : 'Nope'}}</a>\n" +
-    "    </div>\n" +
-    "  </div>\n" +
-    "</section>");
-}]);
 
-angular.module("/templates/directives/uml/canvas.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/directives/uml/canvas.html",
-    "<div id=\"umlcanvas\">\n" +
-    "</div>");
-}]);
+/*(function(){
+  if (!window.CONFIG) window.CONFIG = {};
 
-angular.module("/templates/views/mynavbar.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/views/mynavbar.html",
-    "<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\" bs-navbar>\n" +
-    "    <div class=\"container-fluid\">\n" +
-    "        <div class=\"navbar-header\">\n" +
-    "            <a class=\"navbar-brand\" href=\"#\"><b>Fortune Admin</b></a>\n" +
-    "        </div>\n" +
-    "        <div class=\"collapse navbar-collapse\">\n" +
-    "          <ul class=\"nav navbar-nav\">\n" +
-    "            <fortune-admin-resources-cells></fortune-admin-resources-cells>\n" +
-    "            <fortune-admin-uml-cells></fortune-admin-uml-cells>\n" +
-    "          </ul>\n" +
-    "        </div>\n" +
-    "    </div>\n" +
-    "</nav>\n" +
-    "\n" +
-    "");
-}]);
+   window.CONFIG.docs =  {
+    templateDirectory: '/views/',
+    baseEndpoint: '',
+    apiNamespace: '/api/v1',
+    getApiNamespace: function(){
+      return this.baseEndpoint + this.apiNamespace;
+    },
+    mountPoint: '',
+    appVersion: 1,
+    viewUrlPrefix: '/views/',
+    templateFileSuffix: '.html',
+    prepareViewTemplateUrl: function(url){
+      return this.viewUrlPrefix + url + this.templateFileSuffix;
+    },
+    routing: {
+      html5Mode : true,
+      prefix: ''
+    },
+    authToken: ''
+  };
+})();*/
 
-angular.module("/templates/views/resources.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/views/resources.html",
-    "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
-    "  <div ng-if=\"navbarEnabled\">\n" +
-    "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
-    "  </div>\n" +
-    "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
-    "  <table class=\"table table-bordered\">\n" +
-    "    <tr>\n" +
-    "      <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\" ng-class=\"{'column-filter': showFilter}\">\n" +
-    "        <div>\n" +
-    "          <span>{{name}}</span>\n" +
-    "          <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
-    "          <span class=\"glyphicon glyphicon-remove\" ng-show=\"showFilter\" ng-click=\"showFilter = false; taQuery=''; ResourcesCtrl.dropFilter(name, taQuery)\"></span>\n" +
-    "        </div>\n" +
-    "        <div ng-switch=\"type\">\n" +
-    "          <div ng-switch-when=\"String\" ng-show=\"showFilter\">\n" +
-    "            <input type=\"text\" class=\"form-control\" ng-model=\"taQuery\" typeahead=\"item.{{name}} for item in ResourcesCtrl.getTypeaheadList($viewValue, name, type)\" typeahead-on-select=\"ResourcesCtrl.applyFilter({item: $item, model: $model, label: $label}, name, type)\">\n" +
-    "          </div>\n" +
-    "          <div ng-switch-when=\"Number\" ng-show=\"showFilter\">\n" +
-    "            <div class=\"input-group\">\n" +
-    "              <span class=\"input-group-addon\">From:</span>\n" +
-    "              <input type=\"number\" ng-model=\"Query.start\" class=\"form-control\" ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
-    "            </div>\n" +
-    "            <div class=\"input-group\">\n" +
-    "              <span class=\"input-group-addon\">To:</span>\n" +
-    "              <input class=\"form-control\" type=\"number\" ng-model=\"Query.end\"  ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
-    "            </div>\n" +
-    "          </div>\n" +
-    "          <div ng-switch-when=\"Date\" ng-show=\"showFilter\">\n" +
-    "            <div class=\"input-group\">\n" +
-    "              <span class=\"input-group-addon\">From:</span>\n" +
-    "              <input type=\"date\" class=\"form-control\" ng-model=\"Query.start\" ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
-    "            </div>\n" +
-    "            <div class=\"input-group\">\n" +
-    "              <span class=\"input-group-addon\">To:</span>\n" +
-    "              <input type=\"date\" class=\"form-control\" ng-model=\"Query.end\"  ng-change=\"ResourcesCtrl.applyFilter(Query, name, type)\"/>\n" +
-    "            </div>\n" +
-    "          </div>\n" +
-    "          <div ng-switch-when=\"Boolean\" ng-show=\"showFilter\">\n" +
-    "            <div class=\"btn-group btn-group-sm\">\n" +
-    "              <button class=\"btn btn-sm\" ng-class=\"{'btn-default': !Query.yep, 'btn-info': Query.yep}\" type=\"button\" ng-click=\"Query.yep = true; Query.nope=false; ResourcesCtrl.applyFilter(true, name, type);\">Yep</button>\n" +
-    "              <button class=\"btn btn-sm\" ng-class=\"{'btn-default': !Query.nope, 'btn-info': Query.nope}\" type=\"button\" ng-click=\"Query.yep = false; Query.nope=true; ResourcesCtrl.applyFilter(false, name, type);\">Nope</button>\n" +
-    "            </div>\n" +
-    "          </div>\n" +
-    "        </div>\n" +
-    "      </th>\n" +
-    "      <th ng-repeat=\"(linkName, link) in links\">{{ResourcesCtrl.resolveFieldName(linkName)}}</th>\n" +
-    "      <th>Actions</th>\n" +
-    "    </tr>\n" +
-    "    <tr ng-repeat=\"entity in data\">\n" +
-    "      <td ng-repeat=\"(path, type) in currentResource.schema | filterLinks\">\n" +
-    "        <fa-editable ng-model=\"entity[path]\" path=\"path\" resource-name=\"{{plurResourceName}}\" resource-id=\"{{entity.id}}\" schema-type=\"type\"></fa-editable>\n" +
-    "      </td>\n" +
-    "      <td ng-repeat=\"(linkName, link) in links\">\n" +
-    "        <div ng-if=\"ResourcesCtrl.linkToMany(linkName)\">\n" +
-    "          <a ng-href=\"{{ fortuneAdminRoute('subresource', {parent: plurResourceName, id: entity.id, name: link.type, inverse: ResourcesCtrl.resolveInverse(linkName)}) }}\">Navigate to {{link.type}}</a>\n" +
-    "        </div>\n" +
-    "        <div ng-if=\"!ResourcesCtrl.linkToMany(linkName)\">\n" +
-    "          <div ng-init=\"fname = ResourcesCtrl.resolveFieldName(linkName)\"></div>\n" +
-    "          <!--Initialize links if they do not come from server-->\n" +
-    "          <div ng-init=\"entity.links = entity.links || {}\"></div>\n" +
-    "          <fa-ref ng-model=\"entity.links[fname]\" ref=\"currentResource.schema[fname]\" resource-name=\"{{ plurResourceName }}\" resource-id=\"{{ entity.id }}\"></fa-ref>\n" +
-    "        </div>\n" +
-    "      </td>\n" +
-    "      <td>\n" +
-    "        <button type=\"button\" ng-click=\"ResourcesCtrl.deleteRow($index, entity.id)\" class=\"btn btn-xs btn-danger\">Delete</button>\n" +
-    "      </td>\n" +
-    "    </tr>\n" +
-    "  </table>\n" +
-    "  <div class=\"col-md-3\">\n" +
-    "    <div ng-hide=\"PK === 'id'\">\n" +
-    "      <label>Enter {{ PK }} for new {{ currentResource.name }}</label>\n" +
-    "      <input type=\"text\" ng-model=\"PrimaryKey\" ng-required=\"true\" class=\"form-control\"/>\n" +
-    "    </div>\n" +
-    "    <button type=\"button\" ng-click=\"ResourcesCtrl.addRow(PrimaryKey)\" class=\"btn btn-default btn-sm\" ng-disabled=\"PK !== 'id' && !PrimaryKey\">Create new row</button>\n" +
-    "  </div>\n" +
-    "</section>");
-}]);
+angular.module('docs.Config', [])
+    .constant('docsConfigConstant', {
+        templateDirectory: '/views/',
+        baseEndpoint: '',
+        apiNamespace: '/api/v1',
+        getApiNamespace: function(){
+            return this.baseEndpoint + this.apiNamespace;
+        },
+        mountPoint: '',
+        appVersion: 1,
+        viewUrlPrefix: '/views/',
+        templateFileSuffix: '.html',
+        prepareViewTemplateUrl: function(url){
+            return this.viewUrlPrefix + url + this.templateFileSuffix;
+        },
+        routing: {
+            html5Mode : true,
+            prefix: ''
+        },
+        authToken: ''
+    });
 
-angular.module("/templates/views/resourcesCells.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/views/resourcesCells.html",
-    "<li class=\"dropdown\">\n" +
-    "  <a href=\"#\" class=\"dropdown-toggle\">Resources <b class=\"caret\"></b></a>\n" +
-    "  <ul class=\"dropdown-menu\">\n" +
-    "    <li ng-repeat=\"service in services\">\n" +
-    "      <a ng-click=\"service.collapse = !service.collapse; $event.stopPropagation();\">{{service.name}}</a>\n" +
-    "      <div collapse=\"service.collapse\">\n" +
-    "        <div ng-repeat=\"resource in service.resources | orderBy:'name'\">\n" +
-    "          <a data-ng-href=\"{{ r('resource', {name: resource.route }) }}\">{{ resource.route }}</a>\n" +
-    "        </div>\n" +
-    "      </div>\n" +
-    "    </li>\n" +
-    "  </ul>\n" +
-    "</li>");
-}]);
+(function(angular){
+    angular.module('docs.Controllers', ['docs.Config'])
+        .controller('DocsCtrl', ['$scope', '$location', '$anchorScroll', 'resources', 'docsConfigConstant', DocsController]);
 
-angular.module("/templates/views/uml.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/views/uml.html",
-    "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
-    " <div ng-if=\"navbarEnabled\">\n" +
-    "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
-    "  </div>\n" +
-    "  <section ng-if=\"resources.length !== 0\">\n" +
-    "    <div ng-if=\"render\">\n" +
-    "      <div resources-canvas resources=\"resources\"></div>\n" +
-    "    </div>\n" +
-    "  </section>\n" +
-    "</section>");
-}]);
+    function DocsController($scope, $location, $anchorScroll, resources, config){
+        $scope.resources = resources;
+        $scope.selected = $scope.resources.length ? $scope.resources[0].name : undefined;
 
-angular.module("/templates/views/umlCells.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/templates/views/umlCells.html",
-    "<li><a data-ng-href=\"{{ r('uml_diagram') }}\">UML</a></li>");
-}]);
+        // select api item
+        $scope.select = function (item) {
+            $scope.selected = item;
+            var oldLocation = $location.hash();
+            $location.hash(item);
+            $anchorScroll();
+            $location.hash(oldLocation);
+        };
 
+        // add class to selected api item
+        $scope.itemClass = function (item) {
+            return $scope.selected === item ? 'active' : undefined;
+        };
+    }
+})(angular);
+
+
+(function(angular){
+  angular.module('docs.Directives', ['docs.Config'])
+      .directive('resourceDescription', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/description'),
+              scope: {
+                  resource: '='
+              }
+          }
+      }])
+      .directive('resourceExample', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/example'),
+              scope: {
+                  resource: '='
+              }
+          }
+      }])
+      .directive('resourceGui', ['docsConfigConstant', '$http', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/gui'),
+              scope: {
+                  resource: '='
+              },
+              link: function ($scope) {
+                  $scope.httpMethods = ['get', 'post', 'put', 'patch', 'delete'];
+                  $scope.selectedMethod = $scope.httpMethods[0];
+
+                  $scope.selectMethod = function (method) {
+                      $scope.selectedMethod = method;
+                  };
+              }
+          }
+      }])
+      .directive('requestResponseContainer', ['docsConfigConstant', '$http', function(config, $http){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/requestResponse'),
+              scope: {
+                  resource: '=',
+                  method: '='
+              },
+              link: function ($scope) {
+                  $scope.PK = $scope.resource.modelOptions ? $scope.resource.modelOptions.pk || 'id' : 'id';
+                  $scope.ids = [];
+                  $scope.relatedResource = {};
+                  $scope.response = {};
+
+                  $scope.addRequestParameter = function (id) {
+                      if (id && $scope.ids.indexOf(id) == -1) $scope.ids.push(id);
+                  };
+
+                  $scope.removeRequestParameter = function (id) {
+                      var index = $scope.ids.indexOf(id);
+                      $scope.ids.splice(index, 1);
+                  };
+
+                  $scope.sendGETRequest = function (resource, ids, relatedResourceName) {
+                      var requestConfig = {
+                          method: $scope.method,
+                          url: config.getApiNamespace() + '/' + resource.route
+                      };
+
+                      if (ids.length) {
+                          if (ids.length == 1) requestConfig.url += '/' + ids[0];
+                          if (ids.length > 1) requestConfig.params = { ids: ids.join(',') };
+                          if (relatedResourceName) requestConfig.url += '/' + relatedResourceName;
+                      }
+
+                      $http(requestConfig)
+                          .success(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
+                          })
+                          .error(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
+                          });
+                  };
+
+                  $scope.sendPOSTRequest = function (resource, data) {
+                      var requestConfig = {
+                          method: $scope.method,
+                          url: config.getApiNamespace() + '/' + resource.route,
+                          headers: {
+                              "Content-Type": "application/json"
+                          },
+                          data: data
+                      };
+
+                      $http(requestConfig)
+                          .success(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
+                          })
+                          .error(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
+                          });
+                  };
+
+                  $scope.sendDELETERequest = function (resource, id) {
+                      var requestConfig = {
+                          method: $scope.method,
+                          url: config.getApiNamespace() + '/' + resource.route + '/' + id
+                      };
+
+                      $http(requestConfig)
+                          .success(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data, status: status };
+                          })
+                          .error(function (data, status, headers, config) {
+                              $scope.response[resource.name] = $scope.response[resource.name] || {};
+                              $scope.response[resource.name][$scope.method] = { body: data || 'Request failed', status: status };
+                          });
+                  };
+              }
+          }
+      }])
+      .directive('response', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/response'),
+              scope: {
+                  response: '='
+              }
+          }
+      }])
+      .directive('resourceAttribute', ['docsConfigConstant', function(config){
+          return {
+              restrict: 'E',
+              replace: true,
+              templateUrl: config.prepareViewTemplateUrl('directives/attribute'),
+              scope: {
+                  name: '=',
+                  value: '='
+              },
+              link: function ($scope) {
+                  $scope.data = $scope.$parent.data;
+              }
+          }
+      }])
+})(angular);
+
+
+angular.module('docs', [
+    'sharedElements',
+    'docs.Config',
+    'docs.Controllers',
+    'docs.Directives'
+])
+.provider('docs', [ 'docsConfigConstant', function(config){
+    var lookup = {};
+    var otherwiseLookup = null;
+
+    var ROUTER = {
+        when: function(key, url, params) {
+            lookup[key] = {
+                url : url,
+                params : params
+            };
+        },
+
+        install: function($routeProvider) {
+            for(var key in lookup) {
+                var route = lookup[key];
+                var url = route['url'];
+                var params = route['params'];
+                $routeProvider.when(url, params);
+            }
+            if(otherwiseLookup) {
+                $routeProvider.otherwise(otherwiseLookup);
+            }
+        }
+    };
+
+    //var config = CONFIG.docs;
+    return {
+        setApiHost: function(host){
+            config.baseEndpoint = host;
+        },
+        setApiNamespace: function(namespace){
+            config.apiNamespace = namespace;
+        },
+        html5Mode: function(use, prefix){
+            config.routing.html5Mode = !!use;
+            config.routing.urlPrefix = prefix || '';
+        },
+        enableNavbar: function(){
+            config.enableNavbar = true;
+        },
+        mountTo: function($routeProvider, mountPoint){
+
+            ROUTER.when('docs_page', mountPoint + '/docs', {
+                templateUrl : config.prepareViewTemplateUrl('docs', 'docs'),
+                controller:'DocsCtrl as DocsCtrl',
+                resolve: {
+                    resources: ['$q', '$http', function($q, $http){
+                        /*angular.forEach(data.resources, function(item){ if (!item.service) item.service = “default”});*/
+                        var d = $q.defer();
+                        $http.get(config.baseEndpoint + '/resources').success(function(data){
+                            d.resolve(data.resources);
+                        });
+                        return d.promise;
+                    }]
+                }
+            });
+
+            ROUTER.install($routeProvider);
+        },
+
+        $get: ['docsConfigConstant', function(config){
+            return {
+
+                getRoute: function(key) {
+                    return lookup[key];
+                },
+
+                replaceUrlParams: function(url, params) {
+                    for(var k in params) {
+                        var v = params[k];
+                        url = url.replace(':'+k,v);
+                    }
+                    return url;
+                },
+
+                routeDefined: function(key) {
+                    return !! this.getRoute(key);
+                },
+
+                routePath: function(key, args) {
+                    var url = this.getRoute(key);
+                    url = url ? url.url : null;
+                    if(url && args) {
+                        url = this.replaceUrlParams(url, args);
+                    }
+                    return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
+                },
+
+                setApiHost: function(host){
+                    config.baseEndpoint = host;
+                },
+                setApiNamespace: function(namespace){
+                    config.apiNamespace = namespace;
+                },
+                setAuthToken: function(token){
+                    config.authToken = token;
+                }
+            }
+        }]
+    }
+}])
+
+.run(['$rootScope', '$location', 'docs', 'editableOptions', 'docsConfigConstant',
+    function($rootScope, $location, docs, editableOptions, config) {
+        var prefix = '';
+
+        $rootScope.docsRoute = function(url, args) {
+            return prefix + docs.routePath(url, args);
+        };
+        //$rootScope.navbarEnabled = !!CONFIG.docs.enableNavbar;
+        $rootScope.navbarEnabled = config.enableNavbar;
+
+        // bootstrap3 theme. Can be also 'bs2', 'default'
+        editableOptions.theme = 'bs3';
+    }]);
+
+(function(){
+  if (!window.CONFIG) window.CONFIG = {};
+
+   window.CONFIG.fortuneAdmin =  {
+    templateDirectory: '/views/',
+    baseEndpoint: '',
+    apiNamespace: '/api/v1',
+    getApiNamespace: function(){
+      return this.baseEndpoint + this.apiNamespace;
+    },
+    mountPoint: '',
+    appVersion: 1,
+    viewUrlPrefix: '/views/',
+    templateFileSuffix: '.html',
+    prepareViewTemplateUrl: function(url){
+       return this.viewUrlPrefix + url + this.templateFileSuffix;
+    },
+    routing: {
+      html5Mode : true,
+      prefix: ''
+    },
+    authToken: ''
+  };
+})();
+
+'use strict';
+angular.module('fortuneAdmin.Controllers', [
+    'fortuneAdmin.Services'
+  ])
+  .controller('ResourcesCtrl', [
+    '$scope',
+    '$http',
+    '$routeParams',
+    'resources',
+    'data',
+    function ($scope, $http, $routeParams, resources, data){
+
+      var currentResource = {};
+      angular.forEach(resources, function(res){
+        if(res.name === $routeParams.name || res.route === $routeParams.name){
+          currentResource = res;
+        }
+      });
+
+      //Flatten nested objects to get rid of index configuration
+      /*angular.forEach(currentResource.schema, function(res, key){
+        if (angular.isObject(res) && !angular.isArray(res)){
+          if (res.type){
+            currentResource.schema[key] = res.type;
+          }else{
+            delete currentResource.schema[key];
+          }
+        }
+      });*/
+      var plurResourceName = currentResource.route;
+
+      $scope.plurResourceName = plurResourceName;
+      $scope.currentResource = currentResource;
+
+      $scope.resources = resources;
+
+      $scope.data = data[plurResourceName];
+      $scope.links = data.links;
+      $scope.PK = $scope.currentResource.modelOptions ? $scope.currentResource.modelOptions.pk || 'id' : 'id';
+
+      $scope.parentResourceName = $routeParams.parent;
+      $scope.parentId = $routeParams.id;
+
+      this.resolveFieldName = function(linkName){
+        //No need to dig deeper as there's no nested schemas
+        var parts = linkName.split('.');
+        return parts[parts.length - 1];
+      };
+
+      this.resolveInverse = function(linkName){
+        var fieldName = this.resolveFieldName(linkName);
+        var ref = currentResource.schema[fieldName];
+
+        var inverse = '';
+        if (angular.isArray(ref)){
+          inverse = ref[0].inverse;
+        }else if(angular.isObject(ref)){
+          inverse = ref.inverse;
+        }else {
+          throw new Error('Malformed reference');
+        }
+        return inverse;
+      };
+
+
+      this.linkToMany = function(linkName){
+        var fieldName = this.resolveFieldName(linkName);
+        var ref = currentResource.schema[fieldName];
+        return angular.isArray(ref);
+      };
+
+      // XXX TESTING!
+      this.socket = io.connect("localhost:4000/" + $scope.currentResource.name);
+
+      this.socket.on('add', function(data) {
+        $scope.data.push(data.data);
+        console.log(data.data);
+        // XXX angular sucks ;_;
+        $scope.$apply();
+      });
+
+      this.socket.on('delete', function(data) {
+        // XXX at the moment this returns all of the
+        // rows, we need to change this
+        $scope.data = data.data;
+        console.log(data.data);
+        $scope.$apply();
+      });
+
+      this.socket.on('update', function(data) {
+        var i, l, res, updated = data.data;
+        console.log(updated);
+        for (i = 0, l = $scope.data.length; i < l; i++) {
+          res = $scope.data[i];
+          if (res.id === updated.id) {
+            $scope.data[i] = updated;
+            return $scope.$apply();
+          }
+        }
+      });
+
+
+      this.addRow = function(Primary){
+        var newRow = {};
+        if ($scope.PK !== 'id'){
+          newRow[$scope.PK] = Primary;
+        }
+
+        if ($routeParams.id) {
+          // $scope.currentResource - what is going to be created
+          // $routeParams.inverse - field that references parent resource
+          var refFieldName = $routeParams.inverse;
+
+          //Create reference to new doc
+          if (angular.isArray($scope.currentResource.schema[refFieldName])){
+            newRow[refFieldName] = [$routeParams.id];
+          }else{
+            newRow[refFieldName] = $routeParams.id;
+          }
+        }
+        var cmd = {};
+        cmd[plurResourceName] = [newRow];
+        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd)
+          .success(function(data) {
+            // we don't need this, as websockets will have already added it.
+          // $scope.data.push(data[plurResourceName][0]);
+        });
+      };
+
+      this.deleteRow = function(index, id){
+        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
+          .success(function (data, status) {
+            $scope.data.splice(index, 1);
+          })
+          .error(function(data, status) {
+            console.error(data, status);
+          });
+
+      };
+
+      $scope.filter = {};
+
+      this.getTypeaheadList = function(str, name){
+        var query = {};
+        query['filter[' + name + '][regex]'] = str;
+        query['filter[' + name + '][options'] = 'i';
+        return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
+          params: query
+        })
+          .then(function(res){
+            console.log(res.data[plurResourceName]);
+            var cleanList = [];
+            var stored = [];
+            angular.forEach(res.data[plurResourceName], function(item){
+              if (stored.indexOf(item[name]) === -1){
+                stored.push(item[name]);
+                cleanList.push(item);
+              }
+            });
+            return cleanList;
+          });
+      };
+
+      this.applyFilter = function(selected, fieldName, type){
+        switch (type){
+          case 'String':
+            //Derived from typeahead
+            $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+            $scope.filter['filter[' + fieldName + '][options]'] = 'i';
+            break;
+          case 'Number':
+          case 'Date':
+            $scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
+            $scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
+            break;
+          case 'Boolean':
+            $scope.filter['filter[' + fieldName + ']'] = selected;
+            break;
+        }
+        runCurrentFilter();
+      };
+
+      this.dropFilter = function(fieldName){
+        delete $scope.filter['filter[' + fieldName + '][regex]'];
+        delete $scope.filter['filter[' + fieldName + '][options]'];
+        delete $scope.filter['filter[' + fieldName + '][gte]'];
+        delete $scope.filter['filter[' + fieldName + '][lte]'];
+        delete $scope.filter['filter[' + fieldName + ']'];
+        runCurrentFilter();
+      };
+
+      function runCurrentFilter(){
+        $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
+          params: $scope.filter
+        })
+          .success(function(data){
+            console.log(data);
+            $scope.data = data[plurResourceName];
+          });
+      }
+    }])
+    .controller('faEditableCtrl', ['$scope', '$http',
+        function($scope, $http){
+            $scope.apply = function(value){
+                //Send PATCH to the server
+                var cmd = [];
+                cmd.push({
+                    op: 'replace',
+                    path: '/' + $scope.resourceName + '/0/links/' + $scope.path,
+                    value: value
+                });
+
+                $http({
+                    method: 'PATCH',
+                    url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
+                    data: cmd
+                }).catch(function(data, status){
+                    console.error(data, status);
+                });
+            };
+        }]);
+
+'use strict';
+angular.module('fortuneAdmin.Directives', [])
+  .directive('faEditable', [function(){
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        value: '=ngModel',
+        path: '=',
+        schemaType: '=',
+        resourceName: '@',
+        resourceId: '@'
+      },
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faEditable'),
+      controller: 'faEditableCtrl'
+    }
+  }])
+
+  .directive('faRef', ['$http', '$compile',
+    function($http, $compile){
+      return {
+        restrict: 'E',
+        replace: false,
+        scope: {
+          value: '=ngModel',
+          ref: '=',
+          resourceName: '@',
+          resourceId: '@'
+        },
+        controller: 'faEditableCtrl',
+        link: function(scope, elt){
+          var refTo = scope.path = scope.ref.ref;
+          var resources = scope.resources,
+            currentResource,
+            refRoute;
+
+
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+            resources = data.resources;
+            angular.forEach(resources, function(resource){
+              if (resource.name === scope.ref.ref){
+                refRoute = resource.route;
+                currentResource = resource;
+              }
+            });
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute)
+              .success(function(data){
+                var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
+                scope.list = data[refRoute];
+                var tpl = ['<a href="#" editable-select="value" ',
+                  'e-ng-options="item.', PK || 'id',
+                  ' as item.', PK || 'id',
+                  ' for item in list" ',
+                  'onaftersave="apply(value)">',
+                  '{{ value || "Not set." }}',
+                  '</a>'
+                ];
+                var select = $compile(tpl.join(''))(scope);
+                elt.append(select);
+              });
+          });
+        }
+      }
+    }]);
 
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [ 'templates-main', 
-
-        'ui.bootstrap'
-      , 'xeditable'
-      , 'fortuneAdmin.Controllers'
-      , 'fortuneAdmin.Directives'
-      , 'fortuneAdmin.Services'
-      , 'fortuneAdmin.Uml'
-      , 'fortuneAdmin.Docs'
+        'sharedElements',
+        'fortuneAdmin.Controllers',
+        'fortuneAdmin.Directives',
+        'fortuneAdmin.Services',
+        'fortuneAdmin.Uml'
     ])
-    .provider('fortuneAdmin', [function(){
-
+    .provider('fortuneAdmin', function(){
       var lookup = {};
       var otherwiseLookup = null;
 
@@ -202,32 +697,34 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
       var config = window.CONFIG.fortuneAdmin;
       return {
         setApiHost: function(host){
-          CONFIG.fortuneAdmin.baseEndpoint = host;
+            config.baseEndpoint = host;
         },
         setApiNamespace: function(namespace){
-          CONFIG.fortuneAdmin.apiNamespace = namespace;
+            config.apiNamespace = namespace;
         },
         html5Mode: function(use, prefix){
-          CONFIG.fortuneAdmin.routing.html5Mode = !!use;
-          CONFIG.fortuneAdmin.routing.urlPrefix = prefix || '';
+            config.routing.html5Mode = !!use;
+            config.routing.urlPrefix = prefix || '';
         },
         enableNavbar: function(){
-          CONFIG.fortuneAdmin.enableNavbar = true;
+            config.enableNavbar = true;
         },
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
+            //templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
             templateUrl : config.prepareViewTemplateUrl('uml'),
-            controller: 'UmlCtrl as UmlCtrl'
+            controller: 'UmlCtrl as UmlCtrl',
+            resolve: {
+              test: function(){
+                console.log('resolving uml');
+              }
+            }
           });
-
-            ROUTER.when('docs_page', mountPoint + '/docs', {
-                templateUrl : config.prepareViewTemplateUrl('docs'),
-                controller:'DocsCtrl as DocsCtrl'
-            });
 
           //Resolve necessary data here to simplify controller
           ROUTER.when('resource', mountPoint + '/:name', {
+            //templateUrl: config.prepareViewTemplateUrl('fortune-admin', 'resources'),
             templateUrl: config.prepareViewTemplateUrl('resources'),
             controller: 'ResourcesCtrl as ResourcesCtrl',
             resolve: {
@@ -308,23 +805,22 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
               if(url && args) {
                 url = this.replaceUrlParams(url, args);
               }
-              return CONFIG.fortuneAdmin.routing.html5Mode ? url : '/#' + CONFIG.fortuneAdmin.routing.urlPrefix + url;
+              return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
             },
 
             setApiHost: function(host){
-              CONFIG.fortuneAdmin.baseEndpoint = host;
+                config.baseEndpoint = host;
             },
             setApiNamespace: function(namespace){
-              CONFIG.fortuneAdmin.apiNamespace = namespace;
+                config.apiNamespace = namespace;
             },
             setAuthToken: function(token){
-              CONFIG.fortuneAdmin.authToken = token;
+                config.authToken = token;
             }
           }
         }
       }
-    }])
-
+    })
     .run(['$rootScope', '$location', 'fortuneAdmin', 'editableOptions',
       function($rootScope, $location, fortuneAdmin, editableOptions) {
       var prefix = '';
@@ -338,1007 +834,6 @@ angular.module("/templates/views/umlCells.html", []).run(["$templateCache", func
       editableOptions.theme = 'bs3';
     }]);
 
-(function(){
-  if (!window.CONFIG) window.CONFIG = {};
-
-   window.CONFIG.fortuneAdmin =  {
-    templateDirectory: '/templates/',
-    baseEndpoint: '',
-    apiNamespace: '/api/v1',
-    getApiNamespace: function(){
-      return this.baseEndpoint + this.apiNamespace;
-    },
-    mountPoint: '',
-    appVersion: 1,
-    viewUrlPrefix: '/templates/views/',
-    templateFileSuffix: '.html',
-    prepareViewTemplateUrl: function(url){
-      return this.viewUrlPrefix + url + this.templateFileSuffix;
-    },
-    routing: {
-      html5Mode : true,
-      prefix: ''
-    },
-    authToken: ''
-  };
-})();
-
-'use strict';
-angular.module('fortuneAdmin.Controllers', [
-    'fortuneAdmin.Services'
-  ])
-
-  .filter('filterLinks', [function(){
-    return function(input){
-      var nonLinks = {};
-      angular.forEach(input, function(field, name){
-        if (!angular.isObject(field)){
-          nonLinks[name] = field;
-        }
-      });
-      return nonLinks;
-    }
-  }])
-
-  .controller('ResourcesCtrl', [
-    '$scope',
-    '$http',
-    '$routeParams',
-    'resources',
-    'data',
-    function ($scope, $http, $routeParams, resources, data){
-
-      var currentResource = {};
-      angular.forEach(resources, function(res){
-        if(res.name === $routeParams.name || res.route === $routeParams.name){
-          currentResource = res;
-        }
-      });
-
-      //Flatten nested objects to get rid of index configuration
-      /*angular.forEach(currentResource.schema, function(res, key){
-        if (angular.isObject(res) && !angular.isArray(res)){
-          if (res.type){
-            currentResource.schema[key] = res.type;
-          }else{
-            delete currentResource.schema[key];
-          }
-        }
-      });*/
-      var plurResourceName = currentResource.route;
-
-      $scope.plurResourceName = plurResourceName;
-      $scope.currentResource = currentResource;
-
-      $scope.resources = resources;
-
-      $scope.data = data[plurResourceName];
-      $scope.links = data.links;
-      $scope.PK = $scope.currentResource.modelOptions ? $scope.currentResource.modelOptions.pk || 'id' : 'id';
-
-      $scope.parentResourceName = $routeParams.parent;
-      $scope.parentId = $routeParams.id;
-
-      this.resolveFieldName = function(linkName){
-        //No need to dig deeper as there's no nested schemas
-        var parts = linkName.split('.');
-        return parts[parts.length - 1];
-      };
-
-      this.resolveInverse = function(linkName){
-        var fieldName = this.resolveFieldName(linkName);
-        var ref = currentResource.schema[fieldName];
-
-        var inverse = '';
-        if (angular.isArray(ref)){
-          inverse = ref[0].inverse;
-        }else if(angular.isObject(ref)){
-          inverse = ref.inverse;
-        }else {
-          throw new Error('Malformed reference');
-        }
-        return inverse;
-      };
-
-
-      this.linkToMany = function(linkName){
-        var fieldName = this.resolveFieldName(linkName);
-        var ref = currentResource.schema[fieldName];
-        return angular.isArray(ref);
-      };
-
-
-      this.addRow = function(Primary){
-        var newRow = {};
-        if ($scope.PK !== 'id'){
-          newRow[$scope.PK] = Primary;
-        }
-
-        if ($routeParams.id) {
-          // $scope.currentResource - what is going to be created
-          // $routeParams.inverse - field that references parent resource
-          var refFieldName = $routeParams.inverse;
-
-          //Create reference to new doc
-          if (angular.isArray($scope.currentResource.schema[refFieldName])){
-            newRow[refFieldName] = [$routeParams.id];
-          }else{
-            newRow[refFieldName] = $routeParams.id;
-          }
-        }
-        var cmd = {};
-        cmd[plurResourceName] = [newRow];
-        $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd)
-          .success(function(data) {
-          $scope.data.push(data[plurResourceName][0]);
-        });
-      };
-
-      this.deleteRow = function(index, id){
-        $http.delete(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName + '/' + id)
-          .success(function (data, status) {
-            $scope.data.splice(index, 1);
-          })
-          .error(function(data, status) {
-            console.error(data, status);
-          });
-
-      };
-
-      $scope.filter = {};
-
-      this.getTypeaheadList = function(str, name){
-        var query = {};
-        query['filter[' + name + '][regex]'] = str;
-        query['filter[' + name + '][options'] = 'i';
-        return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
-          params: query
-        })
-          .then(function(res){
-            console.log(res.data[plurResourceName]);
-            var cleanList = [];
-            var stored = [];
-            angular.forEach(res.data[plurResourceName], function(item){
-              if (stored.indexOf(item[name]) === -1){
-                stored.push(item[name]);
-                cleanList.push(item);
-              }
-            });
-            return cleanList;
-          });
-      };
-
-      this.applyFilter = function(selected, fieldName, type){
-        switch (type){
-          case 'String':
-            //Derived from typeahead
-            $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-            $scope.filter['filter[' + fieldName + '][options]'] = 'i';
-            break;
-          case 'Number':
-          case 'Date':
-            $scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
-            $scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
-            break;
-          case 'Boolean':
-            $scope.filter['filter[' + fieldName + ']'] = selected;
-            break;
-        }
-        runCurrentFilter();
-      };
-
-      this.dropFilter = function(fieldName){
-        delete $scope.filter['filter[' + fieldName + '][regex]'];
-        delete $scope.filter['filter[' + fieldName + '][options]'];
-        delete $scope.filter['filter[' + fieldName + '][gte]'];
-        delete $scope.filter['filter[' + fieldName + '][lte]'];
-        delete $scope.filter['filter[' + fieldName + ']'];
-        runCurrentFilter();
-      };
-
-      function runCurrentFilter(){
-        $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
-          params: $scope.filter
-        })
-          .success(function(data){
-            console.log(data);
-            $scope.data = data[plurResourceName];
-          });
-      }
-    }]);
-
-'use strict';
-angular.module('fortuneAdmin.Directives', [
-  ])
-  .directive('fortuneAdminNavbar', [function() {
-    return {
-      restrict: 'E',
-      templateUrl: '/templates/views/mynavbar.html',
-      replace: true,
-      transclude: true,
-      scope: {}
-    }
-  }])
-  .directive('fortuneAdminResourcesCells', ['$http', '$rootScope', function($http, $rootScope){
-    return {
-      restrict: 'E',
-      templateUrl: '/templates/views/resourcesCells.html',
-      replace: true,
-      scope: true,
-      link: function(scope){
-        scope.r = $rootScope.fortuneAdminRoute;
-        scope.resources = [];
-        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-          scope.resources = data.resources;
-          scope.services = {};
-          angular.forEach(data.resources, function(r){
-            r.service = (r.service || 'default-service').split('-').join(' ');
-            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
-            scope.services[r.service].resources.push(r);
-          });
-        });
-      }
-    }
-  }])
-  .directive('fortuneAdminUmlCells', ['$rootScope', function($rootScope){
-    return {
-      restrict: 'E',
-      replace: true,
-      templateUrl: '/templates/views/umlCells.html',
-      scope: true,
-      link: function(scope){
-        scope.r = $rootScope.fortuneAdminRoute;
-      }
-    }
-  }])
-  .controller('faEditableCtrl', ['$scope', '$http',
-    function($scope, $http){
-      $scope.apply = function(value){
-        //Send PATCH to the server
-        var cmd = [];
-        cmd.push({
-          op: 'replace',
-          path: '/' + $scope.resourceName + '/0/links/' + $scope.path,
-          value: value
-        });
-
-        $http({
-          method: 'PATCH',
-          url: CONFIG.fortuneAdmin.getApiNamespace() + '/' + $scope.resourceName + '/' + $scope.resourceId,
-          data: cmd
-        }).catch(function(data, status){
-            console.error(data, status);
-          });
-      };
-    }])
-
-  .directive('faEditable', [function(){
-    return {
-      restrict: 'E',
-      replace: true,
-      scope: {
-        value: '=ngModel',
-        path: '=',
-        schemaType: '=',
-        resourceName: '@',
-        resourceId: '@'
-      },
-      templateUrl: '/templates/directives/faEditable.html',
-      controller: 'faEditableCtrl'
-    }
-  }])
-
-  .directive('faRef', ['$http', '$compile',
-    function($http, $compile){
-      return {
-        restrict: 'E',
-        replace: false,
-        scope: {
-          value: '=ngModel',
-          ref: '=',
-          resourceName: '@',
-          resourceId: '@'
-        },
-        controller: 'faEditableCtrl',
-        link: function(scope, elt){
-          var refTo = scope.path = scope.ref.ref;
-          var resources = scope.resources,
-            currentResource,
-            refRoute;
-
-
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-            resources = data.resources;
-            angular.forEach(resources, function(resource){
-              if (resource.name === scope.ref.ref){
-                refRoute = resource.route;
-                currentResource = resource;
-              }
-            });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute)
-              .success(function(data){
-                var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
-                scope.list = data[refRoute];
-                var tpl = ['<a href="#" editable-select="value" ',
-                  'e-ng-options="item.', PK || 'id',
-                  ' as item.', PK || 'id',
-                  ' for item in list" ',
-                  'onaftersave="apply(value)">',
-                  '{{ value || "Not set." }}',
-                  '</a>'
-                ];
-                var select = $compile(tpl.join(''))(scope);
-                elt.append(select);
-              });
-          });
-        }
-      }
-    }]);
-(function(angular){
-  angular.module('fortuneAdmin.Uml.Controllers', [])
-    .controller('UmlCtrl', ['$scope', '$http', UmlController]);
-
-  function UmlController($scope, $http){
-    $scope.resources = [];
-    $scope.render = false;
-    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
-      $scope.resources = data.resources;
-      $scope.render = true;
-    });
-  }
-})(angular);
-
-(function(angular){
-  //It's just a wrapper around d3 to make it easy to mock
-  //Also this can be extended later to defer loading
-  angular.module('fortuneAdmin.Uml.D3', [])
-    .factory('d3', ['$q', '$timeout', '$rootScope', function($q, $timeout, $rootScope){
-      var d3Loader = $q.defer();
-
-      $timeout(function(){
-        $rootScope.$apply(function(){
-          d3Loader.resolve(window.d3);
-        });
-      });
-
-      return{
-        load: function(){
-          return d3Loader.promise;
-        }
-      }
-    }]);
-})(angular);
-
-(function(angular){
-  var config = {
-    headerHeight: 50,
-    fieldHeight: 20,
-    fieldWidth: 200,
-    columnWidth: 300,
-    vgap: 50
-  };
-
-  angular.module('fortuneAdmin.Uml.Directives', [
-      'fortuneAdmin.Uml.D3',
-      'fortuneAdmin.Uml.Services'
-    ])
-    .directive('resourcesCanvas', ['$compile', 'UmlElementsRegistry', resourcesCanvas])
-    .directive('resourceClass', ['$compile', 'UmlElementsRegistry', resourceClass])
-    .directive('resourceProperty', ['$compile', 'UmlElementsRegistry', resourceProperty])
-    .directive('resourceLink', ['UmlElementsRegistry', resourceLink]);
-
-  function resourcesCanvas($compile, UmlElementsRegistry){
-    return {
-      restrict: 'A',
-      templateUrl: '/templates/directives/uml/canvas.html',
-      scope: {
-        resources: '='
-      },
-      link: function(scope, elt){
-        UmlElementsRegistry.clear();
-        scope.canvas = {};
-        var schema = {};
-        var resources = {};
-
-        var height = 0;
-        var elementsInARow = Math.floor(elt[0].clientWidth / config.columnWidth);
-
-        var tempStorage = {};
-        angular.forEach(scope.resources, function(resource){
-          tempStorage[resource.service] = tempStorage[resource.service] || [];
-          tempStorage[resource.service].push(resource);
-        });
-        scope.resources = angular.copy(tempStorage);
-        tempStorage = {};
-
-        //Convert to D3 data structure
-        angular.forEach(scope.resources, function(serviceResources){
-          //Define tallest elt here to keep schema and resources in sync
-          //TODO: make an algo that will wisely place every element taking it's links into account
-          tempStorage = angular.copy(serviceResources);
-          var tallestElt = tempStorage[0]
-            , tallestHeight = Object.keys(tempStorage[0].schema).length
-            , tallestIndex = 0;
-          angular.forEach(tempStorage, function(resource, index){
-            if (Object.keys(resource.schema).length > tallestHeight){
-              tallestElt = resource;
-              tallestHeight = Object.keys(resource.schema).length;
-              tallestIndex = index;
-            }
-          });
-          var tmp = serviceResources.splice(tallestIndex, 1);
-          serviceResources = tmp.concat(serviceResources);
-          angular.forEach(serviceResources, function(resource, index){
-            //Split resources by services here
-            var service = resource.service || 'default';
-            schema[service] = schema[service] || [];
-            schema[service][index] = [];
-            resources[service] = resources[service] || {};
-            resources[service][index] = {
-              name: resource.name,
-              service: resource.service
-            };
-            if (resource.modelOptions && resource.modelOptions.pk){
-              resources[service][index].pk = resource.modelOptions.pk || 'id';
-            }
-            angular.forEach(resource.schema, function(fieldParams, fieldName){
-              schema[service][index].push({
-                name: fieldName,
-                params: fieldParams,
-                pk: resources[service][index].pk === fieldName
-              });
-            });
-            schema[service][index].sort(function(a,b){
-              return a.name > b.name ? 1: -1;
-            });
-          });
-        });
-        scope.resources = schema;
-
-        function getBottom(){
-          var bottom = UmlElementsRegistry.bottomLine[0];
-          var col = 0;
-          for (var i = 0; i < UmlElementsRegistry.bottomLine.length; i++){
-            if (UmlElementsRegistry.bottomLine[i] < bottom) {
-              bottom = UmlElementsRegistry.bottomLine[i];
-              col = i;
-            }
-          }
-          return [col, bottom];
-        }
-
-        (function setupLayout(){
-          for (var i = 0; i < elementsInARow; i++){
-            //Initialize 30px top margin
-            //This will create top margin for the first row of resources
-            UmlElementsRegistry.bottomLine.push(30);
-          }
-
-          //Iterate resources of the same service here. Then move to the next service
-          angular.forEach(schema, function(service, serviceName){
-            angular.forEach(service, function(resource, index){
-              definePosition(resource, index);
-            });
-            function definePosition(resource, index){
-              var elementHeight = resource.length * config.fieldHeight + config.headerHeight;
-              var coords = getBottom();
-
-              var eltPosition = {
-                x: coords[0] * config.columnWidth,
-                y: coords[1],
-                height: elementHeight,
-                column: coords[0]
-              };
-
-              //Update bottom line
-              UmlElementsRegistry.bottomLine[coords[0]] += elementHeight + config.vgap;
-
-              //Store element position
-              UmlElementsRegistry.positions[serviceName] = UmlElementsRegistry.positions[serviceName] || [];
-              UmlElementsRegistry.positions[serviceName][index] = eltPosition;
-
-            }
-            //Flatten bottom line before proceeding to the next service
-            var bott = UmlElementsRegistry.bottomLine[0];
-            angular.forEach(UmlElementsRegistry.bottomLine, function(colHeight){
-              if (colHeight > bott){
-                bott = colHeight;
-              }
-            });
-            for (var j = UmlElementsRegistry.bottomLine.length; j >= 0; j--){
-              UmlElementsRegistry.bottomLine[j] = bott;
-            }
-          });
-        })();
-
-        function nextPosition(serviceName, index){
-          return UmlElementsRegistry.positions[serviceName][index];
-        }
-
-        for (var i = 0; i < UmlElementsRegistry.bottomLine.length; i++){
-          //Add bottom margin to the main canvas
-          if (UmlElementsRegistry.bottomLine[i] > height) height = UmlElementsRegistry.bottomLine[i] + 100;
-        }
-
-        //create canvas for rendering resources containers
-        var svg = d3.select(elt[0])
-          .append('svg')
-          .attr('id', 'mainCanvas')
-          .attr('height', height)
-          .style('width', '100%');
-
-        var svgOffset = svg[0][0].offsetTop;
-        var svgWidth = svg[0][0].clientWidth;
-        UmlElementsRegistry.setBase(svgOffset);
-
-        angular.forEach(schema, function(sch, serviceName){
-          //find full service height
-          var lowestElement = UmlElementsRegistry.positions[serviceName][0];
-          lowestElement = lowestElement.y + lowestElement.height;
-          angular.forEach(UmlElementsRegistry.positions[serviceName], function(pos){
-            if (pos.y + pos.height > lowestElement){
-              lowestElement = pos.y + pos.height;
-            }
-          });
-
-          var serviceSvg = svg
-            .append('svg')
-            .attr('id', serviceName)
-            .attr('height', lowestElement)
-            .style('width', '100%');
-
-        var foo = serviceSvg.selectAll('g')
-          .data(sch)
-          .enter().append('g')
-          .attr('height', function(d){
-            return d.length * config.fieldHeight;
-          })
-          .attr('width', config.fieldWidth)
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('fill', '#ffffff')
-          .append('foreignObject')
-          .attr('x', function(d, i){
-            return nextPosition(serviceName, i).x + config.vgap;
-          })
-          .attr('y', function(d,i){
-            return nextPosition(serviceName, i).y;
-          })
-          .attr('height', function(d){
-            return d.length * config.fieldHeight + config.headerHeight;
-          })
-          .attr('width', config.fieldWidth)
-          .append('xhtml:div')
-          .attr('class', 'resource');
-
-        //Create resource name
-        var headers = foo.append('xhtml:div')
-          .attr('class', 'header');
-          headers.append('xhtml:h4')
-          .attr('class', 'text-center')
-          .text(function(d, i){
-            return resources[serviceName][i].name;
-          });
-
-        //create resource containers
-        foo.append('xhtml:div')
-          .attr('style', 'width: 100%')
-          .append('xhtml:div')
-          .attr('resource-class', '')
-          .attr('resource', function(d, i){
-            return 'resources["' + serviceName + '"][' + i + ']';
-          });
-
-        angular.forEach(foo[0], function(element){
-          UmlElementsRegistry.add('resources', element, element.innerText);
-        });
-
-          //Create service boundary
-          serviceSvg.append('rect')
-            .attr('width', svgWidth - 10)
-            .attr('x', 5)
-            .attr('y', foo[0][0].offsetTop - 10 - 75)
-            .attr('height', lowestElement - foo[0][0].offsetTop + 85)
-            .attr('fill', 'none')
-            .attr('stroke', 'red');
-
-          //Create service label
-          serviceSvg.append('rect')
-            .attr('width', config.fieldWidth)
-            .attr('height', config.fieldHeight)
-            .attr('x', 0)
-            .attr('y', foo[0][0].offsetTop - 20 - 85)
-            .attr('fill', 'black');
-          serviceSvg.append('text')
-            .attr('width', config.fieldWidth)
-            .attr('height', config.fieldHeight)
-            .attr('x', 0)
-            .attr('y', foo[0][0].offsetTop - 20 - 70)
-            .attr('fill', 'white')
-            .text(serviceName);
-        });
-
-        elt.removeAttr('resources-canvas');
-        $compile(elt)(scope);
-
-      }
-    }
-  }
-
-  function resourceClass($compile, UmlElementsRegistry){
-    return {
-      restrict: 'A',
-      scope: {
-        resource: '='
-      },
-      link: function(scope, elt){
-        var elementHeight = scope.resource.length * config.fieldHeight;
-
-        //create canvas for rendering fields rectangles
-        var svg = d3.select(elt[0])
-          .append('svg')
-          .attr('width', config.fieldWidth)
-          .attr('height', elementHeight);
-
-        var x = 0;
-        var y = -20;
-
-        //create fields containers
-        var fields = svg.selectAll('g')
-          .data(scope.resource)
-          .enter().append('g')
-          .attr('height', config.fieldHeight)
-          .attr('width', config.fieldWidth)
-          .attr('fill', '#cccccc')
-          .append('foreignObject')
-          .attr('x', x)
-          .attr('y', function(){
-            return y += config.fieldHeight;
-          })
-          .attr('height', config.fieldHeight)
-          .attr('width', config.fieldWidth)
-          .append('xhtml:div')
-          .attr('resource-property', '')
-          .attr('field', function(d, i){
-            return 'resource[' + i + ']';
-          })
-          .attr('class', 'text-center field')
-          .attr('style', 'width: 100%');
-
-        elt.removeAttr('resource-class');
-        $compile(elt)(scope);
-      }
-    }
-  }
-
-  function resourceProperty($compile, UmlElementsRegistry){
-    return {
-      restrict: 'A',
-      scope: {
-        field: '=',
-        isPk: '='
-      },
-      link: function(scope, elt){
-        //Decide what kind of field we have
-        var linked = false;
-        if (angular.isArray(scope.field.params)){
-          if (scope.field.params[0]){
-            if (scope.field.params[0].ref){
-              linked = true;
-            }
-          }
-        }else if (angular.isObject(scope.field.params)){
-          if (scope.field.params.ref){
-            linked = true;
-          }
-        }
-
-        var portConfig = {
-          width: 10,
-          height: config.fieldHeight
-        };
-
-        if (linked){
-          //Render connector port if there should be a link
-          var svg = d3.select(elt[0])
-            .append('svg')
-            .attr('width', config.fieldWidth)
-            .attr('height', portConfig.height);
-
-          //Create field name
-          svg.append('foreignObject')
-            .attr('width', config.fieldWidth)
-            .attr('height', config.fieldHeight)
-            .append('xhtml:div')
-            .attr('class', 'field ref')
-            .text(scope.field.name + ' [ref]');
-
-          //Create link itself
-          svg.append('foreignObject')
-            .attr('width', 1)
-            .attr('height', config.fieldHeight)
-            .append('xhtml:div')
-            .attr('port-x', function(){
-              return svg[0][0].offsetLeft;
-            })
-            .attr('port-y', function(){
-              return svg[0][0].offsetTop;
-            })
-            .attr('resource-link', '')
-            .attr('link-to-many', function(){
-              return angular.isArray(scope.field.params);
-            })
-            .attr('link-to', function(){
-              if (angular.isArray(scope.field.params)){
-                return 'field.params[0]';
-              }else{
-                return 'field.params';
-              }
-            });
-        }else{
-          if (scope.field.pk){
-            elt.addClass('pk');
-            elt.text('PK: ' + scope.field.name);
-          }else{
-            if (angular.isArray(scope.field.params)){
-              //TODO: fix this when you can set field: [String] in fortune
-              elt.text(scope.field.name + ' [Arr]');
-            }else if(angular.isObject(scope.field.params)){
-              //TODO: fix this when fortune supports nested schemas
-              elt.text(scope.field.name + ' [Nested]');
-            }else{
-              try{
-                elt.text(scope.field.name + ' [' + scope.field.params.substr(0, 3) + ']');
-              }catch(e){
-                //This will prevent app from crashing in case of typos in resources configuration
-                console.log('caugth error: ', e);
-              }
-            }
-          }
-        }
-
-        elt.removeAttr('resource-property');
-        $compile(elt)(scope);
-      }
-    }
-  }
-
-  function resourceLink(UmlElementsRegistry){
-    return {
-      restrict: 'A',
-      scope: {
-        linkToMany: '=',
-        linkTo: '=',
-        portX: '@',
-        portY: '@'
-      },
-      link: function(scope, elt){
-        var target = UmlElementsRegistry.find('resources', scope.linkTo.ref);
-        if (!target) return;
-        var baseOffset = UmlElementsRegistry.getBaseOffset();
-
-        var portX = parseInt(scope.portX);
-        var portY = parseInt(scope.portY) + 10;
-
-        //Decide where target element is placed
-        var onTheRight = false;
-        var sameCol = (portX - target.right < 100);
-        if (portX <= target.left){
-          onTheRight = true;
-        }
-
-        var lineData = [];
-          if (onTheRight){
-            //Start from right edge
-            lineData.push({x: portX + config.fieldWidth, y: portY - baseOffset});
-            lineData.push({x: portX + config.fieldWidth + 50, y: portY - baseOffset});
-          }else{
-            if (sameCol){
-              //Start form right edge
-              lineData.push({x: portX + config.fieldWidth, y: portY - baseOffset});
-              lineData.push({x: portX + config.fieldWidth + 50, y: portY - baseOffset});
-            }else{
-              //Start from left edge
-              lineData.push({x: portX, y: portY - baseOffset});
-              lineData.push({x: portX - 50, y: portY - baseOffset});
-            }
-          }
-
-
-        //How many columns will be overflown?
-        var overflow = Math.floor((target.right - portX) / config.columnWidth);
-        var absOverflow = Math.abs(overflow);
-        if (absOverflow > 1){
-          var currentColumn = Math.floor(portX / config.columnWidth);
-          //Select direction
-          var targetCol = currentColumn + overflow;
-          var nextCol = onTheRight ? currentColumn + 1 : currentColumn - 1;
-
-          while(nextCol !== targetCol){
-            //Select elements from current column
-            var columnSelection = [];
-            angular.forEach(UmlElementsRegistry.positions, function(service){
-              angular.forEach(service, function(e){
-                if (e.column == nextCol) {
-                  columnSelection.push(e);
-                }
-              });
-            });
-
-            var nearestElement = columnSelection[0];
-
-            //Starts from top
-            var minDy = Math.abs(portY - nearestElement.y);
-            angular.forEach(columnSelection, function(element){
-              var dy = Math.abs(portY - element.y);
-              if (dy < minDy){
-                nearestElement = element;
-                minDy = portY - element.y;
-              }
-            });
-            var gapY = nearestElement.y + nearestElement.height + (Math.random() * 50);
-            var gapX = nearestElement.x;
-            var center = 50;
-
-            if (onTheRight){
-              lineData.push({x: gapX - center, y: gapY});
-              lineData.push({x: gapX + config.columnWidth - center, y: gapY});
-            }else{
-              lineData.push({x: gapX + config.columnWidth + center, y: gapY});
-              lineData.push({x: gapX - center, y: gapY});
-            }
-
-            onTheRight ? nextCol++ : nextCol--;
-          }
-        }
-
-        if (onTheRight){
-          //Target to left edge
-          lineData.push({x: target.left - 50, y: target.top + 10});
-          lineData.push({x: target.left, y: target.top + 10});
-        }else{
-          //Target to right edge
-          lineData.push({x: target.right + 50, y: target.top + 10});
-          lineData.push({x: target.right, y: target.top + 10});
-        }
-
-        var line = d3.svg.line()
-          .x(function(d){
-            return d.x;
-          })
-          .y(function(d){
-            return d.y;
-          })
-          .tension(0.95)
-          .interpolate('basis');
-
-        var color = selectColor();
-        //push link to canvas
-        var path = d3.select('#mainCanvas')
-          .append('path')
-          .attr('d', line(lineData))
-          .attr('stroke', color)
-          .attr('stroke-width', 2)
-          .attr('fill', 'none')
-          .on('mouseover', function(d, i){
-            d3.select(this)
-              .attr('stroke', '#F00')
-              .attr('stroke-width', 10);
-          })
-          .on('mouseleave', function(d, i){
-            d3.select(this)
-              .attr('stroke', color)
-              .attr('stroke-width', 2);
-          });
-
-        var field = elt.parent().parent().parent();
-        field.bind('mouseover', function(){
-          path
-            .attr('stroke', '#F00')
-            .attr('stroke-width', 10);
-        });
-        field.bind('mouseleave', function(){
-          path
-            .attr('stroke', color)
-            .attr('stroke-width', 2);
-        });
-
-        function selectColor(){
-          var map = [
-            '#FF0020',
-            '#FF00CC',
-            '#0000FF',
-            '#00F9FF',
-            '#00FF20',
-            '#FFE000'
-          ];
-          var rnd = Math.floor(Math.random() * 6);
-          return map[rnd];
-        }
-      }
-    }
-  }
-})(angular);
-
-(function(angular){
-  angular.module('fortuneAdmin.Uml', [
-    'fortuneAdmin.Uml.Controllers',
-    'fortuneAdmin.Uml.Services',
-    'fortuneAdmin.Uml.D3',
-    'fortuneAdmin.Uml.Directives'
-  ]);
-})(angular);
-
-(function(angular){
-    angular.module('fortuneAdmin.Docs', [
-        'fortuneAdmin.Docs.Controllers',
-        'fortuneAdmin.Docs.Directives'
-    ]);
-})(angular);
-
-(function(angular){
-  angular.module('fortuneAdmin.Uml.Services', [])
-    .service('UmlElementsRegistry', [ElementsRegistry]);
-
-  function ElementsRegistry(){
-    var elements = {
-      resources: [],
-      fields: []
-    };
-    var baseOffset = 0;
-
-    this.positions = {};
-    this.bottomLine = [];
-
-    this.setBase = function(offset){
-      baseOffset = offset;
-    };
-
-    this.getBaseOffset = function(){
-      return baseOffset;
-    };
-
-    this.add = function(type, elt, id){
-      //somehow id gets \n
-      id = id.replace(/\n/ig, '');
-
-      elements[type].push({
-        id: id,
-        top: elt.offsetTop - baseOffset,
-        left: elt.offsetLeft,
-        right: elt.offsetLeft + elt.clientWidth
-      });
-    };
-
-    /**
-     * @param type - type of elements to lookup
-     * @param name - resource name + field name
-     */
-    this.find = function(type, name){
-      var element = null;
-      angular.forEach(elements[type], function(elt){
-        if (elt.id === name){
-          element = elt;
-        }
-      });
-      return element;
-    };
-
-    this.remove = function(type, name){
-      //Finds element in array and destroys it
-    };
-
-    this.clear = function(){
-      elements = {
-        resources: [],
-        fields: []
-      };
-      this.positions = {};
-      this.bottomLine = [];
-    }
-  }
-
-})(angular);
 angular.module('fortuneAdmin.Services.inflectPort', [])
   .service('Inflect', [
   function Inflect(){
@@ -1891,6 +1386,664 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
 
     return inflect
   }]);
+(function(angular){
+  angular.module('fortuneAdmin.Uml.Controllers', [])
+    .controller('UmlCtrl', ['$scope', '$http', UmlController]);
+
+  function UmlController($scope, $http){
+    $scope.resources = [];
+    $scope.render = false;
+    $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+      $scope.resources = data.resources;
+      $scope.render = true;
+    });
+  }
+})(angular);
+
+(function(angular){
+  //It's just a wrapper around d3 to make it easy to mock
+  //Also this can be extended later to defer loading
+  angular.module('fortuneAdmin.Uml.D3', [])
+    .factory('d3', ['$q', '$timeout', '$rootScope', function($q, $timeout, $rootScope){
+      var d3Loader = $q.defer();
+
+      $timeout(function(){
+        $rootScope.$apply(function(){
+          d3Loader.resolve(window.d3);
+        });
+      });
+
+      return{
+        load: function(){
+          return d3Loader.promise;
+        }
+      }
+    }]);
+})(angular);
+
+(function(angular){
+  var config = {
+    headerHeight: 50,
+    fieldHeight: 20,
+    fieldWidth: 200,
+    columnWidth: 300,
+    vgap: 50
+  };
+
+  angular.module('fortuneAdmin.Uml.Directives', [
+      'fortuneAdmin.Uml.D3',
+      'fortuneAdmin.Uml.Services'
+    ])
+    .directive('resourcesCanvas', ['$compile', 'UmlElementsRegistry', resourcesCanvas])
+    .directive('resourceClass', ['$compile', 'UmlElementsRegistry', resourceClass])
+    .directive('resourceProperty', ['$compile', 'UmlElementsRegistry', resourceProperty])
+    .directive('resourceLink', ['UmlElementsRegistry', resourceLink]);
+
+  function resourcesCanvas($compile, UmlElementsRegistry){
+    return {
+      restrict: 'A',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/uml/canvas'),
+      scope: {
+        resources: '='
+      },
+      link: function(scope, elt){
+        UmlElementsRegistry.clear();
+        scope.canvas = {};
+        var schema = {};
+        var resources = {};
+
+        var height = 0;
+        var elementsInARow = Math.floor(elt[0].clientWidth / config.columnWidth);
+
+        var tempStorage = {};
+        angular.forEach(scope.resources, function(resource){
+          tempStorage[resource.service] = tempStorage[resource.service] || [];
+          tempStorage[resource.service].push(resource);
+        });
+        scope.resources = angular.copy(tempStorage);
+        tempStorage = {};
+
+        //Convert to D3 data structure
+        angular.forEach(scope.resources, function(serviceResources){
+          //Define tallest elt here to keep schema and resources in sync
+          //TODO: make an algo that will wisely place every element taking it's links into account
+          tempStorage = angular.copy(serviceResources);
+          var tallestElt = tempStorage[0]
+            , tallestHeight = Object.keys(tempStorage[0].schema).length
+            , tallestIndex = 0;
+          angular.forEach(tempStorage, function(resource, index){
+            if (Object.keys(resource.schema).length > tallestHeight){
+              tallestElt = resource;
+              tallestHeight = Object.keys(resource.schema).length;
+              tallestIndex = index;
+            }
+          });
+          var tmp = serviceResources.splice(tallestIndex, 1);
+          serviceResources = tmp.concat(serviceResources);
+          angular.forEach(serviceResources, function(resource, index){
+            //Split resources by services here
+            var service = resource.service || 'default';
+            schema[service] = schema[service] || [];
+            schema[service][index] = [];
+            resources[service] = resources[service] || {};
+            resources[service][index] = {
+              name: resource.name,
+              service: resource.service
+            };
+            if (resource.modelOptions && resource.modelOptions.pk){
+              resources[service][index].pk = resource.modelOptions.pk || 'id';
+            }
+            angular.forEach(resource.schema, function(fieldParams, fieldName){
+              schema[service][index].push({
+                name: fieldName,
+                params: fieldParams,
+                pk: resources[service][index].pk === fieldName
+              });
+            });
+            schema[service][index].sort(function(a,b){
+              return a.name > b.name ? 1: -1;
+            });
+          });
+        });
+        scope.resources = schema;
+
+        function getBottom(){
+          var bottom = UmlElementsRegistry.bottomLine[0];
+          var col = 0;
+          for (var i = 0; i < UmlElementsRegistry.bottomLine.length; i++){
+            if (UmlElementsRegistry.bottomLine[i] < bottom) {
+              bottom = UmlElementsRegistry.bottomLine[i];
+              col = i;
+            }
+          }
+          return [col, bottom];
+        }
+
+        (function setupLayout(){
+          for (var i = 0; i < elementsInARow; i++){
+            //Initialize 30px top margin
+            //This will create top margin for the first row of resources
+            UmlElementsRegistry.bottomLine.push(30);
+          }
+
+          //Iterate resources of the same service here. Then move to the next service
+          angular.forEach(schema, function(service, serviceName){
+            angular.forEach(service, function(resource, index){
+              definePosition(resource, index);
+            });
+            function definePosition(resource, index){
+              var elementHeight = resource.length * config.fieldHeight + config.headerHeight;
+              var coords = getBottom();
+
+              var eltPosition = {
+                x: coords[0] * config.columnWidth,
+                y: coords[1],
+                height: elementHeight,
+                column: coords[0]
+              };
+
+              //Update bottom line
+              UmlElementsRegistry.bottomLine[coords[0]] += elementHeight + config.vgap;
+
+              //Store element position
+              UmlElementsRegistry.positions[serviceName] = UmlElementsRegistry.positions[serviceName] || [];
+              UmlElementsRegistry.positions[serviceName][index] = eltPosition;
+
+            }
+            //Flatten bottom line before proceeding to the next service
+            var bott = UmlElementsRegistry.bottomLine[0];
+            angular.forEach(UmlElementsRegistry.bottomLine, function(colHeight){
+              if (colHeight > bott){
+                bott = colHeight;
+              }
+            });
+            for (var j = UmlElementsRegistry.bottomLine.length; j >= 0; j--){
+              UmlElementsRegistry.bottomLine[j] = bott;
+            }
+          });
+        })();
+
+        function nextPosition(serviceName, index){
+          return UmlElementsRegistry.positions[serviceName][index];
+        }
+
+        for (var i = 0; i < UmlElementsRegistry.bottomLine.length; i++){
+          //Add bottom margin to the main canvas
+          if (UmlElementsRegistry.bottomLine[i] > height) height = UmlElementsRegistry.bottomLine[i] + 100;
+        }
+
+        //create canvas for rendering resources containers
+        var svg = d3.select(elt[0])
+          .append('svg')
+          .attr('id', 'mainCanvas')
+          .attr('height', height)
+          .style('width', '100%');
+
+        var svgOffset = svg[0][0].offsetTop;
+        var svgWidth = svg[0][0].clientWidth;
+        UmlElementsRegistry.setBase(svgOffset);
+
+        angular.forEach(schema, function(sch, serviceName){
+          //find full service height
+          var lowestElement = UmlElementsRegistry.positions[serviceName][0];
+          lowestElement = lowestElement.y + lowestElement.height;
+          angular.forEach(UmlElementsRegistry.positions[serviceName], function(pos){
+            if (pos.y + pos.height > lowestElement){
+              lowestElement = pos.y + pos.height;
+            }
+          });
+
+          var serviceSvg = svg
+            .append('svg')
+            .attr('id', serviceName)
+            .attr('height', lowestElement)
+            .style('width', '100%');
+
+        var foo = serviceSvg.selectAll('g')
+          .data(sch)
+          .enter().append('g')
+          .attr('height', function(d){
+            return d.length * config.fieldHeight;
+          })
+          .attr('width', config.fieldWidth)
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('fill', '#ffffff')
+          .append('foreignObject')
+          .attr('x', function(d, i){
+            return nextPosition(serviceName, i).x + config.vgap;
+          })
+          .attr('y', function(d,i){
+            return nextPosition(serviceName, i).y;
+          })
+          .attr('height', function(d){
+            return d.length * config.fieldHeight + config.headerHeight;
+          })
+          .attr('width', config.fieldWidth)
+          .append('xhtml:div')
+          .attr('class', 'resource');
+
+        //Create resource name
+        var headers = foo.append('xhtml:div')
+          .attr('class', 'header');
+          headers.append('xhtml:h4')
+          .attr('class', 'text-center')
+          .text(function(d, i){
+            return resources[serviceName][i].name;
+          });
+
+        //create resource containers
+        foo.append('xhtml:div')
+          .attr('style', 'width: 100%')
+          .append('xhtml:div')
+          .attr('resource-class', '')
+          .attr('resource', function(d, i){
+            return 'resources["' + serviceName + '"][' + i + ']';
+          });
+
+        angular.forEach(foo[0], function(element){
+          UmlElementsRegistry.add('resources', element, element.innerText);
+        });
+
+          //Create service boundary
+          serviceSvg.append('rect')
+            .attr('width', svgWidth - 10)
+            .attr('x', 5)
+            .attr('y', foo[0][0].offsetTop - 10 - 75)
+            .attr('height', lowestElement - foo[0][0].offsetTop + 85)
+            .attr('fill', 'none')
+            .attr('stroke', 'red');
+
+          //Create service label
+          serviceSvg.append('rect')
+            .attr('width', config.fieldWidth)
+            .attr('height', config.fieldHeight)
+            .attr('x', 0)
+            .attr('y', foo[0][0].offsetTop - 20 - 85)
+            .attr('fill', 'black');
+          serviceSvg.append('text')
+            .attr('width', config.fieldWidth)
+            .attr('height', config.fieldHeight)
+            .attr('x', 0)
+            .attr('y', foo[0][0].offsetTop - 20 - 70)
+            .attr('fill', 'white')
+            .text(serviceName);
+        });
+
+        elt.removeAttr('resources-canvas');
+        $compile(elt)(scope);
+
+      }
+    }
+  }
+
+  function resourceClass($compile, UmlElementsRegistry){
+    return {
+      restrict: 'A',
+      scope: {
+        resource: '='
+      },
+      link: function(scope, elt){
+        var elementHeight = scope.resource.length * config.fieldHeight;
+
+        //create canvas for rendering fields rectangles
+        var svg = d3.select(elt[0])
+          .append('svg')
+          .attr('width', config.fieldWidth)
+          .attr('height', elementHeight);
+
+        var x = 0;
+        var y = -20;
+
+        //create fields containers
+        var fields = svg.selectAll('g')
+          .data(scope.resource)
+          .enter().append('g')
+          .attr('height', config.fieldHeight)
+          .attr('width', config.fieldWidth)
+          .attr('fill', '#cccccc')
+          .append('foreignObject')
+          .attr('x', x)
+          .attr('y', function(){
+            return y += config.fieldHeight;
+          })
+          .attr('height', config.fieldHeight)
+          .attr('width', config.fieldWidth)
+          .append('xhtml:div')
+          .attr('resource-property', '')
+          .attr('field', function(d, i){
+            return 'resource[' + i + ']';
+          })
+          .attr('class', 'text-center field')
+          .attr('style', 'width: 100%');
+
+        elt.removeAttr('resource-class');
+        $compile(elt)(scope);
+      }
+    }
+  }
+
+  function resourceProperty($compile, UmlElementsRegistry){
+    return {
+      restrict: 'A',
+      scope: {
+        field: '=',
+        isPk: '='
+      },
+      link: function(scope, elt){
+        //Decide what kind of field we have
+        var linked = false;
+        if (angular.isArray(scope.field.params)){
+          if (scope.field.params[0]){
+            if (scope.field.params[0].ref){
+              linked = true;
+            }
+          }
+        }else if (angular.isObject(scope.field.params)){
+          if (scope.field.params.ref){
+            linked = true;
+          }
+        }
+
+        var portConfig = {
+          width: 10,
+          height: config.fieldHeight
+        };
+
+        if (linked){
+          //Render connector port if there should be a link
+          var svg = d3.select(elt[0])
+            .append('svg')
+            .attr('width', config.fieldWidth)
+            .attr('height', portConfig.height);
+
+          //Create field name
+          svg.append('foreignObject')
+            .attr('width', config.fieldWidth)
+            .attr('height', config.fieldHeight)
+            .append('xhtml:div')
+            .attr('class', 'field ref')
+            .text(scope.field.name + ' [ref]');
+
+          //Create link itself
+          svg.append('foreignObject')
+            .attr('width', 1)
+            .attr('height', config.fieldHeight)
+            .append('xhtml:div')
+            .attr('port-x', function(){
+              return svg[0][0].offsetLeft;
+            })
+            .attr('port-y', function(){
+              return svg[0][0].offsetTop;
+            })
+            .attr('resource-link', '')
+            .attr('link-to-many', function(){
+              return angular.isArray(scope.field.params);
+            })
+            .attr('link-to', function(){
+              if (angular.isArray(scope.field.params)){
+                return 'field.params[0]';
+              }else{
+                return 'field.params';
+              }
+            });
+        }else{
+          if (scope.field.pk){
+            elt.addClass('pk');
+            elt.text('PK: ' + scope.field.name);
+          }else{
+            if (angular.isArray(scope.field.params)){
+              //TODO: fix this when you can set field: [String] in fortune
+              elt.text(scope.field.name + ' [Arr]');
+            }else if(angular.isObject(scope.field.params)){
+              //TODO: fix this when fortune supports nested schemas
+              elt.text(scope.field.name + ' [Nested]');
+            }else{
+              try{
+                elt.text(scope.field.name + ' [' + scope.field.params.substr(0, 3) + ']');
+              }catch(e){
+                //This will prevent app from crashing in case of typos in resources configuration
+                console.log('caugth error: ', e);
+              }
+            }
+          }
+        }
+
+        elt.removeAttr('resource-property');
+        $compile(elt)(scope);
+      }
+    }
+  }
+
+  function resourceLink(UmlElementsRegistry){
+    return {
+      restrict: 'A',
+      scope: {
+        linkToMany: '=',
+        linkTo: '=',
+        portX: '@',
+        portY: '@'
+      },
+      link: function(scope, elt){
+        var target = UmlElementsRegistry.find('resources', scope.linkTo.ref);
+        if (!target) return;
+        var baseOffset = UmlElementsRegistry.getBaseOffset();
+
+        var portX = parseInt(scope.portX);
+        var portY = parseInt(scope.portY) + 10;
+
+        //Decide where target element is placed
+        var onTheRight = false;
+        var sameCol = (portX - target.right < 100);
+        if (portX <= target.left){
+          onTheRight = true;
+        }
+
+        var lineData = [];
+          if (onTheRight){
+            //Start from right edge
+            lineData.push({x: portX + config.fieldWidth, y: portY - baseOffset});
+            lineData.push({x: portX + config.fieldWidth + 50, y: portY - baseOffset});
+          }else{
+            if (sameCol){
+              //Start form right edge
+              lineData.push({x: portX + config.fieldWidth, y: portY - baseOffset});
+              lineData.push({x: portX + config.fieldWidth + 50, y: portY - baseOffset});
+            }else{
+              //Start from left edge
+              lineData.push({x: portX, y: portY - baseOffset});
+              lineData.push({x: portX - 50, y: portY - baseOffset});
+            }
+          }
+
+
+        //How many columns will be overflown?
+        var overflow = Math.floor((target.right - portX) / config.columnWidth);
+        var absOverflow = Math.abs(overflow);
+        if (absOverflow > 1){
+          var currentColumn = Math.floor(portX / config.columnWidth);
+          //Select direction
+          var targetCol = currentColumn + overflow;
+          var nextCol = onTheRight ? currentColumn + 1 : currentColumn - 1;
+
+          while(nextCol !== targetCol){
+            //Select elements from current column
+            var columnSelection = [];
+            angular.forEach(UmlElementsRegistry.positions, function(service){
+              angular.forEach(service, function(e){
+                if (e.column == nextCol) {
+                  columnSelection.push(e);
+                }
+              });
+            });
+
+            var nearestElement = columnSelection[0];
+
+            //Starts from top
+            var minDy = Math.abs(portY - nearestElement.y);
+            angular.forEach(columnSelection, function(element){
+              var dy = Math.abs(portY - element.y);
+              if (dy < minDy){
+                nearestElement = element;
+                minDy = portY - element.y;
+              }
+            });
+            var gapY = nearestElement.y + nearestElement.height + (Math.random() * 50);
+            var gapX = nearestElement.x;
+            var center = 50;
+
+            if (onTheRight){
+              lineData.push({x: gapX - center, y: gapY});
+              lineData.push({x: gapX + config.columnWidth - center, y: gapY});
+            }else{
+              lineData.push({x: gapX + config.columnWidth + center, y: gapY});
+              lineData.push({x: gapX - center, y: gapY});
+            }
+
+            onTheRight ? nextCol++ : nextCol--;
+          }
+        }
+
+        if (onTheRight){
+          //Target to left edge
+          lineData.push({x: target.left - 50, y: target.top + 10});
+          lineData.push({x: target.left, y: target.top + 10});
+        }else{
+          //Target to right edge
+          lineData.push({x: target.right + 50, y: target.top + 10});
+          lineData.push({x: target.right, y: target.top + 10});
+        }
+
+        var line = d3.svg.line()
+          .x(function(d){
+            return d.x;
+          })
+          .y(function(d){
+            return d.y;
+          })
+          .tension(0.95)
+          .interpolate('basis');
+
+        var color = selectColor();
+        //push link to canvas
+        var path = d3.select('#mainCanvas')
+          .append('path')
+          .attr('d', line(lineData))
+          .attr('stroke', color)
+          .attr('stroke-width', 2)
+          .attr('fill', 'none')
+          .on('mouseover', function(d, i){
+            d3.select(this)
+              .attr('stroke', '#F00')
+              .attr('stroke-width', 10);
+          })
+          .on('mouseleave', function(d, i){
+            d3.select(this)
+              .attr('stroke', color)
+              .attr('stroke-width', 2);
+          });
+
+        var field = elt.parent().parent().parent();
+        field.bind('mouseover', function(){
+          path
+            .attr('stroke', '#F00')
+            .attr('stroke-width', 10);
+        });
+        field.bind('mouseleave', function(){
+          path
+            .attr('stroke', color)
+            .attr('stroke-width', 2);
+        });
+
+        function selectColor(){
+          var map = [
+            '#FF0020',
+            '#FF00CC',
+            '#0000FF',
+            '#00F9FF',
+            '#00FF20',
+            '#FFE000'
+          ];
+          var rnd = Math.floor(Math.random() * 6);
+          return map[rnd];
+        }
+      }
+    }
+  }
+})(angular);
+
+(function(angular){
+  angular.module('fortuneAdmin.Uml', [
+    'fortuneAdmin.Uml.Controllers',
+    'fortuneAdmin.Uml.Services',
+    'fortuneAdmin.Uml.D3',
+    'fortuneAdmin.Uml.Directives'
+  ]);
+})(angular);
+
+(function(angular){
+  angular.module('fortuneAdmin.Uml.Services', [])
+    .service('UmlElementsRegistry', [ElementsRegistry]);
+
+  function ElementsRegistry(){
+    var elements = {
+      resources: [],
+      fields: []
+    };
+    var baseOffset = 0;
+
+    this.positions = {};
+    this.bottomLine = [];
+
+    this.setBase = function(offset){
+      baseOffset = offset;
+    };
+
+    this.getBaseOffset = function(){
+      return baseOffset;
+    };
+
+    this.add = function(type, elt, id){
+      //somehow id gets \n
+      id = id.replace(/\n/ig, '');
+
+      elements[type].push({
+        id: id,
+        top: elt.offsetTop - baseOffset,
+        left: elt.offsetLeft,
+        right: elt.offsetLeft + elt.clientWidth
+      });
+    };
+
+    /**
+     * @param type - type of elements to lookup
+     * @param name - resource name + field name
+     */
+    this.find = function(type, name){
+      var element = null;
+      angular.forEach(elements[type], function(elt){
+        if (elt.id === name){
+          element = elt;
+        }
+      });
+      return element;
+    };
+
+    this.remove = function(type, name){
+      //Finds element in array and destroys it
+    };
+
+    this.clear = function(){
+      elements = {
+        resources: [],
+        fields: []
+      };
+      this.positions = {};
+      this.bottomLine = [];
+    }
+  }
+
+})(angular);
 /**
  * Created by aldo on 5/5/14.
  */
@@ -1899,36 +2052,159 @@ angular.module('fortuneAdmin.Services', [
   'fortuneAdmin.Services.inflectPort'
 ]);
 
+(function(){
+  if (!window.CONFIG) window.CONFIG = {};
+
+   window.CONFIG.shared =  {
+    templateDirectory: '/views/',
+    baseEndpoint: '',
+    apiNamespace: '/api/v1',
+    getApiNamespace: function(){
+      return this.baseEndpoint + this.apiNamespace;
+    },
+    mountPoint: '',
+    appVersion: 1,
+    viewUrlPrefix: '/views/',
+    templateFileSuffix: '.html',
+    prepareViewTemplateUrl: function(url){
+      return this.viewUrlPrefix + url + this.templateFileSuffix;
+    },
+    routing: {
+      html5Mode : true,
+      prefix: ''
+    },
+    authToken: ''
+  };
+})();
+
+'use strict';
+angular.module('sharedElements.Directives', [])
+  .directive('fortuneAdminNavbar', [function() {
+    return {
+      restrict: 'E',
+      templateUrl:  CONFIG.shared.prepareViewTemplateUrl('mynavbar'),
+      replace: true,
+      transclude: true,
+      scope: {}
+    }
+  }])
+  .directive('fortuneAdminResourcesCells', ['$http', '$rootScope', function($http, $rootScope){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.shared.prepareViewTemplateUrl('resourcesCells'),
+      replace: true,
+      scope: true,
+      link: function(scope){
+        scope.r = $rootScope.fortuneAdminRoute;
+        scope.resources = [];
+        $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources').success(function(data){
+          scope.resources = data.resources;
+          scope.services = {};
+          angular.forEach(data.resources, function(r){
+            r.service = (r.service || 'default-service').split('-').join(' ');
+            scope.services[r.service] = scope.services[r.service] || {name: r.service, resources: [], collapse: true};
+            scope.services[r.service].resources.push(r);
+          });
+        });
+      }
+    }
+  }])
+  .directive('fortuneAdminUmlCells', ['$rootScope', function($rootScope){
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: CONFIG.shared.prepareViewTemplateUrl('umlCells'),
+      scope: true,
+      link: function(scope){
+        scope.r = $rootScope.fortuneAdminRoute;
+      }
+    }
+  }])
+    .directive('fortuneAdminDocsCells', ['$rootScope', function($rootScope){
+        return {
+            restrict: 'E',
+            replace: true,
+            templateUrl: CONFIG.shared.prepareViewTemplateUrl('docsCells'),
+            scope: true,
+            link: function(scope){
+                scope.r = $rootScope.docsRoute;
+            }
+        }
+    }]);
+'use strict';
+angular.module('sharedElements.Filters', [])
+    .filter('filterLinks', [function(){
+        return function(input){
+            var nonLinks = {};
+            angular.forEach(input, function(field, name){
+                if (!angular.isObject(field)){
+                    nonLinks[name] = field;
+                }
+            });
+            return nonLinks;
+        }
+    }])
+
+    // filter prevents alphabetical sort of object keys
+    .filter('notSorted', [function(){
+        return function(object){
+            if (!object) {
+                return [];
+            }
+            return Object.keys(object);
+        }
+    }]);
+
+  // module for elements shared by components
+  angular.module('sharedElements', [
+        'ui.bootstrap',
+        'xeditable',
+        'sharedElements.Directives',
+        'sharedElements.Filters'
+  ]);
+
 // A standalone app. Don't include it in plugin build.
 (function(angular){
   angular.module('fortuneAdmin.Standalone', [
     'ngRoute',
-    'fortuneAdmin'
+    'fortuneAdmin',
+    'docs'
   ])
-    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider',
-      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider){
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider', 'docsProvider',
+      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider, docsProvider){
         fortuneAdminProvider.enableNavbar();
-        fortuneAdminProvider.mountTo($routeProvider, '');
+        fortuneAdminProvider.mountTo($routeProvider, '/admin');
+
+        docsProvider.enableNavbar();
+        docsProvider.mountTo($routeProvider, '/docs');
+
         $routeProvider.when('/', {
           templateUrl: 'init.html',
           controller: 'initCtrl'
         });
         $routeProvider.otherwise({
-          redirectTo: '/uml'
+          redirectTo: '/'
         });
         $locationProvider.html5Mode(true);
     }])
-    .controller('initCtrl', ['$scope', '$location', 'fortuneAdmin', function($scope, $location, fortuneAdmin){
+    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', function($scope, $rootScope, $location, fortuneAdmin, docs){
       $scope.params = {
         host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
 
-      $scope.start = function(){
+      $scope.startDocs = function(){
+        docs.setApiHost($scope.params.host);
+        docs.setApiNamespace($scope.params.namespace);
+
+        $location.url('/docs/docs');
+      };
+
+      $scope.startFA = function(){
         fortuneAdmin.setApiHost($scope.params.host);
         fortuneAdmin.setApiNamespace($scope.params.namespace);
-        $location.url('/uml');
+
+        $location.url('/admin/uml');
       };
     }]);
 })(angular);
-

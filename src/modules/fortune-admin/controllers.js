@@ -69,6 +69,36 @@ angular.module('fortuneAdmin.Controllers', [
         return angular.isArray(ref);
       };
 
+      // XXX TESTING!
+      this.socket = io.connect("localhost:4000/" + $scope.currentResource.name);
+
+      this.socket.on('add', function(data) {
+        $scope.data.push(data.data);
+        console.log(data.data);
+        // XXX angular sucks ;_;
+        $scope.$apply();
+      });
+
+      this.socket.on('delete', function(data) {
+        // XXX at the moment this returns all of the
+        // rows, we need to change this
+        $scope.data = data.data;
+        console.log(data.data);
+        $scope.$apply();
+      });
+
+      this.socket.on('update', function(data) {
+        var i, l, res, updated = data.data;
+        console.log(updated);
+        for (i = 0, l = $scope.data.length; i < l; i++) {
+          res = $scope.data[i];
+          if (res.id === updated.id) {
+            $scope.data[i] = updated;
+            return $scope.$apply();
+          }
+        }
+      });
+
 
       this.addRow = function(Primary){
         var newRow = {};
@@ -92,7 +122,8 @@ angular.module('fortuneAdmin.Controllers', [
         cmd[plurResourceName] = [newRow];
         $http.post(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, cmd)
           .success(function(data) {
-          $scope.data.push(data[plurResourceName][0]);
+            // we don't need this, as websockets will have already added it.
+          // $scope.data.push(data[plurResourceName][0]);
         });
       };
 
