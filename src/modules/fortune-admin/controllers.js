@@ -74,17 +74,15 @@ angular.module('fortuneAdmin.Controllers', [
 
       this.socket.on('add', function(data) {
         $scope.data.push(data.data);
-        console.log(data.data);
         // XXX angular sucks ;_;
         $scope.$apply();
       });
 
       this.socket.on('delete', function(data) {
-        // XXX at the moment this returns all of the
-        // rows, we need to change this
-        $scope.data = data.data;
-        console.log(data.data);
-        $scope.$apply();
+        // XXX at the moment fortune returns
+        // an array of empty arrays, so we are leaving
+        // it as a no-op for the time being
+        console.log("FIXME! - fortune on Delete missed!");
       });
 
       this.socket.on('update', function(data) {
