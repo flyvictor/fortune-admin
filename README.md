@@ -5,21 +5,23 @@ Fortune admin is an angular component that provides a CRUD UI, and an ERD for a 
 
 ## Start here : To run the example as a standalone app
 
+* Depends on nodejs, mongodb (on OSX `brew install node mongodb`)
+
 * cd into the root of this repository
 
-* git submodule init
+* `git submodule update --init`
 
-* git submodule update
+* `npm install -g bower`
 
-* bower install
+* `bower install`
 
 * cd into examples
 
-* npm install
+* `npm install`
 
-* node server.js
+* `node server.js`
 
-* open your browser and navigate the interface; the top navigation has links to the UML
+* open your browser, point it to `http://localhost:1337` (default) and navigate the interface; the top navigation has links to the UML
 
 ## To include the angular component as a plugin for existing app
 
