@@ -1,6 +1,16 @@
 <table class="table table-bordered">
     <tr>
-        <th ng-repeat="(name, type) in currentResource.schema | filterLinks" ng-class="{'column-filter': showFilter}">
+        <th>
+            <div ng-class="{'column-filter': showFilter}">
+                <span>ID</span>
+                <div ng-show="showFilter">
+                    <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in getTypeaheadList($viewValue, name, type)" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
+                </div>
+                <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
+                <span class="glyphicon glyphicon-remove" ng-show="showFilter" ng-click="showFilter = false; taQuery=''; dropFilter(name, taQuery)"></span>
+            </div>
+        </th>
+        <th ng-repeat="(name, type) in currentResource.schema | filterLinks" ng-class="{'column-filter': showFilter}" ng-init="type = type.type || type">
             <div>
                 <span>{{name}}</span>
                 <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
@@ -42,6 +52,7 @@
         <th>Actions</th>
     </tr>
     <tr ng-repeat="entity in data">
+        <td>{{entity.id}}</td>
         <td ng-repeat="(path, type) in currentResource.schema | filterLinks">
             <fa-editable ng-model="entity[path]" path="path" resource-name="{{plurResourceName}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
         </td>
