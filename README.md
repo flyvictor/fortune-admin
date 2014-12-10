@@ -7,17 +7,10 @@ Fortune admin is an angular component that provides a CRUD UI, and an ERD for a 
 
 * cd into the root of this repository
 
-* git submodule init
-
-* git submodule update
-
-* bower install
-
-* cd into examples
-
 * npm install
 
-* node server.js
+* grunt install:example
+* grunt serve:example
 
 * open your browser and navigate the interface; the top navigation has links to the UML
 

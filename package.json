@@ -5,7 +5,7 @@
   "main": "examples/app.js",
   "start": "examples/app.js",
   "scripts": {
-    "postinstall": "cd lib/fortune && npm install"
+    "test": "./node_modules/.bin/grunt test"
   },
   "repository": {
     "type": "git",
@@ -15,18 +15,17 @@
   "bugs": {
     "url": "https://github.com/flyvictor/fortune-admin/issues"
   },
-  "scripts" : {
-    "test" : "./node_modules/karma/bin/karma start karma.conf.js"
-  },
   "devDependencies": {
     "grunt": "~0.4.4",
+    "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-concat": "~0.4.0",
-    "load-grunt-tasks": "~0.4.0",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-html2js": "~0.2.7",
+    "grunt-shell": "^1.1.1",
     "jasmine-core": "^2.1.3",
     "karma": "^0.12.28",
-    "karma-jasmine": "^0.3.2"
+    "karma-jasmine": "^0.3.2",
+    "load-grunt-tasks": "~0.4.0"
   }
 }

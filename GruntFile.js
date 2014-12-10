@@ -1,8 +1,23 @@
 
 module.exports = function(grunt){
+  
   require('load-grunt-tasks')(grunt);
-  grunt.initConfig({
 
+  grunt.initConfig({
+    shell: {
+      bower_install: {
+        command: 'bower install'
+      },
+      install_example: {
+        command: 'git submodule init; git submodule update; cd examples/lib/fortune; npm install;'
+      },
+      serve_example: {
+        command: 'node examples/server.js;'
+      },
+      test : {
+        command: './node_modules/karma/bin/karma start karma.conf.js'
+      }
+    },
     clean: {
       options:{
         force: true
@@ -49,6 +64,10 @@ module.exports = function(grunt){
   });
 
   grunt.registerTask('build', ['clean:lib', 'html2js', 'concat', 'addtemplates', 'clean:tmp', 'uglify']);
+  grunt.registerTask('install', ['shell:bower_install']);
+  grunt.registerTask('install:example', ['install', 'shell:install_example']);
+  grunt.registerTask('serve:example', ['shell:serve_example']);
+  grunt.registerTask('test', ['shell:test']);
   grunt.registerTask('default', ['build']);
 
   grunt.registerTask('addtemplates', function(){
