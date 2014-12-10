@@ -1,0 +1,63 @@
+<table class="table table-bordered">
+    <tr>
+        <th ng-repeat="(name, type) in currentResource.schema | filterLinks" ng-class="{'column-filter': showFilter}">
+            <div>
+                <span>{{name}}</span>
+                <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
+                <span class="glyphicon glyphicon-remove" ng-show="showFilter" ng-click="showFilter = false; taQuery=''; dropFilter(name, taQuery)"></span>
+            </div>
+            <div ng-switch="type">
+                <div ng-switch-when="String" ng-show="showFilter">
+                    <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in getTypeaheadList($viewValue, name, type)" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
+                </div>
+                <div ng-switch-when="Number" ng-show="showFilter">
+                    <div class="input-group">
+                        <span class="input-group-addon">From:</span>
+                        <input type="number" ng-model="Query.start" class="form-control" ng-change="applyFilter(Query, name, type)"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">To:</span>
+                        <input class="form-control" type="number" ng-model="Query.end"  ng-change="applyFilter(Query, name, type)"/>
+                    </div>
+                </div>
+                <div ng-switch-when="Date" ng-show="showFilter">
+                    <div class="input-group">
+                        <span class="input-group-addon">From:</span>
+                        <input type="date" class="form-control" ng-model="Query.start" ng-change="applyFilter(Query, name, type)"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">To:</span>
+                        <input type="date" class="form-control" ng-model="Query.end"  ng-change="applyFilter(Query, name, type)"/>
+                    </div>
+                </div>
+                <div ng-switch-when="Boolean" ng-show="showFilter">
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-sm" ng-class="{'btn-default': !Query.yep, 'btn-info': Query.yep}" type="button" ng-click="Query.yep = true; Query.nope=false; applyFilter(true, name, type);">Yep</button>
+                        <button class="btn btn-sm" ng-class="{'btn-default': !Query.nope, 'btn-info': Query.nope}" type="button" ng-click="Query.yep = false; Query.nope=true; applyFilter(false, name, type);">Nope</button>
+                    </div>
+                </div>
+            </div>
+        </th>
+        <th ng-repeat="(linkName, link) in links">{{resolveFieldName(linkName)}}</th>
+        <th>Actions</th>
+    </tr>
+    <tr ng-repeat="entity in data">
+        <td ng-repeat="(path, type) in currentResource.schema | filterLinks">
+            <fa-editable ng-model="entity[path]" path="path" resource-name="{{plurResourceName}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
+        </td>
+        <td ng-repeat="(linkName, link) in links">
+            <div ng-if="linkToMany(linkName)">
+                <a ng-href="{{ fortuneAdminRoute('subresource', {parent: plurResourceName, id: entity.id, name: link.type, inverse: resolveInverse(linkName)}) }}">Navigate to {{link.type}}</a>
+            </div>
+            <div ng-if="!linkToMany(linkName)">
+                <div ng-init="fname = resolveFieldName(linkName)"></div>
+                <!--Initialize links if they do not come from server-->
+                <div ng-init="entity.links = entity.links || {}"></div>
+                <fa-ref ng-model="entity.links[fname]" ref="currentResource.schema[fname]" resource-name="{{ plurResourceName }}" resource-id="{{ entity.id }}"></fa-ref>
+            </div>
+        </td>
+        <td>
+            <button type="button" ng-click="deleteRow($index, entity.id)" class="btn btn-xs btn-danger">Delete</button>
+        </td>
+    </tr>
+</table>
