@@ -6,4 +6,6 @@
 .project
 examples/bower_components
 examples/node_modules
+bower_components
+node_modules
 npm-debug.log
