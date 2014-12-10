@@ -79,8 +79,8 @@ angular.module('fortuneAdmin.Controllers', [
       };
 
       $scope.filter = {};
-
-      this.getTypeaheadList = function(str, name){
+      $scope.getTypeaheadList = function(str, name, type){
+        console.log('typeahed');
         var query = {};
         query['filter[' + name + '][regex]'] = str;
         query['filter[' + name + '][options'] = 'i';

@@ -1,13 +1,13 @@
 <table class="table table-bordered">
     <tr>
         <th>
-            <div ng-class="{'column-filter': showFilter}">
+            <div ng-class="{'column-filter': _showFilter}">
                 <span>ID</span>
-                <div ng-show="showFilter">
-                    <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in getTypeaheadList($viewValue, name, type)" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
+                <div ng-show="_showFilter">
+                    <input type="text" class="form-control" ng-model="idQuery" typeahead="item.id for item in getTypeaheadList({str: $viewValue, name: 'id', type: type})" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
                 </div>
-                <span class="glyphicon glyphicon-filter" ng-show="!showFilter" ng-click="showFilter = !showFilter"></span>
-                <span class="glyphicon glyphicon-remove" ng-show="showFilter" ng-click="showFilter = false; taQuery=''; dropFilter(name, taQuery)"></span>
+                <span class="glyphicon glyphicon-filter" ng-show="!_showFilter" ng-click="_showFilter = !_showFilter"></span>
+                <span class="glyphicon glyphicon-remove" ng-show="_showFilter" ng-click="_showFilter = false; idQuery=''; dropFilter(name, idQuery)"></span>
             </div>
         </th>
         <th ng-repeat="(name, type) in currentResource.schema | filterLinks" ng-class="{'column-filter': showFilter}" ng-init="type = type.type || type">
@@ -18,7 +18,7 @@
             </div>
             <div ng-switch="type">
                 <div ng-switch-when="String" ng-show="showFilter">
-                    <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in getTypeaheadList($viewValue, name, type)" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
+                    <input type="text" class="form-control" ng-model="taQuery" typeahead="item.{{name}} for item in getTypeaheadList({str: $viewValue, name: name, type: type})" typeahead-on-select="applyFilter({item: $item, model: $model, label: $label}, name, type)">
                 </div>
                 <div ng-switch-when="Number" ng-show="showFilter">
                     <div class="input-group">
@@ -53,7 +53,7 @@
     </tr>
     <tr ng-repeat="entity in data">
         <td>{{entity.id}}</td>
-        <td ng-repeat="(path, type) in currentResource.schema | filterLinks">
+        <td ng-repeat="(path, type) in currentResource.schema | filterLinks" ng-init="type = type.type || type">
             <fa-editable ng-model="entity[path]" path="path" resource-name="{{plurResourceName}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
         </td>
         <td ng-repeat="(linkName, link) in links">

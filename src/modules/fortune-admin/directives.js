@@ -9,16 +9,22 @@ angular.module('fortuneAdmin.Directives', [])
         resources: '=',
         currentResource: '=',
         filter: '=',
-        filterChangedCb: '&'
+        filterChangedCb: '&',
+        getTypeaheadList: '&'
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
       link: function(scope){
+        scope.typeaheadList = function(str, name, type){
+          console.log('calling getTypeaheadList ', str, name, type);
+          return scope.getTypeaheadList({str: str, name: name, type: type})
+        };
         scope.dropFilter = function(fieldName, taQuery){
           delete scope.filter['filter[' + fieldName + '][regex]'];
           delete scope.filter['filter[' + fieldName + '][options]'];
           delete scope.filter['filter[' + fieldName + '][gte]'];
           delete scope.filter['filter[' + fieldName + '][lte]'];
           delete scope.filter['filter[' + fieldName + ']'];
+          scope.filterChangedCb()
         };
 
         scope.applyFilter = function(selected, fieldName, type){
@@ -37,6 +43,7 @@ angular.module('fortuneAdmin.Directives', [])
               scope.filter['filter[' + fieldName + ']'] = selected;
               break;
           }
+          scope.filterChangedCb();
         };
 
         scope.resolveFieldName = function(linkName){
