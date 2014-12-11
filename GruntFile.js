@@ -66,7 +66,7 @@ module.exports = function(grunt){
   grunt.registerTask('build', ['clean:lib', 'html2js', 'concat', 'addtemplates', 'clean:tmp', 'uglify']);
   grunt.registerTask('install', ['shell:bower_install']);
   grunt.registerTask('install:example', ['install', 'shell:install_example']);
-  grunt.registerTask('serve:example', ['shell:serve_example']);
+  grunt.registerTask('serve:example', ['build', 'shell:serve_example']);
   grunt.registerTask('test', ['shell:test']);
   grunt.registerTask('default', ['build']);
 

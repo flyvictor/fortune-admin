@@ -417,35 +417,6 @@ angular.module('fortuneAdmin.Controllers', [
       $scope.parentResourceName = $routeParams.parent;
       $scope.parentId = $routeParams.id;
 
-      this.resolveFieldName = function(linkName){
-        //No need to dig deeper as there's no nested schemas
-        var parts = linkName.split('.');
-        return parts[parts.length - 1];
-      };
-
-      this.resolveInverse = function(linkName){
-        var fieldName = this.resolveFieldName(linkName);
-        var ref = currentResource.schema[fieldName];
-
-        var inverse = '';
-        if (angular.isArray(ref)){
-          inverse = ref[0].inverse;
-        }else if(angular.isObject(ref)){
-          inverse = ref.inverse;
-        }else {
-          throw new Error('Malformed reference');
-        }
-        return inverse;
-      };
-
-
-      this.linkToMany = function(linkName){
-        var fieldName = this.resolveFieldName(linkName);
-        var ref = currentResource.schema[fieldName];
-        return angular.isArray(ref);
-      };
-
-
       this.addRow = function(Primary){
         var newRow = {};
         if ($scope.PK !== 'id'){
@@ -484,8 +455,8 @@ angular.module('fortuneAdmin.Controllers', [
       };
 
       $scope.filter = {};
-
-      this.getTypeaheadList = function(str, name){
+      $scope.getTypeaheadList = function(str, name, type){
+        console.log('typeahed');
         var query = {};
         query['filter[' + name + '][regex]'] = str;
         query['filter[' + name + '][options'] = 'i';
@@ -506,33 +477,7 @@ angular.module('fortuneAdmin.Controllers', [
           });
       };
 
-      this.applyFilter = function(selected, fieldName, type){
-        switch (type){
-          case 'String':
-            //Derived from typeahead
-            $scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-            $scope.filter['filter[' + fieldName + '][options]'] = 'i';
-            break;
-          case 'Number':
-          case 'Date':
-            $scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
-            $scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
-            break;
-          case 'Boolean':
-            $scope.filter['filter[' + fieldName + ']'] = selected;
-            break;
-        }
-        runCurrentFilter();
-      };
-
-      this.dropFilter = function(fieldName){
-        delete $scope.filter['filter[' + fieldName + '][regex]'];
-        delete $scope.filter['filter[' + fieldName + '][options]'];
-        delete $scope.filter['filter[' + fieldName + '][gte]'];
-        delete $scope.filter['filter[' + fieldName + '][lte]'];
-        delete $scope.filter['filter[' + fieldName + ']'];
-        runCurrentFilter();
-      };
+      this.filterChangedCb = runCurrentFilter();
 
       function runCurrentFilter(){
         $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
@@ -567,6 +512,81 @@ angular.module('fortuneAdmin.Controllers', [
 
 'use strict';
 angular.module('fortuneAdmin.Directives', [])
+  .directive('faGrid', [function(){
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        links: '=',
+        resources: '=',
+        currentResource: '=',
+        filter: '=',
+        filterChangedCb: '&',
+        getTypeaheadList: '&'
+      },
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
+      link: function(scope){
+        scope.typeaheadList = function(str, name, type){
+          console.log('calling getTypeaheadList ', str, name, type);
+          return scope.getTypeaheadList({str: str, name: name, type: type})
+        };
+        scope.dropFilter = function(fieldName, taQuery){
+          delete scope.filter['filter[' + fieldName + '][regex]'];
+          delete scope.filter['filter[' + fieldName + '][options]'];
+          delete scope.filter['filter[' + fieldName + '][gte]'];
+          delete scope.filter['filter[' + fieldName + '][lte]'];
+          delete scope.filter['filter[' + fieldName + ']'];
+          scope.filterChangedCb()
+        };
+
+        scope.applyFilter = function(selected, fieldName, type){
+          switch (type){
+            case 'String':
+              //Derived from typeahead
+              scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+              scope.filter['filter[' + fieldName + '][options]'] = 'i';
+              break;
+            case 'Number':
+            case 'Date':
+              scope.filter['filter[' + fieldName + '][gte]'] = selected.start;
+              scope.filter['filter[' + fieldName + '][lte]'] = selected.end;
+              break;
+            case 'Boolean':
+              scope.filter['filter[' + fieldName + ']'] = selected;
+              break;
+          }
+          scope.filterChangedCb();
+        };
+
+        scope.resolveFieldName = function(linkName){
+          //No need to dig deeper as there's no nested schemas
+          var parts = linkName.split('.');
+          return parts[parts.length - 1];
+        };
+
+        scope.resolveInverse = function(linkName){
+          var fieldName = this.resolveFieldName(linkName);
+          var ref = scope.currentResource.schema[fieldName];
+
+          var inverse = '';
+          if (angular.isArray(ref)){
+            inverse = ref[0].inverse;
+          }else if(angular.isObject(ref)){
+            inverse = ref.inverse;
+          }else {
+            throw new Error('Malformed reference');
+          }
+          return inverse;
+        };
+
+        scope.linkToMany = function(linkName){
+          var fieldName = this.resolveFieldName(linkName);
+          var ref = scope.currentResource.schema[fieldName];
+          return angular.isArray(ref);
+        };
+      }
+    }
+  }])
   .directive('faEditable', [function(){
     return {
       restrict: 'E',
@@ -2106,8 +2126,10 @@ angular.module('sharedElements.Filters', [])
         return function(input){
             var nonLinks = {};
             angular.forEach(input, function(field, name){
-                if (!angular.isObject(field)){
-                    nonLinks[name] = field;
+                if (!angular.isObject(field) || !field.ref){
+                    if (!angular.isArray(field) || !field[0] || !field[0].ref){
+                        nonLinks[name] = field;
+                    }
                 }
             });
             return nonLinks;
