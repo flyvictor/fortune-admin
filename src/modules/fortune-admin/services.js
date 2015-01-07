@@ -4,19 +4,25 @@
 'use strict';
 angular.module('fortuneAdmin.Services', [
   'fortuneAdmin.Services.inflectPort'
-]).service('faActionsService', [function() {
-    var actionsMap = {
-            'delete' : {
-                cls  : 'DELE',
-                style: 'font-style: italic',
-                type : 'ajax'
-            }
-        },
-        resNamesMap = {
-            'users' : ['delete','Show details']
-        };
-        
+])
+.value('faActionsServiceState', {
+    actionsMap : {
+        'delete' : {
+            cls  : 'DELE',
+            style: 'font-style: italic',
+            type : 'ajax'
+        }
+    },
+    resNamesMap : {}
+})
+.factory('faActionsService', ['faActionsServiceState', function(faActionsServiceState) {
+    var actionsMap  = faActionsServiceState['actionsMap'],
+        resNamesMap = faActionsServiceState['resNamesMap'];
     return {
+        applyCfg   : function(cfg) {
+            angular.extend(faActionsServiceState['actionsMap'] , cfg['actionsMap'] );
+            angular.extend(faActionsServiceState['resNamesMap'], cfg['resNamesMap']);
+        },
         addAction  : function(actions) {
             var action;
             
@@ -26,7 +32,7 @@ angular.module('fortuneAdmin.Services', [
         },
         getActions : function(resName) {
             var res_actions = [],
-                actions = resNamesMap[resName], 
+                actions = resNamesMap[resName] || [], 
                 i = 0,
                 len = actions.length;
             
@@ -48,15 +54,4 @@ angular.module('fortuneAdmin.Services', [
             } 
         }
     };
-}])
-// .provider('faActionsService', function() {
-//     return {
-//         $get : function () {
-//           return {
-//               applyCfg : function(cfg) {
-//                   //TODO: Bind the service's state and modify it in this function
-//               }
-//           };
-//         }
-//     };
-// });
+}]);

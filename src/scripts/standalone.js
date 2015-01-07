@@ -42,7 +42,7 @@
                 }
             }
         },
-        'resourceActionMap' : {
+        'resNamesMap' : {
           'users' : ['Delete', 'Show Details']
         }
       });
