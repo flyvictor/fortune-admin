@@ -11,13 +11,13 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'bower_components/joint/dist/joint.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'src/*.js',
-      'src/**/*.js',
-      'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'src/modules/**/*.js',
+      'src/modules/**/**/*.js',
+      'test/spec/**/*.js',
+      'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
+      'bower_components/angular-xeditable/dist/js/xeditable.min.js',
     ],
 
     // list of files / patterns to exclude
@@ -48,6 +48,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
+    singleRun: true 
   });
 };
