@@ -1,24 +1,24 @@
-describe("FortuneAdminModule", function() {
-    describe('provider', function(){
-        var module, $injector;
+xdescribe("FortuneAdminModule", function() {
+    xdescribe('provider', function(){
+        var fortune, $injector, cs = {
+            applyCfg : function() {}
+        };
         
+        beforeEach(module('fortuneAdmin', function($provide){
+          $provide.value('customService', cs);
+        }));
         beforeEach(module('fortuneAdmin'));
         beforeEach(inject(function(fortuneAdmin){
-           module    = fortuneAdmin;
+          fortune    = fortuneAdmin;
         }));
-        describe("modifyProvider", function(){
+        xdescribe("modifyProvider", function(){
             it("should exist", function(){
-                expect(module.modifyProvider()).toBeDefined();
+                expect(fortune.modifyProvider).toBeDefined();
             });
             it("should inject correctly", function(){
-                var customService = {
-                    applyCfg : function() {}
-                };
-                inject(function(_$injector_){
-                    $injector    = _$injector_;
-                });  
-                fortuneAdmin.modifyProvider('customService', {});
-                expect(customService.applyCfg).toBeCalled();
+                spyOn(cs, 'applyCfg');
+                fortune.modifyProvider('customService', {});
+                expect(cs.applyCfg).toHaveBeenCalled();
             });
          });
     });
