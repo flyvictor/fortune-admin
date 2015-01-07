@@ -11,13 +11,15 @@ describe("fortuneAdmin.Services", function() {
                     'some_resource' : ['some_action']
                 }
             };
-
+        beforeEach(module('faActionsService', function($provide){
+            $provide.value('faActionsServiceState', customState);
+        }));
         beforeEach(inject(function(faActionsService, faActionsServiceState){
            service = faActionsService;
            state   = faActionsServiceState;
         }));
-        beforeEach(module('faActionsService'));
 
+        beforeEach(module('faActionsService'));
         describe('applyCfg', function() {
             it("should exist", function(){
                 expect(service.applyCfg()).toBeDefined();
