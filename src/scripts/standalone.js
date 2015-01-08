@@ -27,7 +27,26 @@
         host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
-
+      
+      fortuneAdmin.modifyProvider('faActionsService', {
+        'actionsMap' : {
+            'Show details' : {
+                type : 'modal',
+                createTpl : function (res) {
+                    var html = '', p;
+                    
+                    for(p in res){
+                        html += '<div>'+p+' : '+res[p]+'</div>';
+                    }
+                    return html;
+                }
+            }
+        },
+        'resNamesMap' : {
+          'users' : ['Delete', 'Show Details']
+        }
+      });
+      
       $scope.startDocs = function(){
         docs.setApiHost($scope.params.host);
         docs.setApiNamespace($scope.params.namespace);
@@ -38,7 +57,7 @@
       $scope.startFA = function(){
         fortuneAdmin.setApiHost($scope.params.host);
         fortuneAdmin.setApiNamespace($scope.params.namespace);
-
+        
         $location.url('/admin/uml');
       };
     }]);

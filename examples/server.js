@@ -8,11 +8,12 @@ var fortune = require('./lib/fortune')
   , path = require('path');
 
 var container = express()
-  , port = process.argv[2] || 1337;
+  , port = process.env.PORT || process.argv[2] || 1337;
 
 var app = fortune({
   db: 'fortune-admin',
-  namespace: '/api/v1'
+  namespace: '/api/v1',
+  connectionString: process.env.CONN_STRING || '' //default by fortune is ''
 })
 
 .resource("user", {
