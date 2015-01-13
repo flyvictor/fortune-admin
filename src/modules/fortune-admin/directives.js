@@ -3,7 +3,6 @@ angular.module('fortuneAdmin.Directives', [])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
-      replace: true,
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActions'),
       controller: 'faActionsCtrl'
     }
