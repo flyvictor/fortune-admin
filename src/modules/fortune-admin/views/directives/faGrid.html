@@ -52,9 +52,11 @@
         <th>Actions</th>
     </tr>
     <tr ng-repeat="entity in data">
-        <td>{{entity.id}}</td>
+      <td>
+        {{entity.id}}
+      </td>
         <td ng-repeat="(path, type) in currentResource.schema | filterLinks" ng-init="type = type.type || type">
-            <fa-editable ng-model="entity[path]" path="path" resource-name="{{plurResourceName}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
+            <fa-editable ng-model="entity[path]" path="path" resource-name="{{currentResource.route}}" resource-id="{{entity.id}}" schema-type="type"></fa-editable>
         </td>
         <td ng-repeat="(linkName, link) in links">
             <div ng-if="linkToMany(linkName)">

@@ -378,6 +378,35 @@ angular.module('docs', [
 angular.module('fortuneAdmin.Controllers', [
     'fortuneAdmin.Services'
   ])
+  .controller('faActionsCtrl', [
+    '$scope', 
+    'faActionsService',
+    '$sce',
+    '$modal',
+    function ($scope, faActionsService, $sce, $modal) {
+      $scope.actions = faActionsService.getActions('users');
+      $scope.selected = $scope.actions[1];
+      $scope.isModalVisible = false;
+  
+      $scope.selectAction = function (action) {
+        $scope.isModalVisible = action.type === 'modal';
+        console.log($scope.entity);
+        if($scope.isModalVisible && action.createTpl) {
+           $modal.open({
+             template : $sce.trustAsHtml(action.createTpl($scope.entity)),
+            // templateUrl: 'myModalContent.html',
+            // controller: 'ModalInstanceCtrl',
+            size: 200,
+            // resolve: {
+            //   items: function () {
+            //     return $scope.items;
+            //   }
+            // }
+          });
+          // $scope.actionTpl = 
+        } 
+      }
+  }])
   .controller('ResourcesCtrl', [
     '$scope',
     '$http',
@@ -512,6 +541,14 @@ angular.module('fortuneAdmin.Controllers', [
 
 'use strict';
 angular.module('fortuneAdmin.Directives', [])
+  .directive('faActions', [function(){
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActions'),
+      controller: 'faActionsCtrl'
+    }
+  }])
   .directive('faGrid', [function(){
     return {
       restrict: 'E',
@@ -771,7 +808,23 @@ angular.module('fortuneAdmin.Directives', [])
 
         $get: function(){
           return {
-
+            //Currently allows only modification of services. TODO: Improve
+            modifyProvider : function(name, cfg) {
+              var injector = angular.injector(['fortuneAdmin.Services']),
+                  provider = injector.get(name);
+              
+              // applyCfg must be present in all providers, that allow external tweaking
+              provider.applyCfg(cfg);
+            },
+            
+            modifyProviders : function(providerCfgMap) {
+              var p;
+              for (p in providerCfgMap) {
+                //untested
+                this.modifyProvider(p, providerCfgMap[p]);
+              }
+            },
+            
             getRoute: function(key) {
               return lookup[key];
             },
@@ -2039,8 +2092,57 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
 'use strict';
 angular.module('fortuneAdmin.Services', [
   'fortuneAdmin.Services.inflectPort'
-]);
-
+])
+.value('faActionsServiceState', {
+    actionsMap : {
+        'delete' : {
+            cls  : 'DELE',
+            style: 'font-style: italic',
+            type : 'ajax'
+        }
+    },
+    resNamesMap : {}
+})
+.factory('faActionsService', ['faActionsServiceState', function(faActionsServiceState) {
+    var actionsMap  = faActionsServiceState['actionsMap'],
+        resNamesMap = faActionsServiceState['resNamesMap'];
+    return {
+        applyCfg   : function(cfg) {
+            angular.extend(faActionsServiceState['actionsMap'] , cfg['actionsMap'] );
+            angular.extend(faActionsServiceState['resNamesMap'], cfg['resNamesMap']);
+        },
+        addAction  : function(actions) {
+            var action;
+            
+            for (action in actions) {
+                actionsMap[action] = actions[action];
+            }
+        },
+        getActions : function(resName) {
+            var res_actions = [],
+                actions = resNamesMap[resName] || [], 
+                i = 0,
+                len = actions.length;
+            
+            for (; i<len; i++) {
+                res_actions.push(angular.extend(
+                    { 
+                        name : actions[i]
+                    }, 
+                    actionsMap[actions[i]]
+                ));
+            }
+            return res_actions;
+        },
+        setResourceActions : function(resNamesMap) {
+            var name;
+            
+            for (name in resNamesMap) {
+                resNamesMap[name] = resNamesMap[name];
+            } 
+        }
+    };
+}]);
 (function(){
   if (!window.CONFIG) window.CONFIG = {};
 
@@ -2183,7 +2285,26 @@ angular.module('sharedElements.Filters', [])
         host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
-
+      
+      fortuneAdmin.modifyProvider('faActionsService', {
+        'actionsMap' : {
+            'Show details' : {
+                type : 'modal',
+                createTpl : function (res) {
+                    var html = '', p;
+                    
+                    for(p in res){
+                        html += '<div>'+p+' : '+res[p]+'</div>';
+                    }
+                    return html;
+                }
+            }
+        },
+        'resNamesMap' : {
+          'users' : ['Delete', 'Show Details']
+        }
+      });
+      
       $scope.startDocs = function(){
         docs.setApiHost($scope.params.host);
         docs.setApiNamespace($scope.params.namespace);
@@ -2194,7 +2315,7 @@ angular.module('sharedElements.Filters', [])
       $scope.startFA = function(){
         fortuneAdmin.setApiHost($scope.params.host);
         fortuneAdmin.setApiNamespace($scope.params.namespace);
-
+        
         $location.url('/admin/uml');
       };
     }]);
