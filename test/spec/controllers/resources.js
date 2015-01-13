@@ -10,39 +10,17 @@ describe('Controller: ResourcesCtrl', function(){
     },
     modelOptions: {
       pk: "email"
-    }
+    },
+    route: "users"
   },{
     name: 'address',
     schema: {
       type: String,
       addressLine1: String,
       user: {ref: "user", inverse: "addresses", pkType: String}
-    }
+    },
+    route: "addresses"
   }];
-  var $httpBackend, $rootScope, createCtrl;
-  beforeEach(function(){
-    module(function($provide){
-      $provide.service('Inflect', function(){
-        this.pluralize = function(str){
-          return /s$/.test(str) ? str + 'es' : str + 's';
-        };
-        return this;
-      });
-    });
-  });
-  beforeEach(inject(function($injector){
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
-    var $controller = $injector.get('$controller');
-    createCtrl = function(params, data){
-      return $controller('ResourcesCtrl', {
-        $scope: $rootScope,
-        $routeParams: params,
-        resources: resources,
-        data: data
-      });
-    };
-  }));
 
   var defaultPlainParams = {
     name: 'user'
@@ -85,19 +63,45 @@ describe('Controller: ResourcesCtrl', function(){
     }
   };
 
+  var $httpBackend, $rootScope, createCtrl;
+  beforeEach(function(){
+    module(function($provide){
+      $provide.service('Inflect', function(){
+        this.pluralize = function(str){
+          return /s$/.test(str) ? str + 'es' : str + 's';
+        };
+        return this;
+      });
+    });
+  });
+  beforeEach(inject(function($injector){
+    $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope').$new();
+    var $controller = $injector.get('$controller');
+    createCtrl = function(params, data){
+      return $controller('ResourcesCtrl', {
+        $scope: $rootScope,
+        $routeParams: params,
+        resources: resources,
+        data: data
+      });
+    };
+  }));
+
+  afterEach(function(){
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  })
+
   it('should identify current resource and select data', function(){
     var ctrl = createCtrl(defaultPlainParams, mockUsers);
-    expect($rootScope.plurResourceName).toEqual('users');
+
     expect($rootScope.currentResource.name).toEqual('user');
     expect($rootScope.data[0].email).toEqual('user@one.com');
     expect($rootScope.links["users.addresses"].type).toEqual('addresses');
     expect($rootScope.PK).toEqual('email');
   });
-  it('should be able to return inverse reference field', function(){
-    var ctrl = createCtrl(defaultPlainParams, mockUsers);
-    var inverse = ctrl.resolveInverse('user.addresses');
-    expect(inverse).toEqual('user');
-  });
+
   it('should set reference when doc created from nested view', function(){
     var ctrl = createCtrl(defaultNestedParams, mockAddresses);
     $httpBackend.expectPOST('/api/v1/addresses').respond(function(method, url, data){
@@ -115,8 +119,4 @@ describe('Controller: ResourcesCtrl', function(){
     $httpBackend.flush();
     expect($rootScope.data[1].links.user).toEqual('userId');
   });
-  afterEach(function(){
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  })
 });

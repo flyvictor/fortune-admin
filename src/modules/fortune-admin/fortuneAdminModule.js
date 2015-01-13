@@ -50,14 +50,8 @@
         mountTo: function($routeProvider, mountPoint){
 
           ROUTER.when('uml_diagram', mountPoint + '/uml', {
-            //templateUrl : config.prepareViewTemplateUrl('fortune-admin', 'uml'),
             templateUrl : config.prepareViewTemplateUrl('uml'),
-            controller: 'UmlCtrl as UmlCtrl',
-            resolve: {
-              test: function(){
-                console.log('resolving uml');
-              }
-            }
+            controller: 'UmlCtrl as UmlCtrl'
           });
 
           //Resolve necessary data here to simplify controller

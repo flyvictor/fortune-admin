@@ -109,7 +109,6 @@ angular.module('fortuneAdmin.Controllers', [
 
       $scope.filter = {};
       $scope.getTypeaheadList = function(str, name, type){
-        console.log('typeahed');
         var query = {};
         query['filter[' + name + '][regex]'] = str;
         query['filter[' + name + '][options'] = 'i';
@@ -130,17 +129,13 @@ angular.module('fortuneAdmin.Controllers', [
           });
       };
 
-      this.filterChangedCb = runCurrentFilter();
-
-      function runCurrentFilter(){
+      this.filterChangedCb = function() {
         $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
           params: $scope.filter
-        })
-          .success(function(data){
-            console.log(data);
-            $scope.data = data[plurResourceName];
-          });
-      }
+        }).success(function(data){
+          $scope.data = data[plurResourceName];
+        });
+      };
     }])
     .controller('faEditableCtrl', ['$scope', '$http',
         function($scope, $http){
