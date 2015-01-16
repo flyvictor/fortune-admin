@@ -4,32 +4,90 @@ angular.module('fortuneAdmin.Controllers', [
   ])
   .controller('faActionsCtrl', [
     '$scope', 
-    'faActionsService',
-    '$sce',
     '$modal',
-    function ($scope, faActionsService, $sce, $modal) {
-      $scope.actions = faActionsService.getActions('users');
-      $scope.selected = $scope.actions[1];
-      $scope.isModalVisible = false;
-  
-      $scope.selectAction = function (action) {
-        $scope.isModalVisible = action.type === 'modal';
-        console.log($scope.entity);
-        if($scope.isModalVisible && action.createTpl) {
-           $modal.open({
-             template : $sce.trustAsHtml(action.createTpl($scope.entity)),
-            // templateUrl: 'myModalContent.html',
-            // controller: 'ModalInstanceCtrl',
-            size: 200,
-            // resolve: {
-            //   items: function () {
-            //     return $scope.items;
-            //   }
-            // }
-          });
-          // $scope.actionTpl = 
-        } 
+    '$http',
+    function ($scope, $modal, $http) {
+      $scope.actions = {
+        'delete': {
+          name: 'delete',
+          title: 'Delete',
+          method: function(model) {
+            var dialog = $modal.open({
+               templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
+               controller: 'DeleteConfirmCtrl'
+            }).result.then(function(confirmed) {
+              if(confirmed) {
+                // Delete confirmed
+                $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, model.id].join('/'))
+                  .then(function(resp) {
+                    model.deleted = true;
+
+                    // Show successfull dialog
+                    var green = $modal.open({
+                      templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faAlert'),
+                      controller: 'AlertCtrl',
+                      resolve: {
+                        message: function() {
+                          return {
+                            type: 'success',
+                            text: 'The record removed successfully!'
+                          }
+                        }
+                      }
+                    })
+                  }).catch(function(err) {
+                    // Dispaly error here
+                    var red = $modal.open({
+                      templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faAlert'),
+                      controller: 'AlertCtrl',
+                      resolve: {
+                        message: function() {
+                          return {
+                            type: 'error',
+                            text: 'Something wrong happened. Please try again later'
+                          }
+                        }
+                      }
+                    })
+                  });
+              }
+            });
+          }
+        },
+        "details": {
+          name: "details",
+          title: "Show Details",
+          method: function(model) {
+            var dialog = $modal.open({
+              templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
+              controller: 'DetailsCtrl',
+              resolve: {
+                model: function() { return model; }
+              }
+            });
+          }
+        }
       }
+  }])
+  .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
+    $scope.model = model;
+    $scope.close = function() {
+      $modalInstance.close(true);
+    };
+  }])
+  .controller('AlertCtrl', ['$scope', '$modalInstance', 'message', function($scope, $modalInstance, message) {
+    $scope.message = message;
+    $scope.close = function() {
+      $modalInstance.close(true);
+    };
+  }])
+  .controller('DeleteConfirmCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance) {
+    $scope.close = function() {
+      $modalInstance.close(false);
+    };
+    $scope.confirm = function() {
+      $modalInstance.close(true);
+    };
   }])
   .controller('ResourcesCtrl', [
     '$scope',
@@ -38,7 +96,6 @@ angular.module('fortuneAdmin.Controllers', [
     'resources',
     'data',
     function ($scope, $http, $routeParams, resources, data){
-
       var currentResource = {};
       angular.forEach(resources, function(res){
         if(res.name === $routeParams.name || res.route === $routeParams.name){
