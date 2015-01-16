@@ -4,7 +4,11 @@ angular.module('fortuneAdmin.Directives', [])
     return {
       restrict: 'E',
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActions'),
-      controller: 'faActionsCtrl'
+      controller: 'faActionsCtrl',
+      scope: {
+        model: "=ngModel",
+        collectionName: "=ngModelCollectionName"
+      }
     }
   }])
   .directive('faGrid', [function(){

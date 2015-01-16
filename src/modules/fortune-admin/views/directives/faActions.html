@@ -1,6 +1,6 @@
 <button ng-repeat="action in actions"
   class="btn btn-default {{action.cls}}"
-  ng-click='selectAction(action)'
+  ng-click='actions[action.name].method(model)'
   style="{{action.style}}">
-  {{action.name}}
+  {{action.title || action.name}}
 </button>

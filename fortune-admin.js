@@ -381,30 +381,16 @@ angular.module('fortuneAdmin.Controllers', [
   .controller('faActionsCtrl', [
     '$scope', 
     'faActionsService',
-    '$sce',
     '$modal',
-    function ($scope, faActionsService, $sce, $modal) {
+    function ($scope, faActionsService, $modal) {
       $scope.actions = faActionsService.getActions('users');
-      $scope.selected = $scope.actions[1];
-      $scope.isModalVisible = false;
   
       $scope.selectAction = function (action) {
-        $scope.isModalVisible = action.type === 'modal';
-        console.log($scope.entity);
-        if($scope.isModalVisible && action.createTpl) {
-           $modal.open({
-             template : $sce.trustAsHtml(action.createTpl($scope.entity)),
-            // templateUrl: 'myModalContent.html',
-            // controller: 'ModalInstanceCtrl',
-            size: 200,
-            // resolve: {
-            //   items: function () {
-            //     return $scope.items;
-            //   }
-            // }
-          });
-          // $scope.actionTpl = 
-        } 
+        $modal.open({
+           //template : action.template,
+           templateUrl: './directives/deleteConfirm',
+           size: 200,
+        });
       }
   }])
   .controller('ResourcesCtrl', [
@@ -686,6 +672,7 @@ angular.module('fortuneAdmin.Directives', [])
         }
       }
     }]);
+
 
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [ 'templates-main', 
