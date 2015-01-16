@@ -58,10 +58,22 @@ angular.module('fortuneAdmin.Controllers', [
           name: "details",
           title: "Show Details",
           method: function(model) {
-            alert('Show Details');
+            var dialog = $modal.open({
+              templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
+              controller: 'DetailsCtrl',
+              resolve: {
+                model: function() { return model; }
+              }
+            });
           }
         }
       }
+  }])
+  .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
+    $scope.model = model;
+    $scope.close = function() {
+      $modalInstance.close(true);
+    };
   }])
   .controller('AlertCtrl', ['$scope', '$modalInstance', 'message', function($scope, $modalInstance, message) {
     $scope.message = message;
