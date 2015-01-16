@@ -1,6 +1,13 @@
-<button ng-repeat="action in actions"
-  class="btn btn-default {{action.cls}}"
-  ng-click='actions[action.name].method(model)'
-  style="{{action.style}}">
-  {{action.title || action.name}}
-</button>
+<div class="btn-group" style="width: 100px;">
+  <button type="button" class="btn btn-danger" ng-click="actions.delete.method(model)">{{actions.delete.title || 'Delete'}}</button>
+  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li ng-repeat="action in actions">
+      <a href="#" ng-click="actions[action.name].method(model)" ng-hide="action.name == 'delete'">{{action.title || action.name}}</a>
+    </li>
+  </ul>
+</div>
+
