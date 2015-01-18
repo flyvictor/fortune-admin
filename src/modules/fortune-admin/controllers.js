@@ -1,12 +1,16 @@
 'use strict';
 angular.module('fortuneAdmin.Controllers', [
-    'fortuneAdmin.Services'
+    'fortuneAdmin.Services',
+    'ui.bootstrap'
   ])
   .controller('faActionsCtrl', [
     '$scope', 
     '$modal',
     '$http',
-    function ($scope, $modal, $http) {
+    'faActionsService',
+    function ($scope, $modal, $http, faActionsService) {
+      //$scope.collectionName; injected from directive
+
       $scope.actions = {
         'delete': {
           name: 'delete',
@@ -67,7 +71,12 @@ angular.module('fortuneAdmin.Controllers', [
             });
           }
         }
-      }
+      };
+
+      var additionalResourceActions = faActionsService.getActions($scope.collectionName);
+      angular.forEach(additionalResourceActions, function(action){
+        $scope.actions[action.name] = action;
+      });
   }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;

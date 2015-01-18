@@ -22,30 +22,31 @@
         });
         $locationProvider.html5Mode(true);
     }])
-    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', function($scope, $rootScope, $location, fortuneAdmin, docs){
+    .run(['faActionsService', function(faActionsService){
+      faActionsService.registerActions([{
+        name: 'global',
+        title: 'Default for every resource',
+        method: function(model){
+          alert('This action is set on every resource');
+        }
+      }]);
+    }])
+    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', 'faActionsService', function($scope, $rootScope, $location, fortuneAdmin, docs, faActionsService){
       $scope.params = {
         host: 'http://localhost:1337',
         namespace: '/api/v1'
       };
-      
-      fortuneAdmin.modifyProvider('faActionsService', {
-        'actionsMap' : {
-            'Show details' : {
-                type : 'modal',
-                createTpl : function (res) {
-                    var html = '', p;
-                    
-                    for(p in res){
-                        html += '<div>'+p+' : '+res[p]+'</div>';
-                    }
-                    return html;
-                }
-            }
-        },
-        'resNamesMap' : {
-          'users' : ['Delete', 'Show Details']
+
+      faActionsService.registerActions([
+        {
+          name: 'injected',
+          resources: ['users'],
+          title: "Injected action",
+          method: function(model) {
+            alert('Say hello to my little friend!');
+          }
         }
-      });
+      ]);
       
       $scope.startDocs = function(){
         docs.setApiHost($scope.params.host);

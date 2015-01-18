@@ -28,12 +28,14 @@ module.exports = function(grunt){
     html2js: {
       options: {
         rename: function(moduleName){
-          moduleName = moduleName.replace('../../src', '');
+          console.log('renaming ', moduleName);
+          moduleName = moduleName.replace(/modules\/[\w-]+/, '');
+          console.log('resulting template url ', moduleName);
           return moduleName;
         }
       },
       main: {
-        src: ['src/templates/**/*.html', 'src/templates/**/**/*.html'],
+        src: ['src/modules/**/**/**/*.html'],
         dest: 'templates.js'
       }
     },
