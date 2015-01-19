@@ -5,53 +5,25 @@
 angular.module('fortuneAdmin.Services', [
   'fortuneAdmin.Services.inflectPort'
 ])
-.value('faActionsServiceState', {
-    actionsMap : {
-        'delete' : {
-            cls  : 'DELE',
-            style: 'font-style: italic',
-            type : 'ajax'
-        }
-    },
-    resNamesMap : {}
-})
-.factory('faActionsService', ['faActionsServiceState', function(faActionsServiceState) {
-    var actionsMap  = faActionsServiceState['actionsMap'],
-        resNamesMap = faActionsServiceState['resNamesMap'];
+.factory('faActionsService', [function() {
+    var actionsMap  = {};
     return {
-        applyCfg   : function(cfg) {
-            angular.extend(faActionsServiceState['actionsMap'] , cfg['actionsMap'] );
-            angular.extend(faActionsServiceState['resNamesMap'], cfg['resNamesMap']);
-        },
-        addAction  : function(actions) {
-            var action;
-            
-            for (action in actions) {
-                actionsMap[action] = actions[action];
-            }
+        registerActions: function(actions){
+          angular.forEach(actions, function(action){
+              if (angular.isDefined(actionsMap[action.name])) console.warn('Overwriting existing action ', action.name);
+              actionsMap[action.name] = action;
+          });
         },
         getActions : function(resName) {
-            var res_actions = [],
-                actions = resNamesMap[resName] || [], 
-                i = 0,
-                len = actions.length;
-            
-            for (; i<len; i++) {
-                res_actions.push(angular.extend(
-                    { 
-                        name : actions[i]
-                    }, 
-                    actionsMap[actions[i]]
-                ));
-            }
+            var res_actions = [];
+            angular.forEach(actionsMap, function(action){
+                if (angular.isUndefined(action.resources)) {
+                    res_actions.push(action);
+                }else if (action.resources.indexOf(resName) !== -1) {
+                    res_actions.push(action);
+                }
+            });
             return res_actions;
-        },
-        setResourceActions : function(resNamesMap) {
-            var name;
-            
-            for (name in resNamesMap) {
-                resNamesMap[name] = resNamesMap[name];
-            } 
         }
     };
 }]);

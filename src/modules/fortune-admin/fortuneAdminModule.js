@@ -114,23 +114,6 @@
 
         $get: function(){
           return {
-            //Currently allows only modification of services. TODO: Improve
-            modifyProvider : function(name, cfg) {
-              var injector = angular.injector(['fortuneAdmin.Services']),
-                  provider = injector.get(name);
-              
-              // applyCfg must be present in all providers, that allow external tweaking
-              provider.applyCfg(cfg);
-            },
-            
-            modifyProviders : function(providerCfgMap) {
-              var p;
-              for (p in providerCfgMap) {
-                //untested
-                this.modifyProvider(p, providerCfgMap[p]);
-              }
-            },
-            
             getRoute: function(key) {
               return lookup[key];
             },
