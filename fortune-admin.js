@@ -206,7 +206,7 @@ angular.module("/views/directives/faActions.html", []).run(["$templateCache", fu
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\">\n" +
     "    <li ng-repeat=\"action in actions\">\n" +
-    "      <a href=\"#\" ng-click=\"actions[action.name].method(model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
+    "      <a ng-click=\"actions[action.name].method(model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +
