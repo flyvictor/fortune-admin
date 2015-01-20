@@ -360,7 +360,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "        </td>\n" +
     "        <td ng-repeat=\"(linkName, link) in links\">\n" +
     "            <div ng-if=\"linkToMany(linkName)\">\n" +
-    "                <a ng-href=\"{{ fortuneAdminRoute('subresource', {parent: currentResource.route, id: entity.id, name: link.type, inverse: resolveInverse(linkName)}) }}\">Navigate to {{link.type}}</a>\n" +
+    "                <a ng-href=\"{{ getSubresourceRoute('subresource', {parent: currentResource.route, id: entity.id, name: link.type, inverse: resolveInverse(linkName)}) }}\">Navigate to {{link.type}}</a>\n" +
     "            </div>\n" +
     "            <div ng-if=\"!linkToMany(linkName)\">\n" +
     "                <div ng-init=\"fname = resolveFieldName(linkName)\"></div>\n" +
@@ -1103,6 +1103,10 @@ angular.module('fortuneAdmin.Directives', [])
           scope.filterChangedCb()
         };
 
+        scope.getSubresourceRoute = function(url, params){
+          return CONFIG.fortuneAdmin.route(url, params);
+        };
+
         scope.applyFilter = function(selected, fieldName, type){
           switch (type){
             case 'String':
@@ -1315,8 +1319,10 @@ angular.module('fortuneAdmin.Directives', [])
                 var inverse = $route.current.params.inverse;
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
-                $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId + '&limit=20')
+                var query = {};
+                query['filter[' + inverse + ']'] = parentId;
+                query.limit = 20;
+                $http.get(config.getApiNamespace() + '/' + childResource, {params: query})
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -1373,6 +1379,9 @@ angular.module('fortuneAdmin.Directives', [])
       var prefix = '';
 
       $rootScope.fortuneAdminRoute = function(url, args) {
+        return prefix + fortuneAdmin.routePath(url, args);
+      };
+      CONFIG.fortuneAdmin.route = function(url, args) {
         return prefix + fortuneAdmin.routePath(url, args);
       };
       $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;

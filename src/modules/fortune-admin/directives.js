@@ -38,6 +38,10 @@ angular.module('fortuneAdmin.Directives', [])
           scope.filterChangedCb()
         };
 
+        scope.getSubresourceRoute = function(url, params){
+          return CONFIG.fortuneAdmin.route(url, params);
+        };
+
         scope.applyFilter = function(selected, fieldName, type){
           switch (type){
             case 'String':

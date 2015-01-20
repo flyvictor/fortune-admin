@@ -99,8 +99,10 @@
                 var inverse = $route.current.params.inverse;
                 var parentId = $route.current.params.id;
                 var childResource = $route.current.params.name;
-                $http.get(config.getApiNamespace() + '/' + childResource +
-                    '?filter[' + inverse + ']=' + parentId + '&limit=20')
+                var query = {};
+                query['filter[' + inverse + ']'] = parentId;
+                query.limit = 20;
+                $http.get(config.getApiNamespace() + '/' + childResource, {params: query})
                   .success(function (data) {
                     d.resolve(data);
                   });
@@ -157,6 +159,9 @@
       var prefix = '';
 
       $rootScope.fortuneAdminRoute = function(url, args) {
+        return prefix + fortuneAdmin.routePath(url, args);
+      };
+      CONFIG.fortuneAdmin.route = function(url, args) {
         return prefix + fortuneAdmin.routePath(url, args);
       };
       $rootScope.navbarEnabled = !!CONFIG.fortuneAdmin.enableNavbar;
