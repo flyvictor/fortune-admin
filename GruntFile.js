@@ -42,7 +42,7 @@ module.exports = function(grunt){
     concat: {
       'fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
-        'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+        'src/ui-boostrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.min.js',
         'bower_components/d3/d3.js'
       ],
       'fortune-admin.js': [

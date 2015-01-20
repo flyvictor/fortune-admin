@@ -1,5 +1,5 @@
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle">Resources <b class="caret"></b></a>
+<li class="dropdown" dropdown>
+  <a href="#" class="dropdown-toggle" dropdown-toggle>Resources <b class="caret"></b></a>
   <ul class="dropdown-menu">
     <li ng-repeat="service in services">
       <a ng-click="service.collapse = !service.collapse; $event.stopPropagation();">{{service.name}}</a>
