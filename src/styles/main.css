@@ -33,4 +33,7 @@ svg .ref {
     background-color: #ececec;
 }
 
-
+.fa-grid {
+    width: 100%;
+    overflow-x: auto;
+}

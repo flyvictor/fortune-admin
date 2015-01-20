@@ -299,7 +299,8 @@ angular.module("/views/directives/faEditable.html", []).run(["$templateCache", f
 
 angular.module("/views/directives/faGrid.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/views/directives/faGrid.html",
-    "<table class=\"table table-bordered\">\n" +
+    "<div class=\"fa-grid\">\n" +
+    "    <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
     "        <th>\n" +
     "            <div ng-class=\"{'column-filter': _showFilter}\">\n" +
@@ -373,6 +374,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "        </td>\n" +
     "    </tr>\n" +
     "</table>\n" +
+    "</div>\n" +
     "");
 }]);
 

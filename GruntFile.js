@@ -52,7 +52,7 @@ module.exports = function(grunt){
       ],
       'fortune-admin.css': [
         'bower_components/angular-xeditable/dist/css/xeditable.css',
-        'src/main.css'
+        'src/styles/main.css'
       ]
     },
     uglify: {
