@@ -391,7 +391,7 @@ angular.module("/views/resources.html", []).run(["$templateCache", function($tem
     "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
     "  </div>\n" +
     "  <h4 class=\"text-center\">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>\n" +
-    "  <fa-grid data=\"data\" links=\"links\" resources=\"resources\" current-resource=\"currentResource\" filter=\"filter\" filter-changed-cb=\"ResourcesCtrl.filterChangedCb()\" get-typeahead-list=\"getTypeaheadList(str, name, type)\"></fa-grid>\n" +
+    "  <fa-grid data=\"data\" links=\"links\" resources=\"resources\" current-resource=\"currentResource\" filter=\"filter\" filter-changed-cb=\"ResourcesCtrl.filterChangedCb()\" get-typeahead-list=\"getTypeaheadList(str, name, type)\" strict-filters=\"strictFilters\"></fa-grid>\n" +
     "  <div class=\"col-md-3\">\n" +
     "    <div ng-hide=\"PK === 'id'\">\n" +
     "      <label>Enter {{ PK }} for new {{ currentResource.name }}</label>\n" +
@@ -941,9 +941,10 @@ angular.module('fortuneAdmin.Controllers', [
     '$scope',
     '$http',
     '$routeParams',
+    'fortuneAdmin',
     'resources',
     'data',
-    function ($scope, $http, $routeParams, resources, data){
+    function ($scope, $http, $routeParams, fortuneAdmin, resources, data){
       var currentResource = {};
       angular.forEach(resources, function(res){
         if(res.name === $routeParams.name || res.route === $routeParams.name){
@@ -1013,10 +1014,16 @@ angular.module('fortuneAdmin.Controllers', [
       };
 
       $scope.filter = {};
-      $scope.getTypeaheadList = function(str, name, type){
+      $scope.strictFilters = fortuneAdmin.getStrictFilters();
+      var defaultTypeahead = function(str, name, type){
+        var strict  = fortuneAdmin.getStrictFilters();
         var query = {};
-        query['filter[' + name + '][regex]'] = str;
-        query['filter[' + name + '][options'] = 'i';
+        if (!strict[plurResourceName]){
+          query['filter[' + name + '][regex]'] = str;
+          query['filter[' + name + '][options'] = 'i';
+        }else{
+          query['filter[' + name + ']'] = str;
+        }
         return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
           params: query
         })
@@ -1033,8 +1040,10 @@ angular.module('fortuneAdmin.Controllers', [
             return cleanList;
           });
       };
+      $scope.getTypeaheadList = defaultTypeahead;
+      //fortuneAdmin.typeaheadList({route: plurResourceName}, defaultTypeahead);
 
-      this.filterChangedCb = function() {
+        this.filterChangedCb = function() {
         $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
           params: $scope.filter
         }).success(function(data){
@@ -1086,7 +1095,8 @@ angular.module('fortuneAdmin.Directives', [])
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
-        getTypeaheadList: '&'
+        getTypeaheadList: '&',
+        strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
       link: function(scope){
@@ -1108,11 +1118,16 @@ angular.module('fortuneAdmin.Directives', [])
         };
 
         scope.applyFilter = function(selected, fieldName, type){
+          var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':
               //Derived from typeahead
-              scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-              scope.filter['filter[' + fieldName + '][options]'] = 'i';
+              if (isStrict){
+                scope.filter['filter[' + fieldName + ']'] = selected.model;
+              }else{
+                scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+                scope.filter['filter[' + fieldName + '][options]'] = 'i';
+              }
               break;
             case 'Number':
             case 'Date':
@@ -1253,7 +1268,11 @@ angular.module('fortuneAdmin.Directives', [])
       };
 
       var config = window.CONFIG.fortuneAdmin;
-      return {
+      var provider = {
+        _strictFilters: null,
+        setStrictFiltering: function(map){
+          this._strictFilters = map;
+        },
         setApiHost: function(host){
             config.baseEndpoint = host;
         },
@@ -1369,10 +1388,15 @@ angular.module('fortuneAdmin.Directives', [])
             },
             setAuthToken: function(token){
                 config.authToken = token;
+            },
+            getStrictFilters: function(){
+              return angular.copy(provider._strictFilters);
             }
           }
         }
-      }
+      };
+
+      return provider;
     })
     .run(['$rootScope', '$location', 'fortuneAdmin', 'editableOptions',
       function($rootScope, $location, fortuneAdmin, editableOptions) {

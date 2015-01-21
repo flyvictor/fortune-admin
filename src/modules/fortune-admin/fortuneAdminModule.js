@@ -33,7 +33,11 @@
       };
 
       var config = window.CONFIG.fortuneAdmin;
-      return {
+      var provider = {
+        _strictFilters: null,
+        setStrictFiltering: function(map){
+          this._strictFilters = map;
+        },
         setApiHost: function(host){
             config.baseEndpoint = host;
         },
@@ -149,10 +153,15 @@
             },
             setAuthToken: function(token){
                 config.authToken = token;
+            },
+            getStrictFilters: function(){
+              return angular.copy(provider._strictFilters);
             }
           }
         }
-      }
+      };
+
+      return provider;
     })
     .run(['$rootScope', '$location', 'fortuneAdmin', 'editableOptions',
       function($rootScope, $location, fortuneAdmin, editableOptions) {

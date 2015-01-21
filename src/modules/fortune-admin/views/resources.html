@@ -3,7 +3,7 @@
     <fortune-admin-navbar></fortune-admin-navbar>
   </div>
   <h4 class="text-center">{{ parentResourceName | uppercase }} {{ parentId ? parentId + ' /' : null}} {{plurResourceName | uppercase}}</h4>
-  <fa-grid data="data" links="links" resources="resources" current-resource="currentResource" filter="filter" filter-changed-cb="ResourcesCtrl.filterChangedCb()" get-typeahead-list="getTypeaheadList(str, name, type)"></fa-grid>
+  <fa-grid data="data" links="links" resources="resources" current-resource="currentResource" filter="filter" filter-changed-cb="ResourcesCtrl.filterChangedCb()" get-typeahead-list="getTypeaheadList(str, name, type)" strict-filters="strictFilters"></fa-grid>
   <div class="col-md-3">
     <div ng-hide="PK === 'id'">
       <label>Enter {{ PK }} for new {{ currentResource.name }}</label>
