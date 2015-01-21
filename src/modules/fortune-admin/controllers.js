@@ -102,9 +102,10 @@ angular.module('fortuneAdmin.Controllers', [
     '$scope',
     '$http',
     '$routeParams',
+    'fortuneAdmin',
     'resources',
     'data',
-    function ($scope, $http, $routeParams, resources, data){
+    function ($scope, $http, $routeParams, fortuneAdmin, resources, data){
       var currentResource = {};
       angular.forEach(resources, function(res){
         if(res.name === $routeParams.name || res.route === $routeParams.name){
@@ -174,10 +175,16 @@ angular.module('fortuneAdmin.Controllers', [
       };
 
       $scope.filter = {};
-      $scope.getTypeaheadList = function(str, name, type){
+      $scope.strictFilters = fortuneAdmin.getStrictFilters();
+      var defaultTypeahead = function(str, name, type){
+        var strict  = fortuneAdmin.getStrictFilters();
         var query = {};
-        query['filter[' + name + '][regex]'] = str;
-        query['filter[' + name + '][options'] = 'i';
+        if (!strict[plurResourceName]){
+          query['filter[' + name + '][regex]'] = str;
+          query['filter[' + name + '][options'] = 'i';
+        }else{
+          query['filter[' + name + ']'] = str;
+        }
         return $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName, {
           params: query
         })
@@ -194,8 +201,10 @@ angular.module('fortuneAdmin.Controllers', [
             return cleanList;
           });
       };
+      $scope.getTypeaheadList = defaultTypeahead;
+      //fortuneAdmin.typeaheadList({route: plurResourceName}, defaultTypeahead);
 
-      this.filterChangedCb = function() {
+        this.filterChangedCb = function() {
         $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + plurResourceName,{
           params: $scope.filter
         }).success(function(data){

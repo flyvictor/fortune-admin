@@ -21,7 +21,8 @@ angular.module('fortuneAdmin.Directives', [])
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
-        getTypeaheadList: '&'
+        getTypeaheadList: '&',
+        strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
       link: function(scope){
@@ -38,12 +39,21 @@ angular.module('fortuneAdmin.Directives', [])
           scope.filterChangedCb()
         };
 
+        scope.getSubresourceRoute = function(url, params){
+          return CONFIG.fortuneAdmin.route(url, params);
+        };
+
         scope.applyFilter = function(selected, fieldName, type){
+          var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':
               //Derived from typeahead
-              scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
-              scope.filter['filter[' + fieldName + '][options]'] = 'i';
+              if (isStrict){
+                scope.filter['filter[' + fieldName + ']'] = selected.model;
+              }else{
+                scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
+                scope.filter['filter[' + fieldName + '][options]'] = 'i';
+              }
               break;
             case 'Number':
             case 'Date':
