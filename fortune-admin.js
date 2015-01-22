@@ -199,6 +199,7 @@ angular.module("/views/docs.html", []).run(["$templateCache", function($template
 angular.module("/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/views/directives/faActions.html",
     "<div class=\"btn-group\" style=\"width: 100px;\" dropdown>\n" +
+    "  <button type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\"></button>\n" +
     "  <button type=\"button\" class=\"btn btn-danger\" ng-click=\"actions.delete.method(model)\">{{actions.delete.title || 'Delete'}}</button>\n" +
     "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
     "    <span class=\"caret\"></span>\n" +
@@ -849,6 +850,18 @@ angular.module('fortuneAdmin.Controllers', [
     'faActionsService',
     function ($scope, $modal, $http, faActionsService) {
       //$scope.collectionName; injected from directive
+
+      $scope.selected = [];
+      $scope.isSelected = function(model){
+        return $scope.selected.indexOf(model.id) !== -1;
+      };
+      $scope.toggleSelection = function(model){
+        if ($scope.isSelected(model)){
+          $scope.selected.splice($scope.selected.indexOf(model.id), 1);
+        }else{
+          $scope.selected.push(model.id);
+        }
+      };
 
       $scope.actions = {
         'delete': {

@@ -1,12 +1,16 @@
-<div class="btn-group" style="width: 100px;" dropdown>
-  <button type="button" class="btn btn-danger" ng-click="actions.delete.method(model)">{{actions.delete.title || 'Delete'}}</button>
+<div class="btn-group" dropdown>
+  <button type="button" class="btn" ng-class="{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}" ng-click="toggleSelection(model)">
+      <span class="glyphicon glyphicon-star-empty" ng-hide="isSelected(model)"></span>
+      <span class="glyphicon glyphicon-star" ng-show="isSelected(model)"></span>
+  </button>
+  <button type="button" class="btn btn-danger" ng-click="applyAction(actions.delete, model)">{{actions.delete.title || 'Delete'}}</button>
   <button type="button" class="btn btn-danger dropdown-toggle" dropdown-toggle data-toggle="dropdown" aria-expanded="false">
     <span class="caret"></span>
     <span class="sr-only">Toggle Dropdown</span>
   </button>
   <ul class="dropdown-menu" role="menu">
     <li ng-repeat="action in actions">
-      <a ng-click="actions[action.name].method(model)" ng-hide="action.name == 'delete'">{{action.title || action.name}}</a>
+      <a ng-click="applyAction(actions[action.name], model)" ng-hide="action.name == 'delete'">{{action.title || action.name}}</a>
     </li>
   </ul>
 </div>

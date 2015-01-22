@@ -7,6 +7,7 @@ angular.module('fortuneAdmin.Directives', [])
       controller: 'faActionsCtrl',
       scope: {
         model: "=ngModel",
+        data: "=",
         collectionName: "=ngModelCollectionName"
       }
     }
