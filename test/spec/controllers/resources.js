@@ -63,6 +63,10 @@ describe('Controller: ResourcesCtrl', function(){
     }
   };
 
+  var mockFortuneAdmin = {
+    getStrictFilters: function(){return {}}
+  };
+
   var $httpBackend, $rootScope, createCtrl;
   beforeEach(function(){
     module(function($provide){
@@ -83,6 +87,7 @@ describe('Controller: ResourcesCtrl', function(){
         $scope: $rootScope,
         $routeParams: params,
         resources: resources,
+        fortuneAdmin: mockFortuneAdmin,
         data: data
       });
     };

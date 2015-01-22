@@ -198,15 +198,19 @@ angular.module("/views/docs.html", []).run(["$templateCache", function($template
 
 angular.module("/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/views/directives/faActions.html",
-    "<div class=\"btn-group\" style=\"width: 100px;\" dropdown>\n" +
-    "  <button type=\"button\" class=\"btn btn-danger\" ng-click=\"actions.delete.method(model)\">{{actions.delete.title || 'Delete'}}</button>\n" +
+    "<div class=\"btn-group\" dropdown>\n" +
+    "  <button type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\">\n" +
+    "      <span class=\"glyphicon glyphicon-star-empty\" ng-hide=\"isSelected(model)\"></span>\n" +
+    "      <span class=\"glyphicon glyphicon-star\" ng-show=\"isSelected(model)\"></span>\n" +
+    "  </button>\n" +
+    "  <button type=\"button\" class=\"btn btn-danger\" ng-click=\"applyAction(actions.delete, model)\">{{actions.delete.title || 'Delete'}}</button>\n" +
     "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
     "    <span class=\"caret\"></span>\n" +
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\">\n" +
     "    <li ng-repeat=\"action in actions\">\n" +
-    "      <a ng-click=\"actions[action.name].method(model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
+    "      <a ng-click=\"applyAction(actions[action.name], model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +
@@ -370,7 +374,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "            </div>\n" +
     "        </td>\n" +
     "        <td>\n" +
-    "             <fa-actions ng-model=\"entity\" ng-model-collection-name=\"currentResource.route\"></fa-actions>\n" +
+    "             <fa-actions ng-model=\"entity\" data=\"data\" ng-model-collection-name=\"currentResource.route\"></fa-actions>\n" +
     "        </td>\n" +
     "    </tr>\n" +
     "</table>\n" +
@@ -850,20 +854,33 @@ angular.module('fortuneAdmin.Controllers', [
     function ($scope, $modal, $http, faActionsService) {
       //$scope.collectionName; injected from directive
 
+      $scope.isSelected = function(model){
+        return faActionsService.isSelected(model);
+      };
+      $scope.toggleSelection = function(model){
+        faActionsService.toggleSelection(model);
+      };
+
       $scope.actions = {
         'delete': {
           name: 'delete',
           title: 'Delete',
-          method: function(model) {
+          method: function(models) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
             }).result.then(function(confirmed) {
               if(confirmed) {
                 // Delete confirmed
-                $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, model.id].join('/'))
+                var ids = [];
+                angular.forEach(models, function(model){
+                  ids.push(model.id);
+                });
+                $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, ids.join(',') ].join('/'))
                   .then(function(resp) {
-                    model.deleted = true;
+                    angular.forEach(models, function(model){
+                      model.deleted = true;
+                    });
 
                     // Show successfull dialog
                     var green = $modal.open({
@@ -900,18 +917,26 @@ angular.module('fortuneAdmin.Controllers', [
         "details": {
           name: "details",
           title: "Show Details",
-          method: function(model) {
-            var dialog = $modal.open({
-              templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
-              controller: 'DetailsCtrl',
-              resolve: {
-                model: function() { return model; }
-              }
+          method: function(models) {
+            angular.forEach(models, function(model) {
+              var dialog = $modal.open({
+                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
+                controller: 'DetailsCtrl',
+                resolve: {
+                  model: function () {
+                    return model;
+                  }
+                }
+              });
             });
           }
         }
       };
 
+      $scope.applyAction = function(iAction, model){
+        var selected = faActionsService.getSelectedItems($scope.data, model);
+        iAction.method(selected);
+      };
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;
@@ -1081,6 +1106,7 @@ angular.module('fortuneAdmin.Directives', [])
       controller: 'faActionsCtrl',
       scope: {
         model: "=ngModel",
+        data: "=",
         collectionName: "=ngModelCollectionName"
       }
     }
@@ -2631,26 +2657,55 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
 angular.module('fortuneAdmin.Services', [
   'fortuneAdmin.Services.inflectPort'
 ])
-.factory('faActionsService', [function() {
+.service('faActionsService', ['$rootScope', function($rootScope) {
     var actionsMap  = {};
-    return {
-        registerActions: function(actions){
-          angular.forEach(actions, function(action){
-              if (angular.isDefined(actionsMap[action.name])) console.warn('Overwriting existing action ', action.name);
-              actionsMap[action.name] = action;
-          });
-        },
-        getActions : function(resName) {
-            var res_actions = [];
-            angular.forEach(actionsMap, function(action){
-                if (angular.isUndefined(action.resources)) {
-                    res_actions.push(action);
-                }else if (action.resources.indexOf(resName) !== -1) {
-                    res_actions.push(action);
-                }
-            });
-            return res_actions;
-        }
+    var selected = [];
+    var srv = this;
+
+    this.isSelected = function(model){
+       return selected.indexOf(model.id) !== -1;
+    };
+
+    this.toggleSelection = function(model){
+      if (this.isSelected(model)){
+        selected.splice(selected.indexOf(model.id), 1);
+      }else{
+        selected.push(model.id);
+      }
+    };
+
+    this.getSelectedItems = function(data, model){
+      var ret = [];
+      angular.forEach(data, function(item){
+        if (srv.isSelected(item) || item.id === model.id) ret.push(item);
+      });
+      return ret;
+    };
+
+    this.initialize = function(){
+      selected = [];
+    };
+
+    $rootScope.$on('$locationChangeStart', function(){
+      srv.initialize();
+    });
+
+   this.registerActions = function(actions){
+      angular.forEach(actions, function(action){
+          if (angular.isDefined(actionsMap[action.name])) console.warn('Overwriting existing action ', action.name);
+          actionsMap[action.name] = action;
+      });
+   };
+   this.getActions = function(resName) {
+      var res_actions = [];
+      angular.forEach(actionsMap, function(action){
+          if (angular.isUndefined(action.resources)) {
+              res_actions.push(action);
+          }else if (action.resources.indexOf(resName) !== -1) {
+              res_actions.push(action);
+          }
+      });
+      return res_actions;
     };
 }]);
 (function(){
