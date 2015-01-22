@@ -11,20 +11,33 @@ angular.module('fortuneAdmin.Controllers', [
     function ($scope, $modal, $http, faActionsService) {
       //$scope.collectionName; injected from directive
 
+      $scope.isSelected = function(model){
+        return faActionsService.isSelected(model);
+      };
+      $scope.toggleSelection = function(model){
+        faActionsService.toggleSelection(model);
+      };
+
       $scope.actions = {
         'delete': {
           name: 'delete',
           title: 'Delete',
-          method: function(model) {
+          method: function(models) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
             }).result.then(function(confirmed) {
               if(confirmed) {
                 // Delete confirmed
-                $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, model.id].join('/'))
+                var ids = [];
+                angular.forEach(models, function(model){
+                  ids.push(model.id);
+                });
+                $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, ids.join(',') ].join('/'))
                   .then(function(resp) {
-                    model.deleted = true;
+                    angular.forEach(models, function(model){
+                      model.deleted = true;
+                    });
 
                     // Show successfull dialog
                     var green = $modal.open({
@@ -61,18 +74,26 @@ angular.module('fortuneAdmin.Controllers', [
         "details": {
           name: "details",
           title: "Show Details",
-          method: function(model) {
-            var dialog = $modal.open({
-              templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
-              controller: 'DetailsCtrl',
-              resolve: {
-                model: function() { return model; }
-              }
+          method: function(models) {
+            angular.forEach(models, function(model) {
+              var dialog = $modal.open({
+                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
+                controller: 'DetailsCtrl',
+                resolve: {
+                  model: function () {
+                    return model;
+                  }
+                }
+              });
             });
           }
         }
       };
 
+      $scope.applyAction = function(iAction, model){
+        var selected = faActionsService.getSelectedItems($scope.data, model);
+        iAction.method(selected);
+      };
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;
