@@ -63,6 +63,7 @@ container
   .use(express.static(path.join(__dirname, '../src/modules/fortune-admin')))
   .use(express.static(path.join(__dirname, '../src/modules/shared')))
   .use(express.static(path.join(__dirname , '../bower_components')))
+  .use(express.static(path.join(__dirname, './')))
   .use(app.router)
   .listen(port);
 
