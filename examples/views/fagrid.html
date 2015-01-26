@@ -1,7 +1,13 @@
 <div>
     <h4 class="text-center">faGrid as a directive</h4>
+
     <fa-grid data="users" links="users.links" display-fields="{title: true, firstName: true, lastName: true, email: true, additionalDetails : { testNumber: true}}" resources="resources" current-resource="usersMetadata"></fa-grid>
+
+    <fa-grid data="addresses" links="addresses.links" display-fields="{addressLine1: true, addressLine2: true, user: true}" resources="resources" current-resource="addressesMetadata"></fa-grid>
+
 <pre>{{users | json}}</pre>
-    <pre>{{usersMetadata | json}}</pre>
+<pre>{{addresses | json}}</pre>
+<pre>{{usersMetadata | json}}</pre>
+<pre>{{addressesMetadata | json}}</pre>
 <pre>{{resources | json}}</pre>
 </div>

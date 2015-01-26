@@ -30,6 +30,11 @@
               return $http.get('/api/v1/users').then(function(res){
                 return res.data.users;
               });
+            }],
+            addresses: ['$http', function($http){
+              return $http.get('/api/v1/addresses').then(function(res){
+                return res.data.addresses;
+              });
             }]
           }
         });
@@ -78,14 +83,16 @@
         $location.url('/admin/uml');
       };
     }])
-    .controller('fagridCtrl', ['$scope', 'resources', 'users', function($scope, resources, users){
+    .controller('fagridCtrl', ['$scope', 'resources', 'users', 'addresses', function($scope, resources, users, addresses){
       console.log('resolved resources', resources);
       $scope.resources = resources;
       $scope.users = users;
+      $scope.addresses = addresses;
       angular.forEach(resources, function(r){
-        if (r.name === "user"){
-          $scope.usersMetadata = r;
-        }
+        $scope[r.route + "Metadata"] = r;
+        // if (r.name === "user"){
+        //   $scope.usersMetadata = r;
+        // }
       });
     }]);
 })(angular);
