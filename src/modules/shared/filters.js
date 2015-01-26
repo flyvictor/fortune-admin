@@ -1,14 +1,29 @@
 'use strict';
 angular.module('sharedElements.Filters', [])
-    .filter('filterLinks', [function(){
-        return function(input){
+    .filter('filterFields', [function(){
+        return function(input, fields){
+
+            // var fields = displayFields.split(",");
+
+            console.log("fields", fields);
+
             var nonLinks = {};
             angular.forEach(input, function(field, name){
-                if (!angular.isObject(field) || !field.ref){
-                    if (!angular.isArray(field) || !field[0] || !field[0].ref){
-                        nonLinks[name] = field;
-                    }
+
+                if (fields) {
+                  console.log("field", field, name, fields[name]);
+                  if ( fields[name] ) {
+                    nonLinks[name] = field;
+                  }
                 }
+                else {
+                    if (!angular.isObject(field) || !field.ref){
+                        if (!angular.isArray(field) || !field[0] || !field[0].ref ){
+                            nonLinks[name] = field;
+                        }
+                    }    
+                }
+                
             });
             return nonLinks;
         }

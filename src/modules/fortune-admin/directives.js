@@ -19,6 +19,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
+        displayFields: '=',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -27,6 +28,9 @@ angular.module('fortuneAdmin.Directives', [])
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
       link: function(scope){
+
+        console.log("scope.displayFields", scope.displayFields);
+
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);
           return scope.getTypeaheadList({str: str, name: name, type: type})
@@ -45,6 +49,7 @@ angular.module('fortuneAdmin.Directives', [])
         };
 
         scope.applyFilter = function(selected, fieldName, type){
+          console.log("scope.fields", scope.fields);
           var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':

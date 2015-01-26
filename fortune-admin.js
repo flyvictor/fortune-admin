@@ -316,7 +316,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "                <span class=\"glyphicon glyphicon-remove\" ng-show=\"_showFilter\" ng-click=\"_showFilter = false; idQuery=''; dropFilter(name, idQuery)\"></span>\n" +
     "            </div>\n" +
     "        </th>\n" +
-    "        <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\" ng-class=\"{'column-filter': showFilter}\" ng-init=\"type = type.type || type\">\n" +
+    "        <th ng-repeat=\"(name, type) in currentResource.schema | filterFields:displayFields\" ng-class=\"{'column-filter': showFilter}\" ng-init=\"type = type.type || type\">\n" +
     "            <div>\n" +
     "                <span>{{name}}</span>\n" +
     "                <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
@@ -359,7 +359,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "    </tr>\n" +
     "    <tr ng-repeat=\"entity in data\" ng-hide=\"entity.deleted\">\n" +
     "        <td>{{entity.id}}</td>\n" +
-    "        <td ng-repeat=\"(path, type) in currentResource.schema | filterLinks\" ng-init=\"type = type.type || type\">\n" +
+    "        <td ng-repeat=\"(path, type) in currentResource.schema | filterFields:displayFields\" ng-init=\"type = type.type || type\">\n" +
     "            <fa-editable ng-model=\"entity[path]\" path=\"path\" resource-name=\"{{currentResource.route}}\" resource-id=\"{{entity.id}}\" schema-type=\"type\"></fa-editable>\n" +
     "        </td>\n" +
     "        <td ng-repeat=\"(linkName, link) in links\">\n" +
@@ -1118,6 +1118,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
+        displayFields: '=',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -1126,6 +1127,9 @@ angular.module('fortuneAdmin.Directives', [])
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
       link: function(scope){
+
+        console.log("scope.displayFields", scope.displayFields);
+
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);
           return scope.getTypeaheadList({str: str, name: name, type: type})
@@ -1144,6 +1148,7 @@ angular.module('fortuneAdmin.Directives', [])
         };
 
         scope.applyFilter = function(selected, fieldName, type){
+          console.log("scope.fields", scope.fields);
           var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':
@@ -2789,15 +2794,30 @@ angular.module('sharedElements.Directives', [])
     }]);
 'use strict';
 angular.module('sharedElements.Filters', [])
-    .filter('filterLinks', [function(){
-        return function(input){
+    .filter('filterFields', [function(){
+        return function(input, fields){
+
+            // var fields = displayFields.split(",");
+
+            console.log("fields", fields);
+
             var nonLinks = {};
             angular.forEach(input, function(field, name){
-                if (!angular.isObject(field) || !field.ref){
-                    if (!angular.isArray(field) || !field[0] || !field[0].ref){
-                        nonLinks[name] = field;
-                    }
+
+                if (fields) {
+                  console.log("field", field, name, fields[name]);
+                  if ( fields[name] ) {
+                    nonLinks[name] = field;
+                  }
                 }
+                else {
+                    if (!angular.isObject(field) || !field.ref){
+                        if (!angular.isArray(field) || !field[0] || !field[0].ref ){
+                            nonLinks[name] = field;
+                        }
+                    }    
+                }
+                
             });
             return nonLinks;
         }
