@@ -18,6 +18,9 @@ This assumes you've setup ssh with. GitHub and cloned the repo with ssh; the for
 
 * open your browser and navigate the interface (http://127.0.0.1:1337); the top navigation has links to the UML
 
+You can optionally install a set of test data using :
+* grunt data:example
+
 ## To include the angular component as a plugin for existing app
 
 * Add .css and .js fortune-admin files

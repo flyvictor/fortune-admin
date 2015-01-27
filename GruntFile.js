@@ -1,6 +1,6 @@
 
 module.exports = function(grunt){
-  
+
   require('load-grunt-tasks')(grunt);
 
   grunt.initConfig({
@@ -13,6 +13,9 @@ module.exports = function(grunt){
       },
       serve_example: {
         command: 'node examples/server.js;'
+      },
+      data_example: {
+        command: 'curl -X POST -d @examples/sampleData.json -H "Content-Type: application/json" http://127.0.0.1:1337/api/v1/addresses'
       },
       test : {
         command: './node_modules/karma/bin/karma start karma.conf.js'
@@ -69,6 +72,7 @@ module.exports = function(grunt){
   grunt.registerTask('install', ['shell:bower_install']);
   grunt.registerTask('install:example', ['install', 'shell:install_example']);
   grunt.registerTask('serve:example', ['build', 'shell:serve_example']);
+  grunt.registerTask('data:example', ['shell:data_example']);
   grunt.registerTask('test', ['shell:test']);
   grunt.registerTask('default', ['build']);
 
