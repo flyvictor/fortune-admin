@@ -1,5 +1,5 @@
 'use strict';
-angular.module('fortuneAdmin.Directives', [])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -97,6 +97,37 @@ angular.module('fortuneAdmin.Directives', [])
           var ref = scope.currentResource.schema[fieldName];
           return angular.isArray(ref);
         };
+      }
+    }
+  }])
+  .directive('faUiGrid', [function(){
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        links: '=',
+        resources: '=',
+        fields: '@',
+        currentResource: '='
+      },
+      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      link: function(scope){
+
+        scope.gridOptions = {};
+        scope.gridOptions.data = scope.data;
+        scope.gridOptions.enableCellEdit = true;
+        scope.gridOptions.columnDefs = [];
+
+        // Only show requested fields
+        angular.forEach(scope.fields.split(','), function(value, key) {
+          scope.gridOptions.columnDefs.push({ name: value });
+        });
+
+        // ID and Actions are required
+        scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+        scope.gridOptions.columnDefs.push({ name: 'actions', enableCellEdit: false });
+
+        console.log('gridOptions' ,  scope.gridOptions);
       }
     }
   }])
