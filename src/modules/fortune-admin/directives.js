@@ -19,7 +19,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
-        displayFields: '=',
+        fields: '@',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -27,9 +27,7 @@ angular.module('fortuneAdmin.Directives', [])
         strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
-      link: function(scope){
-
-        console.log("scope.displayFields", scope.displayFields);
+      link: function(scope, attr){
 
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);

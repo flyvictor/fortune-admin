@@ -3,16 +3,22 @@ angular.module('sharedElements.Filters', [])
     .filter('filterFields', [function(){
         return function(input, fields){
 
-            // var fields = displayFields.split(",");
-
-            console.log("fields", fields);
+            if (typeof fields === 'string') {
+                fields = fields.split(",");
+            }
+            // Kept for backwards compatibility with old filter methods.
+            /* @todo Check if this is needed/update dependent code */
+            else if (fields.isArray) {
+                console.log('filterFields passed Array fields');
+                fields = Object.keys(fields);
+            }
 
             var nonLinks = {};
+
             angular.forEach(input, function(field, name){
 
                 if (fields) {
-                  console.log("field", field, name, fields[name]);
-                  if ( fields[name] ) {
+                  if ( fields.indexOf(name) !== -1 ) {
                     nonLinks[name] = field;
                   }
                 }
@@ -21,10 +27,11 @@ angular.module('sharedElements.Filters', [])
                         if (!angular.isArray(field) || !field[0] || !field[0].ref ){
                             nonLinks[name] = field;
                         }
-                    }    
+                    }
                 }
-                
+
             });
+
             return nonLinks;
         }
     }])
