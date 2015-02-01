@@ -9,13 +9,14 @@
     current-resource="usersMetadata"
     fields="title,firstName,lastName"></fa-grid>
 
-  <h5> Cleaner fields (aka display-fields) scope, using ui-grid (includes edit)</h5>
+  <h5> Cleaner fields (aka display-fields) scope, using ui-grid (includes basic edit)</h5>
   <fa-ui-grid
     data="users"
     links="users.links"
     resources="resources"
     current-resource="usersMetadata"
-    fields="title,firstName,lastName"></fa-grid>
+    columns='[{"name":"title", "displayName":"Mr/Mrs"}, {"name" :"firstName"}, {"name":"lastName"}]'></fa-grid>
+
 <!--
   <h5> Users </h5>
   <fa-grid

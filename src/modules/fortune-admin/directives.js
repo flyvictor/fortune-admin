@@ -107,21 +107,17 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
         data: '=',
         links: '=',
         resources: '=',
-        fields: '@',
+        columns: '@',
         currentResource: '='
       },
       template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
-      link: function(scope){
+      link: function(scope, element, attr){
 
         scope.gridOptions = {};
         scope.gridOptions.data = scope.data;
         scope.gridOptions.enableCellEdit = true;
-        scope.gridOptions.columnDefs = [];
 
-        // Only show requested fields
-        angular.forEach(scope.fields.split(','), function(value, key) {
-          scope.gridOptions.columnDefs.push({ name: value });
-        });
+        scope.gridOptions.columnDefs = JSON.parse(attr.columns);
 
         // ID and Actions are required
         scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
