@@ -12,14 +12,12 @@
   <h5> Cleaner fields (aka display-fields) scope, using ui-grid (includes basic edit)</h5>
   <fa-ui-grid
     data="users"
-    links="users.links"
-    resources="resources"
-    current-resource="usersMetadata"
+    current-resource="users"
     columns='[{"name":"title", "displayName":"Mr/Mrs"},
       {"name":"firstName"},
       {"name":"lastName"},
       {"name":"additionalDetails.testNumber", "displayName":"Test Number"},
-      {"name":"addresses[0].addressLine1", "displayName":"Address Line 1"}]'></fa-ui-grid>
+      {"name":"linked.addresses[0].addressLine1", "displayName":"Address Line 1"}]'></fa-ui-grid>
 
   <h5> UI Grid addresses</h5>
   <fa-ui-grid
