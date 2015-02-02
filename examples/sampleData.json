@@ -281,6 +281,9 @@
         "languageCode": "en-GB",
         "lastName": "Fortescue",
         "title": "Mr",
+        "additionalDetails": {
+          "testNumber": 1
+        },
         "links": {
           "addresses": [
             "544e6f185e967a260746a6e1"
@@ -294,6 +297,9 @@
         "languageCode": "en-GB",
         "lastName": "Hyde",
         "title": "Mr",
+        "additionalDetails": {
+          "testNumber": 2
+        },
         "links": {
           "addresses": [
             "544e6f2c5e967a260746a6e4"

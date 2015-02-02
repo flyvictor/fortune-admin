@@ -15,7 +15,17 @@
     links="users.links"
     resources="resources"
     current-resource="usersMetadata"
-    columns='[{"name":"title", "displayName":"Mr/Mrs"}, {"name" :"firstName"}, {"name":"lastName"}]'></fa-grid>
+    columns='[{"name":"title", "displayName":"Mr/Mrs"},
+      {"name":"firstName"},
+      {"name":"lastName"},
+      {"name":"additionalDetails.testNumber", "displayName":"Test Number"},
+      {"name":"addresses[0].addressLine1", "displayName":"Address Line 1"}]'></fa-ui-grid>
+
+  <h5> UI Grid addresses</h5>
+  <fa-ui-grid
+    data="addresses"
+    resources="addresses"
+    current-resource="addressesMetadata"></fa-ui-grid>
 
 <!--
   <h5> Users </h5>
