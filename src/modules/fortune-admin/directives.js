@@ -1,5 +1,5 @@
 'use strict';
-angular.module('fortuneAdmin.Directives', [])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -19,7 +19,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
-        displayFields: '=',
+        fields: '@',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -27,9 +27,7 @@ angular.module('fortuneAdmin.Directives', [])
         strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
-      link: function(scope){
-
-        console.log("scope.displayFields", scope.displayFields);
+      link: function(scope, attr){
 
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);
@@ -101,6 +99,32 @@ angular.module('fortuneAdmin.Directives', [])
         };
       }
     }
+  }])
+  .directive('faUiGrid', [function(){
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        resources: '=',
+        currentResource: '=',
+        columns: '@'
+      },
+      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      link: function(scope){
+
+        scope.gridOptions = {};
+        scope.gridOptions.data = scope.data;
+        scope.gridOptions.enableCellEdit = true;
+
+        if (scope.columns) {
+          scope.gridOptions.columnDefs = JSON.parse(scope.columns);
+
+          // ID and Actions are required
+          scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          scope.gridOptions.columnDefs.push({ name: 'actions', enableCellEdit: false });
+        }
+      }
+    };
   }])
   .directive('faEditable', [function(){
     return {

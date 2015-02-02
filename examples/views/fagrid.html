@@ -1,13 +1,63 @@
 <div>
-    <h4 class="text-center">faGrid as a directive</h4>
+  <h4 class="text-center">faGrid as a directive</h4>
 
-    <fa-grid data="users" links="users.links" display-fields="{title: true, firstName: true, lastName: true, email: true, additionalDetails : { testNumber: true}}" resources="resources" current-resource="usersMetadata"></fa-grid>
+  <h5> Cleaner fields (aka display-fields) scope </h5>
+  <fa-grid
+    data="users"
+    links="users.links"
+    resources="resources"
+    current-resource="usersMetadata"
+    fields="title,firstName,lastName"></fa-grid>
 
-    <fa-grid data="addresses" links="addresses.links" display-fields="{addressLine1: true, addressLine2: true, user: true}" resources="resources" current-resource="addressesMetadata"></fa-grid>
+  <h5> Cleaner fields (aka display-fields) scope, using ui-grid (includes basic edit)</h5>
+  <fa-ui-grid
+    data="users"
+    current-resource="users"
+    columns='[{"name":"title", "displayName":"Mr/Mrs"},
+      {"name":"firstName"},
+      {"name":"lastName"},
+      {"name":"additionalDetails.testNumber", "displayName":"Test Number"},
+      {"name":"linked.addresses[0].addressLine1", "displayName":"Address Line 1"}]'></fa-ui-grid>
 
-<pre>{{users | json}}</pre>
-<pre>{{addresses | json}}</pre>
-<pre>{{usersMetadata | json}}</pre>
-<pre>{{addressesMetadata | json}}</pre>
-<pre>{{resources | json}}</pre>
+  <h5> UI Grid addresses</h5>
+  <fa-ui-grid
+    data="addresses"
+    resources="addresses"
+    current-resource="addressesMetadata"></fa-ui-grid>
+
+<!--
+  <h5> Users </h5>
+  <fa-grid
+    data="users"
+    links="users.links"
+    display-fields="{title: true, firstName: true, lastName: true, role:true, email: true, additionalDetails : { testNumber: true}}"
+    resources="resources"
+    current-resource="usersMetadata"></fa-grid>
+
+  <h5> Addresses </h5>
+  <fa-grid
+    data="addresses"
+    links="addresses.links"
+    display-fields="{addressLine1: true, addressLine2: true, user: true}" resources="resources"
+    current-resource="addressesMetadata"></fa-grid>
+-->
+
+  <hr/>
+
+  <h5> Debug </h5>
+
+  <strong>Users</strong>
+  <pre>{{users | json}}</pre>
+
+  <strong>Addresses</strong>
+  <pre>{{addresses | json}}</pre>
+
+  <strong>User Meta Data</strong>
+  <pre>{{usersMetadata | json}}</pre>
+
+  <strong>Address Meta Data</strong>
+  <pre>{{addressesMetadata | json}}</pre>
+
+  <strong>Resources</strong>
+  <pre>{{resources | json}}</pre>
 </div>
