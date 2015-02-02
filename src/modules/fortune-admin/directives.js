@@ -110,19 +110,21 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
         columns: '@'
       },
       template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
-      link: function(scope, element, attr){
+      link: function(scope){
 
         scope.gridOptions = {};
         scope.gridOptions.data = scope.data;
         scope.gridOptions.enableCellEdit = true;
 
-        scope.gridOptions.columnDefs = JSON.parse(scope.columns);
+        if (scope.columns) {
+          scope.gridOptions.columnDefs = JSON.parse(scope.columns);
 
-        // ID and Actions are required
-        scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
-        scope.gridOptions.columnDefs.push({ name: 'actions', enableCellEdit: false });
+          // ID and Actions are required
+          scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          scope.gridOptions.columnDefs.push({ name: 'actions', enableCellEdit: false });
+        }
       }
-    }
+    };
   }])
   .directive('faEditable', [function(){
     return {
