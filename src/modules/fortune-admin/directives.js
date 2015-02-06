@@ -1,5 +1,5 @@
 'use strict';
-angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.autoResize'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -8,7 +8,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
       scope: {
         model: "=ngModel",
         data: "=",
-        collectionName: "=ngModelCollectionName"
+        collectionName: "="
       }
     }
   }])
@@ -105,25 +105,36 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit'])
       restrict: 'E',
       scope: {
         data: '=',
-        resources: '=',
         currentResource: '=',
-        columns: '@'
+        columns: '='
       },
       template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
-      link: function(scope){
+      controller: function($scope){
+        $scope.gridOptions = {
+          //TODO: this be achieved requiring this controller from nested directives?
+          _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
+            currentResource: $scope.currentResource
+          }
+        };
+        $scope.gridOptions.data = $scope.data;
+        $scope.gridOptions.enableCellEdit = true;
 
-        scope.gridOptions = {};
-        scope.gridOptions.data = scope.data;
-        scope.gridOptions.enableCellEdit = true;
-
-        if (scope.columns) {
-          scope.gridOptions.columnDefs = JSON.parse(scope.columns);
+        if ($scope.columns) {
+          //Creating shallow copy to avoind propagating local changes to parent $scope
+          $scope.gridOptions.columnDefs = angular.copy($scope.columns);
 
           // ID and Actions are required
-          scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
-          scope.gridOptions.columnDefs.push({ name: 'actions', enableCellEdit: false });
+          $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          $scope.gridOptions.columnDefs.push({
+            name: 'actions',
+            enableCellEdit: false,
+            cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+          });
         }
-      }
+      },
+      link: function(scope){
+        console.log('linking faUiGrid');
+     }
     };
   }])
   .directive('faEditable', [function(){

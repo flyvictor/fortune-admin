@@ -12,7 +12,7 @@
   <h5> Cleaner fields (aka display-fields) scope, using ui-grid (includes basic edit)</h5>
   <fa-ui-grid
     data="users"
-    current-resource="users"
+    current-resource="usersMetadata"
     columns='[{"name":"title", "displayName":"Mr/Mrs"},
       {"name":"firstName"},
       {"name":"lastName"},
@@ -45,6 +45,9 @@
   <hr/>
 
   <h5> Debug </h5>
+
+  <strong>Users metadata</strong>
+  <pre>{{usersMetadata | json}}</pre>
 
   <strong>Users</strong>
   <pre>{{users | json}}</pre>

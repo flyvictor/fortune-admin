@@ -8,7 +8,7 @@ angular.module('sharedElements.Filters', [])
             }
             // Kept for backwards compatibility with old filter methods.
             /* @todo Check if this is needed/update dependent code */
-            else if (fields.isArray) {
+            else if (angular.isArray(fields)) {
                 console.log('filterFields passed Array fields');
                 fields = Object.keys(fields);
             }

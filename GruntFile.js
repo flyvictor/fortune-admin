@@ -46,7 +46,8 @@ module.exports = function(grunt){
       'fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
         'src/ui-boostrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.min.js',
-        'bower_components/d3/d3.js'
+        'bower_components/d3/d3.js',
+        'bower_components/angular-ui-grid/ui-grid.js'
       ],
       'fortune-admin.js': [
         'templates.js',
@@ -54,6 +55,7 @@ module.exports = function(grunt){
         'src/**/*.js'
       ],
       'fortune-admin.css': [
+        'bower_components/angular-ui-grid/ui-grid.css',
         'bower_components/angular-xeditable/dist/css/xeditable.css',
         'src/styles/main.css'
       ]
