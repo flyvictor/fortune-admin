@@ -1,6 +1,6 @@
 
 module.exports = function(grunt){
-  
+
   require('load-grunt-tasks')(grunt);
 
   grunt.initConfig({
@@ -13,6 +13,9 @@ module.exports = function(grunt){
       },
       serve_example: {
         command: 'node examples/server.js;'
+      },
+      data_example: {
+        command: 'curl -X POST -d @examples/sampleData.json -H "Content-Type: application/json" http://127.0.0.1:1337/api/v1/addresses'
       },
       test : {
         command: './node_modules/karma/bin/karma start karma.conf.js'
@@ -43,7 +46,8 @@ module.exports = function(grunt){
       'fortune-admin.vendor.js': [
         'bower_components/angular-xeditable/dist/js/xeditable.js',
         'src/ui-boostrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.min.js',
-        'bower_components/d3/d3.js'
+        'bower_components/d3/d3.js',
+        'bower_components/angular-ui-grid/ui-grid.js'
       ],
       'fortune-admin.js': [
         'templates.js',
@@ -51,6 +55,7 @@ module.exports = function(grunt){
         'src/**/*.js'
       ],
       'fortune-admin.css': [
+        'bower_components/angular-ui-grid/ui-grid.css',
         'bower_components/angular-xeditable/dist/css/xeditable.css',
         'src/styles/main.css'
       ]
@@ -69,6 +74,7 @@ module.exports = function(grunt){
   grunt.registerTask('install', ['shell:bower_install']);
   grunt.registerTask('install:example', ['install', 'shell:install_example']);
   grunt.registerTask('serve:example', ['build', 'shell:serve_example']);
+  grunt.registerTask('data:example', ['shell:data_example']);
   grunt.registerTask('test', ['shell:test']);
   grunt.registerTask('default', ['build']);
 

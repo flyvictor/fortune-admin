@@ -1,5 +1,5 @@
 'use strict';
-angular.module('fortuneAdmin.Directives', [])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.autoResize'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -8,7 +8,7 @@ angular.module('fortuneAdmin.Directives', [])
       scope: {
         model: "=ngModel",
         data: "=",
-        collectionName: "=ngModelCollectionName"
+        collectionName: "="
       }
     }
   }])
@@ -19,6 +19,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
+        fields: '@',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -26,7 +27,8 @@ angular.module('fortuneAdmin.Directives', [])
         strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
-      link: function(scope){
+      link: function(scope, attr){
+
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);
           return scope.getTypeaheadList({str: str, name: name, type: type})
@@ -45,6 +47,7 @@ angular.module('fortuneAdmin.Directives', [])
         };
 
         scope.applyFilter = function(selected, fieldName, type){
+          console.log("scope.fields", scope.fields);
           var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':
@@ -96,6 +99,43 @@ angular.module('fortuneAdmin.Directives', [])
         };
       }
     }
+  }])
+  .directive('faUiGrid', [function(){
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        currentResource: '=',
+        columns: '='
+      },
+      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      controller: function($scope){
+        $scope.gridOptions = {
+          //TODO: this be achieved requiring this controller from nested directives?
+          _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
+            currentResource: $scope.currentResource
+          }
+        };
+        $scope.gridOptions.data = $scope.data;
+        $scope.gridOptions.enableCellEdit = true;
+
+        if ($scope.columns) {
+          //Creating shallow copy to avoind propagating local changes to parent $scope
+          $scope.gridOptions.columnDefs = angular.copy($scope.columns);
+
+          // ID and Actions are required
+          $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          $scope.gridOptions.columnDefs.push({
+            name: 'actions',
+            enableCellEdit: false,
+            cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+          });
+        }
+      },
+      link: function(scope){
+        console.log('linking faUiGrid');
+     }
+    };
   }])
   .directive('faEditable', [function(){
     return {

@@ -208,7 +208,7 @@ angular.module("/views/directives/faActions.html", []).run(["$templateCache", fu
     "    <span class=\"caret\"></span>\n" +
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
-    "  <ul class=\"dropdown-menu\" role=\"menu\">\n" +
+    "  <ul class=\"dropdown-menu\" role=\"menu\" style=\"position: fixed; top: 50%; left:87%;\">\n" +
     "    <li ng-repeat=\"action in actions\">\n" +
     "      <a ng-click=\"applyAction(actions[action.name], model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
@@ -316,7 +316,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "                <span class=\"glyphicon glyphicon-remove\" ng-show=\"_showFilter\" ng-click=\"_showFilter = false; idQuery=''; dropFilter(name, idQuery)\"></span>\n" +
     "            </div>\n" +
     "        </th>\n" +
-    "        <th ng-repeat=\"(name, type) in currentResource.schema | filterLinks\" ng-class=\"{'column-filter': showFilter}\" ng-init=\"type = type.type || type\">\n" +
+    "        <th ng-repeat=\"(name, type) in currentResource.schema | filterFields:fields\" ng-class=\"{'column-filter': showFilter}\" ng-init=\"type = type.type || type\">\n" +
     "            <div>\n" +
     "                <span>{{name}}</span>\n" +
     "                <span class=\"glyphicon glyphicon-filter\" ng-show=\"!showFilter\" ng-click=\"showFilter = !showFilter\"></span>\n" +
@@ -359,7 +359,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "    </tr>\n" +
     "    <tr ng-repeat=\"entity in data\" ng-hide=\"entity.deleted\">\n" +
     "        <td>{{entity.id}}</td>\n" +
-    "        <td ng-repeat=\"(path, type) in currentResource.schema | filterLinks\" ng-init=\"type = type.type || type\">\n" +
+    "        <td ng-repeat=\"(path, type) in currentResource.schema | filterFields:fields\" ng-init=\"type = type.type || type\">\n" +
     "            <fa-editable ng-model=\"entity[path]\" path=\"path\" resource-name=\"{{currentResource.route}}\" resource-id=\"{{entity.id}}\" schema-type=\"type\"></fa-editable>\n" +
     "        </td>\n" +
     "        <td ng-repeat=\"(linkName, link) in links\">\n" +
@@ -374,7 +374,7 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "            </div>\n" +
     "        </td>\n" +
     "        <td>\n" +
-    "             <fa-actions ng-model=\"entity\" data=\"data\" ng-model-collection-name=\"currentResource.route\"></fa-actions>\n" +
+    "             <fa-actions ng-model=\"entity\" data=\"data\" collection-name=\"currentResource.route\"></fa-actions>\n" +
     "        </td>\n" +
     "    </tr>\n" +
     "</table>\n" +
@@ -1098,7 +1098,7 @@ angular.module('fortuneAdmin.Controllers', [
         }]);
 
 'use strict';
-angular.module('fortuneAdmin.Directives', [])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.autoResize'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -1107,7 +1107,7 @@ angular.module('fortuneAdmin.Directives', [])
       scope: {
         model: "=ngModel",
         data: "=",
-        collectionName: "=ngModelCollectionName"
+        collectionName: "="
       }
     }
   }])
@@ -1118,6 +1118,7 @@ angular.module('fortuneAdmin.Directives', [])
         data: '=',
         links: '=',
         resources: '=',
+        fields: '@',
         currentResource: '=',
         filter: '=',
         filterChangedCb: '&',
@@ -1125,7 +1126,8 @@ angular.module('fortuneAdmin.Directives', [])
         strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
-      link: function(scope){
+      link: function(scope, attr){
+
         scope.typeaheadList = function(str, name, type){
           console.log('calling getTypeaheadList ', str, name, type);
           return scope.getTypeaheadList({str: str, name: name, type: type})
@@ -1144,6 +1146,7 @@ angular.module('fortuneAdmin.Directives', [])
         };
 
         scope.applyFilter = function(selected, fieldName, type){
+          console.log("scope.fields", scope.fields);
           var isStrict = !!scope.strictFilters[scope.currentResource.route];
           switch (type){
             case 'String':
@@ -1195,6 +1198,43 @@ angular.module('fortuneAdmin.Directives', [])
         };
       }
     }
+  }])
+  .directive('faUiGrid', [function(){
+    return {
+      restrict: 'E',
+      scope: {
+        data: '=',
+        currentResource: '=',
+        columns: '='
+      },
+      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      controller: function($scope){
+        $scope.gridOptions = {
+          //TODO: this be achieved requiring this controller from nested directives?
+          _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
+            currentResource: $scope.currentResource
+          }
+        };
+        $scope.gridOptions.data = $scope.data;
+        $scope.gridOptions.enableCellEdit = true;
+
+        if ($scope.columns) {
+          //Creating shallow copy to avoind propagating local changes to parent $scope
+          $scope.gridOptions.columnDefs = angular.copy($scope.columns);
+
+          // ID and Actions are required
+          $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          $scope.gridOptions.columnDefs.push({
+            name: 'actions',
+            enableCellEdit: false,
+            cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+          });
+        }
+      },
+      link: function(scope){
+        console.log('linking faUiGrid');
+     }
+    };
   }])
   .directive('faEditable', [function(){
     return {
@@ -2789,16 +2829,38 @@ angular.module('sharedElements.Directives', [])
     }]);
 'use strict';
 angular.module('sharedElements.Filters', [])
-    .filter('filterLinks', [function(){
-        return function(input){
+    .filter('filterFields', [function(){
+        return function(input, fields){
+
+            if (typeof fields === 'string') {
+                fields = fields.split(",");
+            }
+            // Kept for backwards compatibility with old filter methods.
+            /* @todo Check if this is needed/update dependent code */
+            else if (angular.isArray(fields)) {
+                console.log('filterFields passed Array fields');
+                fields = Object.keys(fields);
+            }
+
             var nonLinks = {};
+
             angular.forEach(input, function(field, name){
-                if (!angular.isObject(field) || !field.ref){
-                    if (!angular.isArray(field) || !field[0] || !field[0].ref){
-                        nonLinks[name] = field;
+
+                if (fields) {
+                  if ( fields.indexOf(name) !== -1 ) {
+                    nonLinks[name] = field;
+                  }
+                }
+                else {
+                    if (!angular.isObject(field) || !field.ref){
+                        if (!angular.isArray(field) || !field[0] || !field[0].ref ){
+                            nonLinks[name] = field;
+                        }
                     }
                 }
+
             });
+
             return nonLinks;
         }
     }])
@@ -2812,6 +2874,7 @@ angular.module('sharedElements.Filters', [])
             return Object.keys(object);
         }
     }]);
+
 
   // module for elements shared by components
   angular.module('sharedElements', [

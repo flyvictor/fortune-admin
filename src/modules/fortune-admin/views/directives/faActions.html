@@ -8,7 +8,7 @@
     <span class="caret"></span>
     <span class="sr-only">Toggle Dropdown</span>
   </button>
-  <ul class="dropdown-menu" role="menu">
+  <ul class="dropdown-menu" role="menu" style="position: fixed; top: 50%; left:87%;">
     <li ng-repeat="action in actions">
       <a ng-click="applyAction(actions[action.name], model)" ng-hide="action.name == 'delete'">{{action.title || action.name}}</a>
     </li>

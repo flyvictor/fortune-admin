@@ -27,8 +27,56 @@
               });
             }],
             users: ['$http', function($http){
-              return $http.get('/api/v1/users').then(function(res){
-                return res.data.users;
+              return $http.get('/api/v1/users?include=addresses').then(function(res){
+                // Building the returned object into something simpler to work with
+                // So linked resources appear on the documents to which they relate
+
+                // This should likely be somewhere else.
+                /**
+                 * UnFlatterns the res to attach linked resources to their parents.
+                 * @param  {Object} res       HTTP get request result
+                 * @param  {String} singular  Name of the parent resource, singular
+                 * @param  {String} plural    Name of the parent resource, plural
+                 * @return {Object}           Formatted parent object
+                 */
+                var attachLinkedToRes = function (res, singular, plural) {
+                  var primaryResource = res.data[plural];
+
+                  // Build a resource indexed version of the linked resources
+                  var linkedIndexed = {};
+
+                  Object.keys(res.data.linked).forEach(function(linkedKey) {
+
+                    res.data.linked[linkedKey].forEach(function(linkedObject) {
+
+                      if (!linkedIndexed[linkedObject.links[singular]]) {
+                        linkedIndexed[linkedObject.links[singular]] = {};
+                      }
+
+                      if (!linkedIndexed[linkedObject.links[singular]][linkedKey]) {
+                        linkedIndexed[linkedObject.links[singular]][linkedKey] = [];
+                      }
+
+                      linkedIndexed[linkedObject.links[singular]][linkedKey].push(linkedObject);
+                    });
+                  });
+
+                  // Attach the linked resources to the primary resource
+                  primaryResource.forEach(function(primaryResourceDoc) {
+                    primaryResourceDoc.linked = linkedIndexed[primaryResourceDoc.id];
+                  });
+
+                  return primaryResource;
+                };
+
+                var data = attachLinkedToRes(res, 'user', 'users');
+
+                return data;
+              });
+            }],
+            addresses: ['$http', function($http){
+              return $http.get('/api/v1/addresses').then(function(res){
+                return res.data.addresses;
               });
             }]
           }
@@ -63,7 +111,7 @@
           }
         }
       ]);
-      
+
       $scope.startDocs = function(){
         docs.setApiHost($scope.params.host);
         docs.setApiNamespace($scope.params.namespace);
@@ -74,18 +122,20 @@
       $scope.startFA = function(){
         fortuneAdmin.setApiHost($scope.params.host);
         fortuneAdmin.setApiNamespace($scope.params.namespace);
-        
+
         $location.url('/admin/uml');
       };
     }])
-    .controller('fagridCtrl', ['$scope', 'resources', 'users', function($scope, resources, users){
+    .controller('fagridCtrl', ['$scope', 'resources', 'users', 'addresses', function($scope, resources, users, addresses){
       console.log('resolved resources', resources);
       $scope.resources = resources;
       $scope.users = users;
+      $scope.addresses = addresses;
       angular.forEach(resources, function(r){
-        if (r.name === "user"){
-          $scope.usersMetadata = r;
-        }
+        $scope[r.route + "Metadata"] = r;
+        // if (r.name === "user"){
+        //   $scope.usersMetadata = r;
+        // }
       });
     }]);
 })(angular);
