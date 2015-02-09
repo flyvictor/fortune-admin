@@ -1,4 +1,4 @@
-angular.module('templates-main', ['/views/directives/attribute.html', '/views/directives/description.html', '/views/directives/example.html', '/views/directives/gui.html', '/views/directives/requestResponse.html', '/views/directives/response.html', '/views/docs.html', '/views/directives/faActions.html', '/views/directives/faAlert.html', '/views/directives/faDeleteConfirm.html', '/views/directives/faDetails.html', '/views/directives/faEditable.html', '/views/directives/faGrid.html', '/views/directives/uml/canvas.html', '/views/resources.html', '/views/uml.html', '/views/docsCells.html', '/views/mynavbar.html', '/views/resourcesCells.html', '/views/umlCells.html']);
+angular.module('templates-main', ['/views/directives/attribute.html', '/views/directives/description.html', '/views/directives/example.html', '/views/directives/gui.html', '/views/directives/requestResponse.html', '/views/directives/response.html', '/views/docs.html', '/views/directives/faActions.html', '/views/directives/faAlert.html', '/views/directives/faBulkActions.html', '/views/directives/faDeleteConfirm.html', '/views/directives/faDetails.html', '/views/directives/faEditable.html', '/views/directives/faGrid.html', '/views/directives/faUiGrid.html', '/views/directives/uml/canvas.html', '/views/resources.html', '/views/uml.html', '/views/docsCells.html', '/views/mynavbar.html', '/views/resourcesCells.html', '/views/umlCells.html']);
 
 angular.module("/views/directives/attribute.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/views/directives/attribute.html",
@@ -200,17 +200,16 @@ angular.module("/views/directives/faActions.html", []).run(["$templateCache", fu
   $templateCache.put("/views/directives/faActions.html",
     "<div class=\"btn-group\" dropdown>\n" +
     "  <button type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\">\n" +
-    "      <span class=\"glyphicon glyphicon-star-empty\" ng-hide=\"isSelected(model)\"></span>\n" +
-    "      <span class=\"glyphicon glyphicon-star\" ng-show=\"isSelected(model)\"></span>\n" +
+    "      <span class=\"glyphicon glyphicon-unchecked\" ng-hide=\"isSelected(model)\"></span>\n" +
+    "      <span class=\"glyphicon glyphicon-ok\" ng-show=\"isSelected(model)\"></span>\n" +
     "  </button>\n" +
-    "  <button type=\"button\" class=\"btn btn-danger\" ng-click=\"applyAction(actions.delete, model)\">{{actions.delete.title || 'Delete'}}</button>\n" +
     "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
     "    <span class=\"caret\"></span>\n" +
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\" style=\"position: fixed; top: 50%; left:87%;\">\n" +
-    "    <li ng-repeat=\"action in actions\">\n" +
-    "      <a ng-click=\"applyAction(actions[action.name], model)\" ng-hide=\"action.name == 'delete'\">{{action.title || action.name}}</a>\n" +
+    "    <li ng-repeat=\"action in actions | singleActions\">\n" +
+    "      <a ng-click=\"applySingleAction(actions[action.name], model)\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +
@@ -235,6 +234,21 @@ angular.module("/views/directives/faAlert.html", []).run(["$templateCache", func
     "</div>\n" +
     "\n" +
     "");
+}]);
+
+angular.module("/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/views/directives/faBulkActions.html",
+    "<div class=\"row\">\n" +
+    "    <div class=\"col-md-3\">\n" +
+    "        <h4>Bulk actions</h4>\n" +
+    "    </div>\n" +
+    "    <div class=\"col-md-6\">\n" +
+    "        <select class=\"form-control\" ng-model=\"actionToRun\" ng-options=\"action as action.name for action in actions | bulkActions\"></select>\n" +
+    "    </div>\n" +
+    "    <div class=\"col-md-3\">\n" +
+    "        <button class=\"btn btn-default\" ng-click=\"applyBulkAction(actionToRun)\">Apply action to selected items</button>\n" +
+    "    </div>\n" +
+    "</div>");
 }]);
 
 angular.module("/views/directives/faDeleteConfirm.html", []).run(["$templateCache", function($templateCache) {
@@ -379,6 +393,17 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "    </tr>\n" +
     "</table>\n" +
     "</div>\n" +
+    "");
+}]);
+
+angular.module("/views/directives/faUiGrid.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/views/directives/faUiGrid.html",
+    "<section>\n" +
+    "  <div class=\"fa-ui-grid\" ui-grid=\"gridOptions\" ui-grid-edit></div>\n" +
+    "  <div>\n" +
+    "      <fa-bulk-actions collection-name=\"currentResource.route\" data=\"data\"></fa-bulk-actions>\n" +
+    "  </div>\n" +
+    "</section>\n" +
     "");
 }]);
 
@@ -864,8 +889,10 @@ angular.module('fortuneAdmin.Controllers', [
       $scope.actions = {
         'delete': {
           name: 'delete',
+          single: true,
+          bulk: true,
           title: 'Delete',
-          method: function(models) {
+          method: function(models, isBulk) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
@@ -916,8 +943,10 @@ angular.module('fortuneAdmin.Controllers', [
         },
         "details": {
           name: "details",
+          single: true,
+          bulk: false,
           title: "Show Details",
-          method: function(models) {
+          method: function(models, isBulk) {
             angular.forEach(models, function(model) {
               var dialog = $modal.open({
                 templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
@@ -933,10 +962,14 @@ angular.module('fortuneAdmin.Controllers', [
         }
       };
 
-      $scope.applyAction = function(iAction, model){
-        var selected = faActionsService.getSelectedItems($scope.data, model);
-        iAction.method(selected);
+      $scope.applySingleAction = function(iAction, model){
+        iAction.method([model], false);
       };
+      $scope.applyBulkAction = function(iAction){
+        var selected = faActionsService.getSelectedItems($scope.data);
+        iAction.method(selected, true);
+      };
+
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;
@@ -1098,7 +1131,7 @@ angular.module('fortuneAdmin.Controllers', [
         }]);
 
 'use strict';
-angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.autoResize'])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'fortuneAdmin.Filters'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -1108,6 +1141,17 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
         model: "=ngModel",
         data: "=",
         collectionName: "="
+      }
+    }
+  }])
+  .directive('faBulkActions', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faBulkActions'),
+      controller: 'faActionsCtrl',
+      scope: {
+        data: '=',
+        collectionName: '='
       }
     }
   }])
@@ -1205,18 +1249,22 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
       scope: {
         data: '=',
         currentResource: '=',
-        columns: '='
+        columns: '=',
+        options: '='
       },
-      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
-        $scope.gridOptions = {
+        $scope.options = angular.isObject($scope.options) ? $scope.options : {};
+
+        $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource
           }
-        };
+        });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
+        $scope.gridOptions.enableColumnResizing = true;
 
         if ($scope.columns) {
           //Creating shallow copy to avoind propagating local changes to parent $scope
@@ -1227,6 +1275,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
           $scope.gridOptions.columnDefs.push({
             name: 'actions',
             enableCellEdit: false,
+            width: 65,
             cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
           });
         }
@@ -1299,11 +1348,36 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
       }
     }]);
 
+'use strict';
+angular.module('fortuneAdmin.Filters', [])
+  .filter('singleActions', [function(){
+    return function(input){
+      var filtered = [];
+      angular.forEach(input, function(item){
+        if (item.single){
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  }])
+  .filter('bulkActions', [function(){
+    return function(input){
+      var filtered = [];
+      angular.forEach(input, function(item){
+        if (item.bulk){
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  }]);
 
   //Fix grunt addtemplates task if you change this line
   angular.module('fortuneAdmin', [ 'templates-main', 
         'sharedElements',
         'fortuneAdmin.Controllers',
+        'fortuneAdmin.Filters',
         'fortuneAdmin.Directives',
         'fortuneAdmin.Services',
         'fortuneAdmin.Uml'
@@ -2714,10 +2788,10 @@ angular.module('fortuneAdmin.Services', [
       }
     };
 
-    this.getSelectedItems = function(data, model){
+    this.getSelectedItems = function(data){
       var ret = [];
       angular.forEach(data, function(item){
-        if (srv.isSelected(item) || item.id === model.id) ret.push(item);
+        if (srv.isSelected(item)) ret.push(item);
       });
       return ret;
     };

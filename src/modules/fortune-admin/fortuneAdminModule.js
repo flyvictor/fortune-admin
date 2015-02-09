@@ -3,6 +3,7 @@
   angular.module('fortuneAdmin', [
         'sharedElements',
         'fortuneAdmin.Controllers',
+        'fortuneAdmin.Filters',
         'fortuneAdmin.Directives',
         'fortuneAdmin.Services',
         'fortuneAdmin.Uml'

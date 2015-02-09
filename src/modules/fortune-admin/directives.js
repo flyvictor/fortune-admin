@@ -1,5 +1,5 @@
 'use strict';
-angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.autoResize'])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'fortuneAdmin.Filters'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -9,6 +9,17 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
         model: "=ngModel",
         data: "=",
         collectionName: "="
+      }
+    }
+  }])
+  .directive('faBulkActions', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faBulkActions'),
+      controller: 'faActionsCtrl',
+      scope: {
+        data: '=',
+        collectionName: '='
       }
     }
   }])
@@ -106,18 +117,22 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
       scope: {
         data: '=',
         currentResource: '=',
-        columns: '='
+        columns: '=',
+        options: '='
       },
-      template: '<div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
-        $scope.gridOptions = {
+        $scope.options = angular.isObject($scope.options) ? $scope.options : {};
+
+        $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource
           }
-        };
+        });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
+        $scope.gridOptions.enableColumnResizing = true;
 
         if ($scope.columns) {
           //Creating shallow copy to avoind propagating local changes to parent $scope
@@ -128,6 +143,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.a
           $scope.gridOptions.columnDefs.push({
             name: 'actions',
             enableCellEdit: false,
+            width: 65,
             cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
           });
         }
