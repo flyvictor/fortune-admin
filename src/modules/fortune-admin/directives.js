@@ -117,16 +117,19 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       scope: {
         data: '=',
         currentResource: '=',
-        columns: '='
+        columns: '=',
+        options: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
-        $scope.gridOptions = {
+        $scope.options = angular.isObject($scope.options) ? $scope.options : {};
+
+        $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource
           }
-        };
+        });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
         $scope.gridOptions.enableColumnResizing = true;
