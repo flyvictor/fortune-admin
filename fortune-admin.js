@@ -203,11 +203,11 @@ angular.module("/views/directives/faActions.html", []).run(["$templateCache", fu
     "      <span class=\"glyphicon glyphicon-unchecked\" ng-hide=\"isSelected(model)\"></span>\n" +
     "      <span class=\"glyphicon glyphicon-ok\" ng-show=\"isSelected(model)\"></span>\n" +
     "  </button>\n" +
-    "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
+    "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" ng-click=\"setClickCoords($event)\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
     "    <span class=\"caret\"></span>\n" +
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
-    "  <ul class=\"dropdown-menu\" role=\"menu\" style=\"position: fixed; top: 50%; left:87%;\">\n" +
+    "  <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
     "    <li ng-repeat=\"action in actions | singleActions\">\n" +
     "      <a ng-click=\"applySingleAction(actions[action.name], model)\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
@@ -1141,6 +1141,17 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         model: "=ngModel",
         data: "=",
         collectionName: "="
+      },
+      link: function(scope){
+        scope.setClickCoords = function($event){
+          console.log($event);
+          scope.popupPosition = {
+            'position': 'fixed',
+            'top': $event.clientY - 250 + 'px',
+            left:  $event.pageX - 170 + 'px',
+            'x-index': 100500
+          };
+        };
       }
     }
   }])
