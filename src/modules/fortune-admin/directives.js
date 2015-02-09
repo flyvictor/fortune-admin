@@ -9,6 +9,18 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         model: "=ngModel",
         data: "=",
         collectionName: "="
+      },
+      link: function(scope){
+        scope.setClickCoords = function($event){
+          console.log($event);
+          scope.popupPosition = {
+            'position': 'fixed',
+            //TODO: figure out how to remove these magic numbers
+            'top': $event.clientY - 250 + 'px',
+            left:  $event.pageX - 170 + 'px',
+            'x-index': 100500
+          };
+        };
       }
     }
   }])
