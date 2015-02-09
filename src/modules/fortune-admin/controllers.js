@@ -21,8 +21,10 @@ angular.module('fortuneAdmin.Controllers', [
       $scope.actions = {
         'delete': {
           name: 'delete',
+          single: true,
+          bulk: true,
           title: 'Delete',
-          method: function(models) {
+          method: function(models, isBulk) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
@@ -73,8 +75,10 @@ angular.module('fortuneAdmin.Controllers', [
         },
         "details": {
           name: "details",
+          single: true,
+          bulk: false,
           title: "Show Details",
-          method: function(models) {
+          method: function(models, isBulk) {
             angular.forEach(models, function(model) {
               var dialog = $modal.open({
                 templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
@@ -90,10 +94,14 @@ angular.module('fortuneAdmin.Controllers', [
         }
       };
 
-      $scope.applyAction = function(iAction, model){
-        var selected = faActionsService.getSelectedItems($scope.data, model);
-        iAction.method(selected);
+      $scope.applySingleAction = function(iAction, model){
+        iAction.method([model], false);
       };
+      $scope.applyBulkAction = function(iAction){
+        var selected = faActionsService.getSelectedItems($scope.data);
+        iAction.method(selected, true);
+      };
+
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;

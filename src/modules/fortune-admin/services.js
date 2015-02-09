@@ -22,10 +22,10 @@ angular.module('fortuneAdmin.Services', [
       }
     };
 
-    this.getSelectedItems = function(data, model){
+    this.getSelectedItems = function(data){
       var ret = [];
       angular.forEach(data, function(item){
-        if (srv.isSelected(item) || item.id === model.id) ret.push(item);
+        if (srv.isSelected(item)) ret.push(item);
       });
       return ret;
     };
