@@ -528,7 +528,7 @@ angular.module('docs.Config', [])
         },
         mountPoint: '',
         appVersion: 1,
-        viewUrlPrefix: '/views/',
+        viewUrlPrefix: '/dist/views/',
         templateFileSuffix: '.html',
         prepareViewTemplateUrl: function(url){
             return this.viewUrlPrefix + url + this.templateFileSuffix;
@@ -853,7 +853,7 @@ angular.module('docs', [
     },
     mountPoint: '',
     appVersion: 1,
-    viewUrlPrefix: '/views/',
+    viewUrlPrefix: '/dist/views/',
     templateFileSuffix: '.html',
     prepareViewTemplateUrl: function(url){
        return this.viewUrlPrefix + url + this.templateFileSuffix;
@@ -2845,7 +2845,7 @@ angular.module('fortuneAdmin.Services', [
     },
     mountPoint: '',
     appVersion: 1,
-    viewUrlPrefix: '/views/',
+    viewUrlPrefix: '/dist/views/',
     templateFileSuffix: '.html',
     prepareViewTemplateUrl: function(url){
       return this.viewUrlPrefix + url + this.templateFileSuffix;

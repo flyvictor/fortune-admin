@@ -15,7 +15,7 @@
         docsProvider.mountTo($routeProvider, '/docs');
 
         $routeProvider.when('/', {
-          templateUrl: 'init.html',
+          templateUrl: 'dist/init.html',
           controller: 'initCtrl'
         });
         $routeProvider.when('/fagrid', {
