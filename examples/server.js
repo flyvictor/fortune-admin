@@ -8,11 +8,13 @@ var fortune = require('./lib/fortune')
   , path = require('path');
 
 var container = express()
-  , port = process.env.PORT || process.argv[2] || 1337;
+  , port = process.env.PORT || process.argv[2] || 1337
+  , namespace = '/api/v1';
 
 var app = fortune({
   db: 'fortune-admin',
-  namespace: '/api/v1',
+  namespace: namespace,
+  port = port,
   connectionString: process.env.CONN_STRING || '' //default by fortune is ''
 })
 
@@ -56,9 +58,24 @@ var app = fortune({
   users: [{ref: "user", inverse: "flights", pkType : String}]
 }, { model: { pk: "flightNumber" }});
 
+var hbs = require('hbs');
+// hbs.registerPartials(__dirname + '/lib/fortune-admin/src/');
+
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
+
+container.get('/', function(req, res, next){
+  res.render('index', { config : { host : "http://localhost:" + port, namespace : namespace }});
+});
+
+
 container
+  .set('view engine', 'html')
+  .set('views', path.join(__dirname , '/../src'))
+  .engine('html', hbs.__express)
   //.use(express.static(path.join(__dirname , '../src')))
-  .use(express.static(path.join(__dirname , '../src')))
+  .use(express.static(path.join(__dirname , '/../src')))
   .use(express.static(path.join(__dirname,  '../src/modules/docs')))
   .use(express.static(path.join(__dirname, '../src/modules/fortune-admin')))
   .use(express.static(path.join(__dirname, '../src/modules/shared')))

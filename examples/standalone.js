@@ -22,11 +22,13 @@
           controller: 'fagridCtrl',
           resolve: {
             resources: ['$http', function($http){
+              //TODO : This should be using a service, that has "config" injected to get the namespace from the server
               return $http.get('/resources').then(function(res){
                 return res.data.resources;
               });
             }],
             users: ['$http', function($http){
+              //TODO : This should be using a service, that has "config" injected to get the namespace from the server
               return $http.get('/api/v1/users?include=addresses').then(function(res){
                 // Building the returned object into something simpler to work with
                 // So linked resources appear on the documents to which they relate
@@ -95,7 +97,10 @@
         }
       }]);
     }])
-    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', 'faActionsService', function($scope, $rootScope, $location, fortuneAdmin, docs, faActionsService){
+    .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', 'faActionsService', 'config', function($scope, $rootScope, $location, fortuneAdmin, docs, faActionsService, config){
+
+      console.log(config);
+
       $scope.params = {
         host: 'http://localhost:1337',
         namespace: '/api/v1'

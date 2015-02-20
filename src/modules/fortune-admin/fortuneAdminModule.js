@@ -145,7 +145,6 @@
               }
               return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
             },
-
             setApiHost: function(host){
                 config.baseEndpoint = host;
             },

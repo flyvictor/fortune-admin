@@ -1147,6 +1147,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           console.log($event);
           scope.popupPosition = {
             'position': 'fixed',
+            //TODO: figure out how to remove these magic numbers
             'top': $event.clientY - 250 + 'px',
             left:  $event.pageX - 170 + 'px',
             'x-index': 100500
@@ -1530,7 +1531,6 @@ angular.module('fortuneAdmin.Filters', [])
               }
               return config.routing.html5Mode ? url : '/#' + config.routing.urlPrefix + url;
             },
-
             setApiHost: function(host){
                 config.baseEndpoint = host;
             },
