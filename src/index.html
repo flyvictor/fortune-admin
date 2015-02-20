@@ -24,7 +24,7 @@
     <!-- Ugly hack for a spike around ui-grid @todo remove -->
     <link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-stable.min.css" />
   </head>
-  <body ng-app="fortuneAdmin.Standalone">
+  <body ng-app="{{ module }}">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -99,7 +99,7 @@
     <script src="standalone.js"></script>
     <!-- <script src="standalone.js"></script> -->
     <script>
-       app.value("config", {{{ json config }}});
+        angular.module("{{ module }}").constant("config", {{{ json config }}});
     </script>
   </body>
 </html>

@@ -9,12 +9,13 @@ var fortune = require('./lib/fortune')
 
 var container = express()
   , port = process.env.PORT || process.argv[2] || 1337
-  , namespace = '/api/v1';
+  , namespace = '/api/v1'
+  , module = 'fortuneAdmin.Standalone';
 
 var app = fortune({
   db: 'fortune-admin',
   namespace: namespace,
-  port = port,
+  port : port,
   connectionString: process.env.CONN_STRING || '' //default by fortune is ''
 })
 
@@ -66,7 +67,7 @@ hbs.registerHelper('json', function(context) {
 });
 
 container.get('/', function(req, res, next){
-  res.render('index', { config : { host : "http://localhost:" + port, namespace : namespace }});
+  res.render('index', { module : module, config : { host : "http://localhost:" + port, namespace : namespace }});
 });
 
 

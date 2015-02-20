@@ -5,8 +5,9 @@
     'fortuneAdmin',
     'docs'
   ])
-    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider', 'docsProvider',
-      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider, docsProvider){
+    .config(['$routeProvider', '$locationProvider', '$httpProvider', 'fortuneAdminProvider', 'docsProvider', 'config',
+      function($routeProvider, $locationProvider, $httpProvider, fortuneAdminProvider, docsProvider, config){
+
         fortuneAdminProvider.enableNavbar();
         fortuneAdminProvider.mountTo($routeProvider, '/admin');
 
@@ -98,8 +99,6 @@
       }]);
     }])
     .controller('initCtrl', ['$scope', '$rootScope', '$location', 'fortuneAdmin', 'docs', 'faActionsService', 'config', function($scope, $rootScope, $location, fortuneAdmin, docs, faActionsService, config){
-
-      console.log(config);
 
       $scope.params = {
         host: 'http://localhost:1337',
