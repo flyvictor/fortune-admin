@@ -14,17 +14,17 @@
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/angular-xeditable/dist/css/xeditable.css" />
+    <link rel="stylesheet" href="/dist/angular-xeditable/dist/css/xeditable.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!--<link rel="stylesheet" href="/main.css" />-->
-    <link rel="stylesheet" href="/styles/main.css" />
-    <link rel="stylesheet" href="/styles/docs.css" />
+    <link rel="stylesheet" href="/dist/styles/main.css" />
+    <link rel="stylesheet" href="/dist/styles/docs.css" />
 
     <!-- Ugly hack for a spike around ui-grid @todo remove -->
     <link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-stable.min.css" />
   </head>
-  <body ng-app="fortuneAdmin.Standalone">
+  <body ng-app="{{ module }}">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -39,12 +39,12 @@
     <script src="/json3/lib/json3.min.js"></script>
     <![endif]-->
 
-    <script src="/angular/angular.js"></script>
-    <script src="/angular-route/angular-route.js"></script>
-    <script src="/angular-xeditable/dist/js/xeditable.js"></script>
-    <script src="/d3/d3.js"></script>
-    <script src="/ui-bootstrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.js"></script>
-    <script src="/angular-ui-grid/ui-grid.js"></script>
+    <script src="/dist/angular/angular.js"></script>
+    <script src="/dist/angular-route/angular-route.js"></script>
+    <script src="/dist/angular-xeditable/dist/js/xeditable.js"></script>
+    <script src="/dist/d3/d3.js"></script>
+    <script src="/dist/ui-bootstrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.js"></script>
+    <script src="/dist/angular-ui-grid/ui-grid.js"></script>
 <!--     <script src="http://ui-grid.info/release/ui-grid-stable.min.js"></script>-->
 
     <!--<script src="/config/config.js"></script>
@@ -63,37 +63,43 @@
     <script src="/fortune-admin.js"></script>
     <script src="/scripts/standalone.js"></script>-->
 
+    <script src="/dist/ui-bootstrap-custom-build/ui-bootstrap-custom-tpls-0.12.0.js"></script>
+    <script src="/dist/angular-ui-grid/ui-grid.js"></script>
 
     <!-- shared -->
-    <script src="modules/shared/config.js"></script>
-    <script src="modules/shared/directives.js"></script>
-    <script src="modules/shared/filters.js"></script>
-    <script src="modules/shared/sharedElementsModule.js"></script>
+    <script src="/dist/modules/shared/config.js"></script>
+    <script src="/dist/modules/shared/directives.js"></script>
+    <script src="/dist/modules/shared/filters.js"></script>
+    <script src="/dist/modules/shared/sharedElementsModule.js"></script>
 
     <!-- fortune admin uml -->
-    <script src="modules/fortune-admin/config.js"></script>
-    <script src="modules/fortune-admin/resources-uml/controllers.js"></script>
-    <script src="modules/fortune-admin/resources-uml/d3.js"></script>
-    <script src="modules/fortune-admin/resources-uml/directives.js"></script>
-    <script src="modules/fortune-admin/resources-uml/services.js"></script>
-    <script src="modules/fortune-admin/resources-uml/index.js"></script>
+    <script src="/dist/modules/fortune-admin/config.js"></script>
+    <script src="/dist/modules/fortune-admin/resources-uml/controllers.js"></script>
+    <script src="/dist/modules/fortune-admin/resources-uml/d3.js"></script>
+    <script src="/dist/modules/fortune-admin/resources-uml/directives.js"></script>
+    <script src="/dist/modules/fortune-admin/resources-uml/services.js"></script>
+    <script src="/dist/modules/fortune-admin/resources-uml/index.js"></script>
     <!-- fortune admin module -->
-    <script src="modules/fortune-admin/inflect.js"></script>
-    <script src="modules/fortune-admin/services.js"></script>
-    <script src="modules/fortune-admin/controllers.js"></script>
-    <script src="modules/fortune-admin/directives.js"></script>
-    <script src="modules/fortune-admin/filters.js"></script>
-    <script src="modules/fortune-admin/fortuneAdminModule.js"></script>
+    <script src="/dist/modules/fortune-admin/inflect.js"></script>
+    <script src="/dist/modules/fortune-admin/services.js"></script>
+    <script src="/dist/modules/fortune-admin/controllers.js"></script>
+    <script src="/dist/modules/fortune-admin/directives.js"></script>
+    <script src="/dist/modules/fortune-admin/filters.js"></script>
+    <script src="/dist/modules/fortune-admin/fortuneAdminModule.js"></script>
 
     <!-- Ugly hack for a spike around ui-grid @todo remove -->
 
 
     <!-- docs module -->
-    <script src="modules/docs/config.js"></script>
-    <script src="modules/docs/controllers.js"></script>
-    <script src="modules/docs/directives.js"></script>
-    <script src="modules/docs/docsModule.js"></script>
+    <script src="/dist/modules/docs/config.js"></script>
+    <script src="/dist/modules/docs/controllers.js"></script>
+    <script src="/dist/modules/docs/directives.js"></script>
+    <script src="/dist/modules/docs/docsModule.js"></script>
 
-    <script src="standalone.js"></script>
+    <script src="/dist/standalone.js"></script>
+    <!-- <script src="standalone.js"></script> -->
+    <script>
+        angular.module("{{ module }}").constant("config", {{{ json config }}});
+    </script>
   </body>
 </html>

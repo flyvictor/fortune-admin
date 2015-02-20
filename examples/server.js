@@ -5,15 +5,17 @@ var fortune = require('./lib/fortune')
   , express = fortune.express
   , RSVP = fortune.RSVP
   , util = require('util')
+  , fs = require('fs')
   , path = require('path');
 
 var container = express()
-  , port = process.env.PORT || process.argv[2] || 1337;
+  , port = process.env.PORT || process.argv[2] || 1337
+  , namespace = '/api/v1'
+  , module = 'fortuneAdmin.Standalone';
 
 var app = fortune({
   db: 'fortune-admin',
-  namespace: '/api/v1',
-  connectionString: process.env.CONN_STRING || '' //default by fortune is ''
+  namespace: namespace
 })
 
 .resource("user", {
@@ -56,22 +58,49 @@ var app = fortune({
   users: [{ref: "user", inverse: "flights", pkType : String}]
 }, { model: { pk: "flightNumber" }});
 
+var hbs = require('hbs');
+// hbs.registerPartials(__dirname + '/lib/fortune-admin/src/');
+
+hbs.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
+
+function renderHome(res) {
+  res.render('index', { module : module, config : { host : "http://localhost:" + port, namespace : namespace }});
+}
+
+container.get('/', function(req, res, next){
+  renderHome(res);
+});
+
 container
-  //.use(express.static(path.join(__dirname , '../src')))
-  .use(express.static(path.join(__dirname , '../src')))
-  .use(express.static(path.join(__dirname,  '../src/modules/docs')))
-  .use(express.static(path.join(__dirname, '../src/modules/fortune-admin')))
-  .use(express.static(path.join(__dirname, '../src/modules/shared')))
-  .use(express.static(path.join(__dirname , '../bower_components')))
-  .use(express.static(path.join(__dirname, './')))
+  .set('view engine', 'html')
+  .set('views', path.join(__dirname, '../src'))
+  .engine('html', hbs.__express)
+  .use('/dist', express.static(path.join(__dirname , '../src')))
+  .use('/dist', express.static(path.join(__dirname,  '../src/modules/docs')))
+  .use('/dist', express.static(path.join(__dirname, '../src/modules/fortune-admin')))
+  .use('/dist', express.static(path.join(__dirname, '../src/modules/shared')))
+  .use('/dist', express.static(path.join(__dirname , '../bower_components')))
+  .use('/dist', express.static(path.join(__dirname, './')))
   .use(app.router)
   .listen(port);
 
-app.router.get('*', function(req, res, next){
+container.get('*', function(req, res, next){
   var resource = /^\/resources.*/;
   var api = /^\/api.+/;
-  if (resource.test(req.url) || api.test(req.url)) return next();
-  res.redirect('/');
+  var statics = /^\/dist.+/;
+
+  if (resource.test(req.url) || api.test(req.url) || statics.test(req.url)) return next();
+  
+  if(req.url.indexOf('.') !== -1) {
+    // if it has a . assume it's a file (CSS, ico, js, etc)
+    return next();
+  }
+
+  // res.redirect('/');
+  console.log("Using homepage for %s to allow Angular router to handle it", req.url);
+  renderHome(res);
 });
 
 console.log('Listening on port ' + port + '...');
