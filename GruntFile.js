@@ -32,7 +32,7 @@ module.exports = function(grunt){
       options: {
         rename: function(moduleName){
           console.log('renaming ', moduleName);
-          moduleName = moduleName.replace(/modules\/[\w-]+/, '');
+          moduleName = moduleName.replace(/modules\/[\w-]+/, '/dist');
           console.log('resulting template url ', moduleName);
           return moduleName;
         }

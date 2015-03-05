@@ -1,7 +1,7 @@
-angular.module('templates-main', ['/views/directives/attribute.html', '/views/directives/description.html', '/views/directives/example.html', '/views/directives/gui.html', '/views/directives/requestResponse.html', '/views/directives/response.html', '/views/docs.html', '/views/directives/faActions.html', '/views/directives/faAlert.html', '/views/directives/faBulkActions.html', '/views/directives/faDeleteConfirm.html', '/views/directives/faDetails.html', '/views/directives/faEditable.html', '/views/directives/faGrid.html', '/views/directives/faUiGrid.html', '/views/directives/uml/canvas.html', '/views/resources.html', '/views/uml.html', '/views/docsCells.html', '/views/mynavbar.html', '/views/resourcesCells.html', '/views/umlCells.html']);
+angular.module('templates-main', ['/dist/views/directives/attribute.html', '/dist/views/directives/description.html', '/dist/views/directives/example.html', '/dist/views/directives/gui.html', '/dist/views/directives/requestResponse.html', '/dist/views/directives/response.html', '/dist/views/docs.html', '/dist/views/directives/faActions.html', '/dist/views/directives/faAlert.html', '/dist/views/directives/faBulkActions.html', '/dist/views/directives/faDeleteConfirm.html', '/dist/views/directives/faDetails.html', '/dist/views/directives/faEditable.html', '/dist/views/directives/faGrid.html', '/dist/views/directives/faUiGrid.html', '/dist/views/directives/uml/canvas.html', '/dist/views/resources.html', '/dist/views/uml.html', '/dist/views/docsCells.html', '/dist/views/mynavbar.html', '/dist/views/resourcesCells.html', '/dist/views/umlCells.html']);
 
-angular.module("/views/directives/attribute.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/attribute.html",
+angular.module("/dist/views/directives/attribute.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/attribute.html",
     "<div>\n" +
     "    <!-- string -->\n" +
     "    <div ng-if=\"value.type == 'String'\">\n" +
@@ -25,8 +25,8 @@ angular.module("/views/directives/attribute.html", []).run(["$templateCache", fu
     "</div>");
 }]);
 
-angular.module("/views/directives/description.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/description.html",
+angular.module("/dist/views/directives/description.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/description.html",
     "<div class=\"resource-description\">\n" +
     "    <h4><strong>The {{resource.name}} object</strong></h4>\n" +
     "    <h5><strong>Attributes</strong></h5>\n" +
@@ -44,8 +44,8 @@ angular.module("/views/directives/description.html", []).run(["$templateCache", 
     "</div>");
 }]);
 
-angular.module("/views/directives/example.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/example.html",
+angular.module("/dist/views/directives/example.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/example.html",
     "<div class=\"resource-example\">\n" +
     "    <h4>{{ resource.name+' object example' | uppercase }}</h4>\n" +
     "    <span>\n" +
@@ -61,8 +61,8 @@ angular.module("/views/directives/example.html", []).run(["$templateCache", func
     "</div>");
 }]);
 
-angular.module("/views/directives/gui.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/gui.html",
+angular.module("/dist/views/directives/gui.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/gui.html",
     "<div class=\"resource-giu\">\n" +
     "    <h4><strong>/{{resource.name}}:</strong> Operations about {{resource.name}} </h4>\n" +
     "\n" +
@@ -79,8 +79,8 @@ angular.module("/views/directives/gui.html", []).run(["$templateCache", function
     "</div>");
 }]);
 
-angular.module("/views/directives/requestResponse.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/requestResponse.html",
+angular.module("/dist/views/directives/requestResponse.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/requestResponse.html",
     "<div class=\"request col-md-12\">\n" +
     "    <h3>Request</h3>\n" +
     "    <div ng-if=\"method == 'get'\">\n" +
@@ -139,8 +139,8 @@ angular.module("/views/directives/requestResponse.html", []).run(["$templateCach
     "</div>");
 }]);
 
-angular.module("/views/directives/response.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/response.html",
+angular.module("/dist/views/directives/response.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/response.html",
     "<div class=\"response\">\n" +
     "    <h3>Response</h3>\n" +
     "    <table class=\"table\">\n" +
@@ -156,8 +156,8 @@ angular.module("/views/directives/response.html", []).run(["$templateCache", fun
     "</div>");
 }]);
 
-angular.module("/views/docs.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/docs.html",
+angular.module("/dist/views/docs.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/docs.html",
     "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
     "    <div ng-if=\"navbarEnabled\">\n" +
     "        <fortune-admin-navbar></fortune-admin-navbar>\n" +
@@ -196,8 +196,8 @@ angular.module("/views/docs.html", []).run(["$templateCache", function($template
     "</section>");
 }]);
 
-angular.module("/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faActions.html",
+angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faActions.html",
     "<div class=\"btn-group\" dropdown>\n" +
     "  <button type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\">\n" +
     "      <span class=\"glyphicon glyphicon-unchecked\" ng-hide=\"isSelected(model)\"></span>\n" +
@@ -217,8 +217,8 @@ angular.module("/views/directives/faActions.html", []).run(["$templateCache", fu
     "");
 }]);
 
-angular.module("/views/directives/faAlert.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faAlert.html",
+angular.module("/dist/views/directives/faAlert.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faAlert.html",
     "<div class=\"modal-body\" style=\"text-align:center;\">\n" +
     "  <button class=\"close pull-right\" type=\"button\" aria-label=\"Close\" ng-click=\"close()\">\n" +
     "    <span aria-hidden=\"true\">&times;</span>\n" +
@@ -236,8 +236,8 @@ angular.module("/views/directives/faAlert.html", []).run(["$templateCache", func
     "");
 }]);
 
-angular.module("/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faBulkActions.html",
+angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faBulkActions.html",
     "<div class=\"row\">\n" +
     "    <div class=\"col-md-3\">\n" +
     "        <h4>Bulk actions</h4>\n" +
@@ -251,8 +251,8 @@ angular.module("/views/directives/faBulkActions.html", []).run(["$templateCache"
     "</div>");
 }]);
 
-angular.module("/views/directives/faDeleteConfirm.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faDeleteConfirm.html",
+angular.module("/dist/views/directives/faDeleteConfirm.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faDeleteConfirm.html",
     "<div class=\"modal-body\" style=\"text-align:center;\">\n" +
     "  <button class=\"close pull-right\" type=\"button\" aria-label=\"Close\" ng-click=\"close()\">\n" +
     "    <span aria-hidden=\"true\">&times;</span>\n" +
@@ -272,8 +272,8 @@ angular.module("/views/directives/faDeleteConfirm.html", []).run(["$templateCach
     "");
 }]);
 
-angular.module("/views/directives/faDetails.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faDetails.html",
+angular.module("/dist/views/directives/faDetails.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faDetails.html",
     "<div class=\"modal-body\">\n" +
     "  <button class=\"close pull-right\" type=\"button\" aria-label=\"Close\" ng-click=\"close()\">\n" +
     "    <span aria-hidden=\"true\">&times;</span>\n" +
@@ -295,8 +295,8 @@ angular.module("/views/directives/faDetails.html", []).run(["$templateCache", fu
     "");
 }]);
 
-angular.module("/views/directives/faEditable.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faEditable.html",
+angular.module("/dist/views/directives/faEditable.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faEditable.html",
     "<section>\n" +
     "  <div ng-switch=\"schemaType\">\n" +
     "    <div ng-switch-when=\"String\">\n" +
@@ -315,8 +315,8 @@ angular.module("/views/directives/faEditable.html", []).run(["$templateCache", f
     "</section>");
 }]);
 
-angular.module("/views/directives/faGrid.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faGrid.html",
+angular.module("/dist/views/directives/faGrid.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faGrid.html",
     "<div class=\"fa-grid\">\n" +
     "    <table class=\"table table-bordered\">\n" +
     "    <tr>\n" +
@@ -396,8 +396,8 @@ angular.module("/views/directives/faGrid.html", []).run(["$templateCache", funct
     "");
 }]);
 
-angular.module("/views/directives/faUiGrid.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/faUiGrid.html",
+angular.module("/dist/views/directives/faUiGrid.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faUiGrid.html",
     "<section>\n" +
     "  <div class=\"fa-ui-grid\" ui-grid=\"gridOptions\" ui-grid-edit></div>\n" +
     "  <div>\n" +
@@ -407,14 +407,14 @@ angular.module("/views/directives/faUiGrid.html", []).run(["$templateCache", fun
     "");
 }]);
 
-angular.module("/views/directives/uml/canvas.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/directives/uml/canvas.html",
+angular.module("/dist/views/directives/uml/canvas.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/uml/canvas.html",
     "<div id=\"umlcanvas\">\n" +
     "</div>");
 }]);
 
-angular.module("/views/resources.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/resources.html",
+angular.module("/dist/views/resources.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/resources.html",
     "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
     "  <div ng-if=\"navbarEnabled\">\n" +
     "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
@@ -432,8 +432,8 @@ angular.module("/views/resources.html", []).run(["$templateCache", function($tem
     "");
 }]);
 
-angular.module("/views/uml.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/uml.html",
+angular.module("/dist/views/uml.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/uml.html",
     "<section id=\"fortune-admin\" ng-class=\"{wmargin: navbarEnabled}\">\n" +
     " <div ng-if=\"navbarEnabled\">\n" +
     "    <fortune-admin-navbar></fortune-admin-navbar>\n" +
@@ -446,13 +446,13 @@ angular.module("/views/uml.html", []).run(["$templateCache", function($templateC
     "</section>");
 }]);
 
-angular.module("/views/docsCells.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/docsCells.html",
+angular.module("/dist/views/docsCells.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/docsCells.html",
     "<li><a data-ng-href=\"{{ r('docs_page') }}\">Docs</a></li>");
 }]);
 
-angular.module("/views/mynavbar.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/mynavbar.html",
+angular.module("/dist/views/mynavbar.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/mynavbar.html",
     "<nav class=\"navbar navbar-inverse navbar-fixed-top\" role=\"navigation\" bs-navbar>\n" +
     "    <div class=\"container-fluid\">\n" +
     "        <div class=\"navbar-header\">\n" +
@@ -471,8 +471,8 @@ angular.module("/views/mynavbar.html", []).run(["$templateCache", function($temp
     "");
 }]);
 
-angular.module("/views/resourcesCells.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/resourcesCells.html",
+angular.module("/dist/views/resourcesCells.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/resourcesCells.html",
     "<li class=\"dropdown\" dropdown>\n" +
     "  <a href=\"#\" class=\"dropdown-toggle\" dropdown-toggle>Resources <b class=\"caret\"></b></a>\n" +
     "  <ul class=\"dropdown-menu\">\n" +
@@ -488,8 +488,8 @@ angular.module("/views/resourcesCells.html", []).run(["$templateCache", function
     "</li>");
 }]);
 
-angular.module("/views/umlCells.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("/views/umlCells.html",
+angular.module("/dist/views/umlCells.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/umlCells.html",
     "<li><a data-ng-href=\"{{ r('uml_diagram') }}\">UML</a></li>");
 }]);
 
