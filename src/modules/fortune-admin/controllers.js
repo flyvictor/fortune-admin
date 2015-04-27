@@ -24,7 +24,7 @@ angular.module('fortuneAdmin.Controllers', [
           single: true,
           bulk: true,
           title: 'Delete',
-          method: function(models, isBulk) {
+          method: function(models, isBulk, data) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
@@ -37,10 +37,21 @@ angular.module('fortuneAdmin.Controllers', [
                 });
                 $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, ids.join(',') ].join('/'))
                   .then(function(resp) {
-                    angular.forEach(models, function(model){
-                      model.deleted = true;
-                    });
+                    var map = _.indexBy( models, "id" ),
+                        i = j = 0;
 
+                    while( i < data.length ){
+                      if( map[ data[i].id ] ) {
+                        data.splice( i, 1 );
+                        j++;
+
+                        if( j === models.length ) {
+                          break;
+                        }
+                      } else {
+                        i++;
+                      }
+                    }
                     // Show successfull dialog
                     var green = $modal.open({
                       templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faAlert'),
@@ -94,12 +105,12 @@ angular.module('fortuneAdmin.Controllers', [
         }
       };
 
-      $scope.applySingleAction = function(iAction, model){
-        iAction.method([model], false);
+      $scope.applySingleAction = function(iAction, model, data){
+        iAction.method([model], false, data);
       };
-      $scope.applyBulkAction = function(iAction){
+      $scope.applyBulkAction = function(iAction, data){
         var selected = faActionsService.getSelectedItems($scope.data);
-        iAction.method(selected, true);
+        iAction.method(selected, true, data);
       };
 
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
