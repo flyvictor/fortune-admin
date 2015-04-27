@@ -209,7 +209,7 @@ angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
     "    <li ng-repeat=\"action in actions | singleActions\">\n" +
-    "      <a ng-click=\"applySingleAction(actions[action.name], model)\">{{action.title || action.name}}</a>\n" +
+    "      <a ng-click=\"applySingleAction(actions[action.name], model, data)\">{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +
@@ -246,7 +246,7 @@ angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateC
     "        <select class=\"form-control\" ng-model=\"actionToRun\" ng-options=\"action as action.name for action in actions | bulkActions\"></select>\n" +
     "    </div>\n" +
     "    <div class=\"col-md-3\">\n" +
-    "        <button class=\"btn btn-default\" ng-click=\"applyBulkAction(actionToRun)\">Apply action to selected items</button>\n" +
+    "        <button class=\"btn btn-default\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply action to selected items</button>\n" +
     "    </div>\n" +
     "</div>");
 }]);
@@ -892,7 +892,7 @@ angular.module('fortuneAdmin.Controllers', [
           single: true,
           bulk: true,
           title: 'Delete',
-          method: function(models, isBulk) {
+          method: function(models, isBulk, data) {
             var dialog = $modal.open({
                templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDeleteConfirm'),
                controller: 'DeleteConfirmCtrl'
@@ -905,10 +905,21 @@ angular.module('fortuneAdmin.Controllers', [
                 });
                 $http.delete([CONFIG.fortuneAdmin.getApiNamespace(), $scope.collectionName, ids.join(',') ].join('/'))
                   .then(function(resp) {
-                    angular.forEach(models, function(model){
-                      model.deleted = true;
-                    });
+                    var map = _.indexBy( models, "id" ),
+                        i = j = 0;
 
+                    while( i < data.length ){
+                      if( map[ data[i].id ] ) {
+                        data.splice( i, 1 );
+                        j++;
+
+                        if( j === models.length ) {
+                          break;
+                        }
+                      } else {
+                        i++;
+                      }
+                    }
                     // Show successfull dialog
                     var green = $modal.open({
                       templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faAlert'),
@@ -962,12 +973,12 @@ angular.module('fortuneAdmin.Controllers', [
         }
       };
 
-      $scope.applySingleAction = function(iAction, model){
-        iAction.method([model], false);
+      $scope.applySingleAction = function(iAction, model, data){
+        iAction.method([model], false, data);
       };
-      $scope.applyBulkAction = function(iAction){
+      $scope.applyBulkAction = function(iAction, data){
         var selected = faActionsService.getSelectedItems($scope.data);
-        iAction.method(selected, true);
+        iAction.method(selected, true, data);
       };
 
       var additionalResourceActions = faActionsService.getActions($scope.collectionName);
