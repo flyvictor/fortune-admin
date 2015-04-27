@@ -6,6 +6,6 @@
         <select class="form-control" ng-model="actionToRun" ng-options="action as action.name for action in actions | bulkActions"></select>
     </div>
     <div class="col-md-3">
-        <button class="btn btn-default" ng-click="applyBulkAction(actionToRun)">Apply action to selected items</button>
+        <button class="btn btn-default" ng-click="applyBulkAction(actionToRun, data)">Apply action to selected items</button>
     </div>
 </div>

@@ -9,7 +9,7 @@
   </button>
   <ul class="dropdown-menu" role="menu" ng-style="popupPosition">
     <li ng-repeat="action in actions | singleActions">
-      <a ng-click="applySingleAction(actions[action.name], model)">{{action.title || action.name}}</a>
+      <a ng-click="applySingleAction(actions[action.name], model, data)">{{action.title || action.name}}</a>
     </li>
   </ul>
 </div>
