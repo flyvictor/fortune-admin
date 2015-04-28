@@ -203,7 +203,7 @@ angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache
     "      <span class=\"glyphicon glyphicon-unchecked\" ng-hide=\"isSelected(model)\"></span>\n" +
     "      <span class=\"glyphicon glyphicon-ok\" ng-show=\"isSelected(model)\"></span>\n" +
     "  </button>\n" +
-    "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" ng-click=\"setClickCoords($event)\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
+    "  <button type=\"button\" class=\"btn btn-danger dropdown-toggle\" ng-click=\"setClickCoords($event, model, data)\" dropdown-toggle data-toggle=\"dropdown\" aria-expanded=\"false\">\n" +
     "    <span class=\"caret\"></span>\n" +
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
@@ -1143,13 +1143,16 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         collectionName: "="
       },
       link: function(scope){
-        scope.setClickCoords = function($event){
-          console.log($event);
+        scope.setClickCoords = function($event, model, data){
+          var parentRow = $( $event.target ).parents("div[class*='ui-grid-row']");
+          /* I could not find the reason the 'fixed' position is relative tp the grid
+          ( not even the first relative parent... ), so event.pageY / screenY etc. can't be used,
+          and that calculation of the height is the only solution I could think of */
           scope.popupPosition = {
             'position': 'fixed',
-            //TODO: figure out how to remove these magic numbers
-            'top': $event.clientY - 250 + 'px',
-            left:  $event.pageX - 170 + 'px',
+            'top': _.indexOf( data, model ) * ( parentRow ? parentRow.height() : 0 ) + 'px',
+            right:  "0px",
+            left : "auto",
             'x-index': 100500
           };
         };
