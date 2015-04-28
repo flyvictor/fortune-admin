@@ -3,7 +3,7 @@
       <span class="glyphicon glyphicon-unchecked" ng-hide="isSelected(model)"></span>
       <span class="glyphicon glyphicon-ok" ng-show="isSelected(model)"></span>
   </button>
-  <button type="button" class="btn btn-danger dropdown-toggle" ng-click="setClickCoords($event)" dropdown-toggle data-toggle="dropdown" aria-expanded="false">
+  <button type="button" class="btn btn-danger dropdown-toggle" ng-click="setClickCoords($event, model, data)" dropdown-toggle data-toggle="dropdown" aria-expanded="false">
     <span class="caret"></span>
     <span class="sr-only">Toggle Dropdown</span>
   </button>
