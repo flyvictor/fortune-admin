@@ -133,7 +133,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         data: '=',
         currentResource: '=',
         columns: '=',
-        options: '='
+        options: '=',
+        fvOptions: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
@@ -153,8 +154,10 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           //Creating shallow copy to avoind propagating local changes to parent $scope
           $scope.gridOptions.columnDefs = angular.copy($scope.columns);
 
-          // ID and Actions are required
-          $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          if( !$scope.fvOptions.ignoreIds ) {
+            $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          }
+          //Actions are required
           $scope.gridOptions.columnDefs.push({
             name: 'actions',
             enableCellEdit: false,
