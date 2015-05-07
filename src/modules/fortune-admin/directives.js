@@ -8,7 +8,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       scope: {
         model: "=ngModel",
         data: "=",
-        collectionName: "="
+        collectionName: "=",
+        options : "="
       },
       link: function(scope){
         scope.setClickCoords = function($event, model, data){
@@ -34,7 +35,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       controller: 'faActionsCtrl',
       scope: {
         data: '=',
-        collectionName: '='
+        collectionName: '=',
+        options : "="
       }
     }
   }])
@@ -139,11 +141,12 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
-
+        $scope.fvOptions = $scope.fvOptions || {};
         $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
-            currentResource: $scope.currentResource
+            currentResource: $scope.currentResource,
+            actionsOptions : $scope.fvOptions.actions || {}
           }
         });
         $scope.gridOptions.data = $scope.data;
@@ -161,14 +164,11 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           $scope.gridOptions.columnDefs.push({
             name: 'actions',
             enableCellEdit: false,
-            width: 65,
-            cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+            width: 68,
+            cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
           });
         }
-      },
-      link: function(scope){
-        console.log('linking faUiGrid');
-     }
+      }
     };
   }])
   .directive('faEditable', [function(){

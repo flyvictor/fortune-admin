@@ -104,6 +104,13 @@ angular.module('fortuneAdmin.Controllers', [
           }
         }
       };
+      $scope.options = $scope.options || {};
+
+      for( var opt in $scope.options ) {
+        if( $scope.actions[ opt ] && $scope.options[ opt ] === false ) {
+          delete $scope.actions[ opt ];
+        }
+      }
 
       $scope.applySingleAction = function(iAction, model, data){
         iAction.method([model], false, data);
