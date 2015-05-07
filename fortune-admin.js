@@ -399,9 +399,12 @@ angular.module("/dist/views/directives/faGrid.html", []).run(["$templateCache", 
 angular.module("/dist/views/directives/faUiGrid.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faUiGrid.html",
     "<section>\n" +
+    "  <div ng-if=\"!fvOptions.noBulk && fvOptions.bulkPosition === 'top'\">\n" +
+    "    <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
+    "  </div>\n" +
     "  <div class=\"fa-ui-grid\" ui-grid=\"gridOptions\" ui-grid-edit></div>\n" +
-    "  <div>\n" +
-    "      <fa-bulk-actions collection-name=\"currentResource.route\" data=\"data\"></fa-bulk-actions>\n" +
+    "  <div  ng-if=\"!fvOptions.noBulk && fvOptions.bulkPosition !== 'top'\">\n" +
+    "      <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
     "  </div>\n" +
     "</section>\n" +
     "");
@@ -972,6 +975,13 @@ angular.module('fortuneAdmin.Controllers', [
           }
         }
       };
+      $scope.options = $scope.options || {};
+
+      for( var opt in $scope.options ) {
+        if( $scope.actions[ opt ] && $scope.options[ opt ] === false ) {
+          delete $scope.actions[ opt ];
+        }
+      }
 
       $scope.applySingleAction = function(iAction, model, data){
         iAction.method([model], false, data);
@@ -1151,7 +1161,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       scope: {
         model: "=ngModel",
         data: "=",
-        collectionName: "="
+        collectionName: "=",
+        options : "="
       },
       link: function(scope){
         scope.setClickCoords = function($event, model, data){
@@ -1177,7 +1188,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       controller: 'faActionsCtrl',
       scope: {
         data: '=',
-        collectionName: '='
+        collectionName: '=',
+        options : "="
       }
     }
   }])
@@ -1276,16 +1288,18 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         data: '=',
         currentResource: '=',
         columns: '=',
-        options: '='
+        options: '=',
+        fvOptions: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
-
+        $scope.fvOptions = $scope.fvOptions || {};
         $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
-            currentResource: $scope.currentResource
+            currentResource: $scope.currentResource,
+            actionsOptions : $scope.fvOptions.actions || {}
           }
         });
         $scope.gridOptions.data = $scope.data;
@@ -1296,19 +1310,18 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           //Creating shallow copy to avoind propagating local changes to parent $scope
           $scope.gridOptions.columnDefs = angular.copy($scope.columns);
 
-          // ID and Actions are required
-          $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          if( !$scope.fvOptions.ignoreIds ) {
+            $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
+          }
+          //Actions are required
           $scope.gridOptions.columnDefs.push({
             name: 'actions',
             enableCellEdit: false,
-            width: 65,
-            cellTemplate: "<fa-actions ng-model='row.entity' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+            width: 68,
+            cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
           });
         }
-      },
-      link: function(scope){
-        console.log('linking faUiGrid');
-     }
+      }
     };
   }])
   .directive('faEditable', [function(){
