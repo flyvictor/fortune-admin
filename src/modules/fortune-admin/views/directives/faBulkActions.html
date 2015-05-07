@@ -1,11 +1,4 @@
-<div class="row">
-    <div class="col-md-3">
-        <h4>Bulk actions</h4>
-    </div>
-    <div class="col-md-6">
-        <select class="form-control" ng-model="actionToRun" ng-options="action as action.name for action in actions | bulkActions"></select>
-    </div>
-    <div class="col-md-3">
-        <button class="btn btn-default" ng-click="applyBulkAction(actionToRun, data)">Apply action to selected items</button>
-    </div>
+<div class="row bulk-actions">
+  <select class="selectpicker" ng-model="actionToRun" ng-options="action as action.name for action in actions | bulkActions"></select>
+  <span class="btn btn-default" ng-disabled="!actionToRun || getSelected().length === 0" ng-click="applyBulkAction(actionToRun, data)">Apply bulk action to selected items</span>
 </div>

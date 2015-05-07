@@ -116,7 +116,7 @@ angular.module('fortuneAdmin.Controllers', [
         iAction.method([model], false, data);
       };
       $scope.applyBulkAction = function(iAction, data){
-        var selected = faActionsService.getSelectedItems($scope.data);
+        var selected = $scope.getSelected();
         iAction.method(selected, true, data);
       };
 
@@ -124,6 +124,10 @@ angular.module('fortuneAdmin.Controllers', [
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;
       });
+      $scope.getSelected = function() {
+        var selected = faActionsService.getSelectedItems($scope.data);
+        return selected;
+      }
   }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;
