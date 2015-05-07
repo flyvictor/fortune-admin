@@ -238,16 +238,9 @@ angular.module("/dist/views/directives/faAlert.html", []).run(["$templateCache",
 
 angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faBulkActions.html",
-    "<div class=\"row\">\n" +
-    "    <div class=\"col-md-3\">\n" +
-    "        <h4>Bulk actions</h4>\n" +
-    "    </div>\n" +
-    "    <div class=\"col-md-6\">\n" +
-    "        <select class=\"form-control\" ng-model=\"actionToRun\" ng-options=\"action as action.name for action in actions | bulkActions\"></select>\n" +
-    "    </div>\n" +
-    "    <div class=\"col-md-3\">\n" +
-    "        <button class=\"btn btn-default\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply action to selected items</button>\n" +
-    "    </div>\n" +
+    "<div class=\"row bulk-actions\">\n" +
+    "  <select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.name for action in actions | bulkActions\"></select>\n" +
+    "  <span class=\"btn btn-default\" ng-disabled=\"!actionToRun || getSelected().length === 0\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply bulk action to selected items</span>\n" +
     "</div>");
 }]);
 
@@ -987,7 +980,7 @@ angular.module('fortuneAdmin.Controllers', [
         iAction.method([model], false, data);
       };
       $scope.applyBulkAction = function(iAction, data){
-        var selected = faActionsService.getSelectedItems($scope.data);
+        var selected = $scope.getSelected();
         iAction.method(selected, true, data);
       };
 
@@ -995,6 +988,10 @@ angular.module('fortuneAdmin.Controllers', [
       angular.forEach(additionalResourceActions, function(action){
         $scope.actions[action.name] = action;
       });
+      $scope.getSelected = function() {
+        var selected = faActionsService.getSelectedItems($scope.data);
+        return selected;
+      }
   }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;
