@@ -1163,13 +1163,14 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       },
       link: function(scope){
         scope.setClickCoords = function($event, model, data){
-          var parentRow = $( $event.target ).parents("div[class*='ui-grid-row']");
-          /* I could not find the reason the 'fixed' position is relative tp the grid
-          ( not even the first relative parent... ), so event.pageY / screenY etc. can't be used,
-          and that calculation of the height is the only solution I could think of */
+          //Current row
+          var el = $( $event.target ).parents("div[class*='ui-grid-row']").eq(0),
+          //Canvas is being offset while scrolling, so we need to take that into account
+              canvas = el.parents("div[class*='ui-grid-canvas']").eq(0);
+
           scope.popupPosition = {
-            'position': 'fixed',
-            'top': _.indexOf( data, model ) * ( parentRow ? parentRow.height() : 0 ) + 'px',
+            position: 'fixed',
+            top  : el.position().top + canvas.position().top + 'px',
             right:  "0px",
             left : "auto",
             'x-index': 100500
