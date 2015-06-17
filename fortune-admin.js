@@ -208,8 +208,8 @@ angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
-    "    <li ng-repeat=\"action in actions | singleActions\">\n" +
-    "      <a ng-click=\"applySingleAction(actions[action.name], model, data)\">{{action.title || action.name}}</a>\n" +
+    "    <li ng-repeat=\"action in actions | singleActions\" ng-class=\"action.getCss(model, data)\">\n" +
+    "      <a ng-click=\"applySingleAction(actions[action.name], model, data)\" >{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +

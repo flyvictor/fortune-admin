@@ -8,8 +8,8 @@
     <span class="sr-only">Toggle Dropdown</span>
   </button>
   <ul class="dropdown-menu" role="menu" ng-style="popupPosition">
-    <li ng-repeat="action in actions | singleActions">
-      <a ng-click="applySingleAction(actions[action.name], model, data)">{{action.title || action.name}}</a>
+    <li ng-repeat="action in actions | singleActions" ng-class="action.getCss(model, data)">
+      <a ng-click="applySingleAction(actions[action.name], model, data)" >{{action.title || action.name}}</a>
     </li>
   </ul>
 </div>
