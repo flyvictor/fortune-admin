@@ -2193,6 +2193,7 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
     .directive('resourcesCanvas', ['$compile', 'UmlElementsRegistry', resourcesCanvas])
     .directive('resourceClass', ['$compile', 'UmlElementsRegistry', resourceClass])
     .directive('resourceProperty', ['$compile', 'UmlElementsRegistry', resourceProperty])
+    .directive('resourceAction', ['$compile', 'UmlElementsRegistry', resourceAction])
     .directive('resourceLink', ['UmlElementsRegistry', resourceLink]);
 
   function resourcesCanvas($compile, UmlElementsRegistry){
@@ -2225,12 +2226,13 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
           //TODO: make an algo that will wisely place every element taking it's links into account
           tempStorage = angular.copy(serviceResources);
           var tallestElt = tempStorage[0]
-            , tallestHeight = Object.keys(tempStorage[0].schema).length
+            , tallestHeight = Object.keys(tempStorage[0].schema).length + Object.keys(tempStorage[0].actions || {}).length
             , tallestIndex = 0;
           angular.forEach(tempStorage, function(resource, index){
-            if (Object.keys(resource.schema).length > tallestHeight){
+            var heightOfResource = Object.keys(resource.schema).length + Object.keys(resource.actions || {}).length;
+              if (heightOfResource > tallestHeight){
               tallestElt = resource;
-              tallestHeight = Object.keys(resource.schema).length;
+              tallestHeight = heightOfResource;
               tallestIndex = index;
             }
           });
@@ -2240,7 +2242,10 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
             //Split resources by services here
             var service = resource.service || 'default';
             schema[service] = schema[service] || [];
-            schema[service][index] = [];
+            schema[service][index] = {
+              properties: [],
+              actions: []
+            };
             resources[service] = resources[service] || {};
             resources[service][index] = {
               name: resource.name,
@@ -2250,15 +2255,26 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
               resources[service][index].pk = resource.modelOptions.pk || 'id';
             }
             angular.forEach(resource.schema, function(fieldParams, fieldName){
-              schema[service][index].push({
+              schema[service][index].properties.push({
                 name: fieldName,
                 params: fieldParams,
                 pk: resources[service][index].pk === fieldName
               });
             });
-            schema[service][index].sort(function(a,b){
-              return a.name > b.name ? 1: -1;
+
+            angular.forEach(resource.actions, function(fieldParams, fieldName){
+              schema[service][index].actions.push({
+                name: fieldParams.name || fieldName,
+                params: fieldParams
+              });
             });
+
+            var comparator = function (a, b) {
+              return a.name > b.name ? 1 : -1;
+            };
+
+            schema[service][index].properties.sort(comparator);
+            schema[service][index].actions.sort(comparator);
           });
         });
         scope.resources = schema;
@@ -2288,7 +2304,8 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
               definePosition(resource, index);
             });
             function definePosition(resource, index){
-              var elementHeight = resource.length * config.fieldHeight + config.headerHeight;
+              var propertiesAndActions = resource.properties.concat(resource.actions);
+              var elementHeight = propertiesAndActions.length * config.fieldHeight + config.headerHeight;
               var coords = getBottom();
 
               var eltPosition = {
@@ -2358,8 +2375,8 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
         var foo = serviceSvg.selectAll('g')
           .data(sch)
           .enter().append('g')
-          .attr('height', function(d){
-            return d.length * config.fieldHeight;
+          .attr('height', function(resource){
+            return resource.actions.concat(resource.properties).length * config.fieldHeight;
           })
           .attr('width', config.fieldWidth)
           .attr('x', 0)
@@ -2372,8 +2389,8 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
           .attr('y', function(d,i){
             return nextPosition(serviceName, i).y;
           })
-          .attr('height', function(d){
-            return d.length * config.fieldHeight + config.headerHeight;
+          .attr('height', function(resource){
+            return (resource.actions.length + resource.properties.length) * config.fieldHeight + config.headerHeight;
           })
           .attr('width', config.fieldWidth)
           .append('xhtml:div')
@@ -2440,38 +2457,56 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
         resource: '='
       },
       link: function(scope, elt){
-        var elementHeight = scope.resource.length * config.fieldHeight;
 
-        //create canvas for rendering fields rectangles
-        var svg = d3.select(elt[0])
-          .append('svg')
-          .attr('width', config.fieldWidth)
-          .attr('height', elementHeight);
+        //renders fields or actions depending on the collection & type you pass.
+        function renderElements(collection, type) {
+          var x = 0;
+          var y = -20;
+          var collectionHeight = collection.length * config.fieldHeight;
+          if (collectionHeight) {
+            var svg = d3.select(elt[0])
+                .append('svg')
+                .attr('width', config.fieldWidth)
+                .attr('height', collectionHeight);
 
-        var x = 0;
-        var y = -20;
+            var directiveToRender = type === 'actions' ? 'resource-action' : 'resource-property';
+            var directiveAttribute = type === 'actions' ? 'action' : 'field';
 
-        //create fields containers
-        var fields = svg.selectAll('g')
-          .data(scope.resource)
-          .enter().append('g')
-          .attr('height', config.fieldHeight)
-          .attr('width', config.fieldWidth)
-          .attr('fill', '#cccccc')
-          .append('foreignObject')
-          .attr('x', x)
-          .attr('y', function(){
-            return y += config.fieldHeight;
-          })
-          .attr('height', config.fieldHeight)
-          .attr('width', config.fieldWidth)
-          .append('xhtml:div')
-          .attr('resource-property', '')
-          .attr('field', function(d, i){
-            return 'resource[' + i + ']';
-          })
-          .attr('class', 'text-center field')
-          .attr('style', 'width: 100%');
+            svg.selectAll('g')
+                .data(collection)
+                .enter().append('g')
+                .attr('height', config.fieldHeight)
+                .attr('width', config.fieldWidth)
+                .attr('fill', '#cccccc')
+                .append('foreignObject')
+                .attr('x', x)
+                .attr('y', function(){
+                  return y += config.fieldHeight;
+                })
+                .attr('height', config.fieldHeight)
+                .attr('width', config.fieldWidth)
+                .append('xhtml:div')
+                .attr(directiveToRender, '')
+                .attr(directiveAttribute, function(d, i){
+                  return 'resource.' + type + '[' + i + ']';
+                })
+                .attr('class', 'text-center ' + type)
+                .attr('style', 'width: 100%');
+
+            y += config.fieldHeight;
+
+            svg.append('line')
+                .attr('x1', x)
+                .attr('y1', y)
+                .attr('x2', x + config.fieldWidth)
+                .attr('y2', y)
+                .attr("stroke-width", 3)
+                .attr("stroke", "black");
+          }
+        }
+
+        renderElements(scope.resource.properties, 'properties');
+        renderElements(scope.resource.actions, 'actions');
 
         elt.removeAttr('resource-class');
         $compile(elt)(scope);
@@ -2566,6 +2601,24 @@ angular.module('fortuneAdmin.Services.inflectPort', [])
         }
 
         elt.removeAttr('resource-property');
+        $compile(elt)(scope);
+      }
+    }
+  }
+
+  function resourceAction($compile, UmlElementsRegistry){
+    return {
+      restrict: 'A',
+      scope: {
+        action: '='
+      },
+      link: function(scope, elt){
+        var portConfig = {
+          width: 10,
+          height: config.fieldHeight
+        };
+        elt.text(scope.action.name + '( )');
+        elt.removeAttr('resource-action');
         $compile(elt)(scope);
       }
     }
