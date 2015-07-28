@@ -1149,7 +1149,7 @@ angular.module('fortuneAdmin.Controllers', [
         }]);
 
 'use strict';
-angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'fortuneAdmin.Filters'])
+angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.pagination', 'fortuneAdmin.Filters'])
   .directive('faActions', [function(){
     return {
       restrict: 'E',
@@ -1311,13 +1311,14 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           if( !$scope.fvOptions.ignoreIds ) {
             $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
           }
-          //Actions are required
-          $scope.gridOptions.columnDefs.push({
-            name: 'actions',
-            enableCellEdit: false,
-            width: 68,
-            cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
-          });
+          if (!$scope.fvOptions.disableActions){
+            $scope.gridOptions.columnDefs.push({
+              name: 'actions',
+              enableCellEdit: false,
+              width: 68,
+              cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
+            });
+          }
         }
       }
     };
