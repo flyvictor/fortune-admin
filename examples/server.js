@@ -29,8 +29,9 @@ var passwordResetEmail = {
 };
 
 var app = fortune({
-  db: 'fortune-admin',
-  namespace: namespace
+  namespace: namespace,
+  connectionString : 'mongodb://localhost:27017/fortune-admin',
+  adapter: "mongodb"
 })
 
 .resource("user", {
@@ -101,6 +102,7 @@ container
   .use('/dist', express.static(path.join(__dirname, '../src/modules/fortune-admin')))
   .use('/dist', express.static(path.join(__dirname, '../src/modules/shared')))
   .use('/dist', express.static(path.join(__dirname , '../bower_components')))
+  .use('/views', express.static(path.join(__dirname, './views')))
   .use('/dist', express.static(path.join(__dirname, './')))
   .use(app.router)
   .listen(port);
