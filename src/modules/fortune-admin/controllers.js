@@ -92,6 +92,7 @@ angular.module('fortuneAdmin.Controllers', [
           method: function(models, isBulk) {
             angular.forEach(models, function(model) {
               var dialog = $modal.open({
+                size : "lg",
                 templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
                 controller: 'DetailsCtrl',
                 resolve: {
