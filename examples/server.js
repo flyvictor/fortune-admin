@@ -13,9 +13,25 @@ var container = express()
   , namespace = '/api/v1'
   , module = 'fortuneAdmin.Standalone';
 
+var passwordResetEmail = {
+  name: 'sendPasswordResetEmail',
+  method: 'POST',
+  config: {
+    configHeader: 'set from init function'
+  },
+  init: function (options) {
+    return function (req, res) {
+      console.log("Sending password reset email");
+
+      res.send(200, 'ok');
+    }
+  }
+};
+
 var app = fortune({
-  db: 'fortune-admin',
-  namespace: namespace
+  namespace: namespace,
+  connectionString : 'mongodb://localhost:27017/fortune-admin',
+  adapter: "mongodb"
 })
 
 .resource("user", {
@@ -36,7 +52,10 @@ var app = fortune({
   }
 }, {
   model: {pk: "email"},
-  "docs:description": 'A user contains the information about different types of users from the system.'
+  "docs:description": 'A user contains the information about different types of users from the system.',
+  actions: {
+    'send-password-reset-email': passwordResetEmail
+  }
 })
 
 .resource("address", {
@@ -45,6 +64,7 @@ var app = fortune({
   addressLine2: { type: String, "docs:example": "Wellfield Road" },
   addressLine3: { type: String, "docs:example": "appt." },
   addressLine4: { type: String, "docs:example": "17" },
+  addressLine5: { type: String, "docs:example": "." },
   city: { type: String, "docs:example": "Newcastle upon Tyne" },
   region: { type: String, "docs:example": "North East" },
   postCode: { type: String, "docs:example": "NE1 AB" },
@@ -82,6 +102,7 @@ container
   .use('/dist', express.static(path.join(__dirname, '../src/modules/fortune-admin')))
   .use('/dist', express.static(path.join(__dirname, '../src/modules/shared')))
   .use('/dist', express.static(path.join(__dirname , '../bower_components')))
+  .use('/views', express.static(path.join(__dirname, './views')))
   .use('/dist', express.static(path.join(__dirname, './')))
   .use(app.router)
   .listen(port);

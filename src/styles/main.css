@@ -26,7 +26,12 @@ svg .pk{
     background-color: #F00;
 }
 
-svg .field{
+svg .properties{
+    border-bottom: dotted 1px;
+}
+
+svg .actions {
+    font-weight: 800;
     border-bottom: dotted 1px;
 }
 svg .ref {
