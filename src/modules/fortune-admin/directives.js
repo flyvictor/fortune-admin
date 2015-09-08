@@ -143,17 +143,21 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       controller: function($scope){
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
         $scope.fvOptions = $scope.fvOptions || {};
+        $scope.fvOptions.actions = $scope.fvOptions.actions || {};
         $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource,
-            actionsOptions : $scope.fvOptions.actions || {}
+            actionsOptions : $scope.fvOptions.actions
           }
         });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
         $scope.gridOptions.enableColumnResizing = true;
 
+        if( $scope.fvOptions.noBulk ) {
+          $scope.fvOptions.actions.noBulk = true;
+        }
         if ($scope.columns) {
           //Creating shallow copy to avoind propagating local changes to parent $scope
           $scope.gridOptions.columnDefs = angular.copy($scope.columns);
@@ -161,13 +165,16 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           if( !$scope.fvOptions.ignoreIds ) {
             $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
           }
+
           if (!$scope.fvOptions.disableActions){
-            $scope.gridOptions.columnDefs.push({
-              name: 'actions',
+            $scope.gridOptions.columnDefs.push(_.extend({
+              name: ' ',
+              enableColumnMenu : false,
               enableCellEdit: false,
-              width: 68,
+              enableSorting : false,
+              width: $scope.fvOptions.noBulk ? 35 : 68,
               cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
-            });
+            }, $scope.fvOptions.actions.colDef || {}));
           }
         }
       }

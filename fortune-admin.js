@@ -199,7 +199,7 @@ angular.module("/dist/views/docs.html", []).run(["$templateCache", function($tem
 angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActions.html",
     "<div class=\"btn-group\" dropdown>\n" +
-    "  <button type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\">\n" +
+    "  <button ng-if=\"!options.noBulk\" type=\"button\" class=\"btn\" ng-class=\"{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}\" ng-click=\"toggleSelection(model)\">\n" +
     "      <span class=\"glyphicon glyphicon-unchecked\" ng-hide=\"isSelected(model)\"></span>\n" +
     "      <span class=\"glyphicon glyphicon-ok\" ng-show=\"isSelected(model)\"></span>\n" +
     "  </button>\n" +
@@ -208,8 +208,8 @@ angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache
     "    <span class=\"sr-only\">Toggle Dropdown</span>\n" +
     "  </button>\n" +
     "  <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
-    "    <li ng-repeat=\"action in actions | singleActions\" ng-class=\"action.getCss(model, data)\">\n" +
-    "      <a ng-click=\"applySingleAction(actions[action.name], model, data)\" >{{action.title || action.name}}</a>\n" +
+    "    <li ng-repeat=\"action in actions | singleActions\" ng-class=\"tempCls = action.getCss(model, data)\">\n" +
+    "      <a ng-click=\"tempCls !== 'disabled' && applySingleAction(actions[action.name], model, data) \" >{{action.title || action.name}}</a>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "</div>\n" +
@@ -239,7 +239,9 @@ angular.module("/dist/views/directives/faAlert.html", []).run(["$templateCache",
 angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faBulkActions.html",
     "<div class=\"row bulk-actions\">\n" +
-    "  <select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.name for action in actions | bulkActions\"></select>\n" +
+    "  <select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.title for action in actions | bulkActions\">\n" +
+    "    <option value=\"\">- Nothing selected -</option>\n" +
+    "  </select>\n" +
     "  <span class=\"btn btn-default\" ng-disabled=\"!actionToRun || getSelected().length === 0\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply bulk action to selected items</span>\n" +
     "</div>");
 }]);
@@ -274,13 +276,8 @@ angular.module("/dist/views/directives/faDetails.html", []).run(["$templateCache
     "  <h1>\n" +
     "    Details\n" +
     "  </h1>\n" +
-    "\n" +
-    "  <div ng-repeat=\"(key, value) in model\" class=\"form-group\">\n" +
-    "    <label>{{key}}</label>\n" +
-    "    <p class=\"form-control-static\">{{value}}</p>\n" +
-    "  </div>\n" +
-    "\n" +
-    "  <div>\n" +
+    "    <pre class=\"form-control-static\">{{model | json}}</pre>\n" +
+    "  <div style=\"text-align : right; margin-top : 10px\">\n" +
     "    <button class=\"btn btn-primary btn-lg\" ng-click=\"close()\">Ok</button>\n" +
     "  <div>\n" +
     "</div>\n" +
@@ -956,6 +953,7 @@ angular.module('fortuneAdmin.Controllers', [
           method: function(models, isBulk) {
             angular.forEach(models, function(model) {
               var dialog = $modal.open({
+                size : "lg",
                 templateUrl: CONFIG.shared.prepareViewTemplateUrl('directives/faDetails'),
                 controller: 'DetailsCtrl',
                 resolve: {
@@ -1293,17 +1291,21 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       controller: function($scope){
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
         $scope.fvOptions = $scope.fvOptions || {};
+        $scope.fvOptions.actions = $scope.fvOptions.actions || {};
         $scope.gridOptions = angular.extend($scope.options, {
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource,
-            actionsOptions : $scope.fvOptions.actions || {}
+            actionsOptions : $scope.fvOptions.actions
           }
         });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
         $scope.gridOptions.enableColumnResizing = true;
 
+        if( $scope.fvOptions.noBulk ) {
+          $scope.fvOptions.actions.noBulk = true;
+        }
         if ($scope.columns) {
           //Creating shallow copy to avoind propagating local changes to parent $scope
           $scope.gridOptions.columnDefs = angular.copy($scope.columns);
@@ -1311,13 +1313,16 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           if( !$scope.fvOptions.ignoreIds ) {
             $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
           }
+
           if (!$scope.fvOptions.disableActions){
-            $scope.gridOptions.columnDefs.push({
-              name: 'actions',
+            $scope.gridOptions.columnDefs.push(_.extend({
+              name: ' ',
+              enableColumnMenu : false,
               enableCellEdit: false,
-              width: 68,
+              enableSorting : false,
+              width: $scope.fvOptions.noBulk ? 35 : 68,
               cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
-            });
+            }, $scope.fvOptions.actions.colDef || {}));
           }
         }
       }

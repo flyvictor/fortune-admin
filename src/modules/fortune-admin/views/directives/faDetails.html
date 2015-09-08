@@ -5,13 +5,8 @@
   <h1>
     Details
   </h1>
-
-  <div ng-repeat="(key, value) in model" class="form-group">
-    <label>{{key}}</label>
-    <p class="form-control-static">{{value}}</p>
-  </div>
-
-  <div>
+    <pre class="form-control-static">{{model | json}}</pre>
+  <div style="text-align : right; margin-top : 10px">
     <button class="btn btn-primary btn-lg" ng-click="close()">Ok</button>
   <div>
 </div>

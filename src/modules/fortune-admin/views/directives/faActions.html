@@ -1,5 +1,5 @@
 <div class="btn-group" dropdown>
-  <button type="button" class="btn" ng-class="{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}" ng-click="toggleSelection(model)">
+  <button ng-if="!options.noBulk" type="button" class="btn" ng-class="{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}" ng-click="toggleSelection(model)">
       <span class="glyphicon glyphicon-unchecked" ng-hide="isSelected(model)"></span>
       <span class="glyphicon glyphicon-ok" ng-show="isSelected(model)"></span>
   </button>
@@ -8,8 +8,8 @@
     <span class="sr-only">Toggle Dropdown</span>
   </button>
   <ul class="dropdown-menu" role="menu" ng-style="popupPosition">
-    <li ng-repeat="action in actions | singleActions" ng-class="action.getCss(model, data)">
-      <a ng-click="applySingleAction(actions[action.name], model, data)" >{{action.title || action.name}}</a>
+    <li ng-repeat="action in actions | singleActions" ng-class="tempCls = action.getCss(model, data)">
+      <a ng-click="tempCls !== 'disabled' && applySingleAction(actions[action.name], model, data) " >{{action.title || action.name}}</a>
     </li>
   </ul>
 </div>
