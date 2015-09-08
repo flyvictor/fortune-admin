@@ -1,4 +1,6 @@
 <div class="row bulk-actions">
-  <select class="selectpicker" ng-model="actionToRun" ng-options="action as action.name for action in actions | bulkActions"></select>
+  <select class="selectpicker" ng-model="actionToRun" ng-options="action as action.title for action in actions | bulkActions">
+    <option value="">- Nothing selected -</option>
+  </select>
   <span class="btn btn-default" ng-disabled="!actionToRun || getSelected().length === 0" ng-click="applyBulkAction(actionToRun, data)">Apply bulk action to selected items</span>
 </div>
