@@ -2228,7 +2228,7 @@ angular.module('xeditable').factory('editableThemes', function() {
 
 !function() {
   var d3 = {
-    version: "3.4.13"
+    version: "3.4.8"
   };
   if (!Date.now) Date.now = function() {
     return +new Date();
@@ -2306,27 +2306,24 @@ angular.module('xeditable').factory('editableThemes', function() {
     }
     return [ a, c ];
   };
-  function d3_number(x) {
-    return x === null ? NaN : +x;
-  }
-  function d3_numeric(x) {
-    return !isNaN(x);
-  }
   d3.sum = function(array, f) {
     var s = 0, n = array.length, a, i = -1;
     if (arguments.length === 1) {
-      while (++i < n) if (d3_numeric(a = +array[i])) s += a;
+      while (++i < n) if (!isNaN(a = +array[i])) s += a;
     } else {
-      while (++i < n) if (d3_numeric(a = +f.call(array, array[i], i))) s += a;
+      while (++i < n) if (!isNaN(a = +f.call(array, array[i], i))) s += a;
     }
     return s;
   };
+  function d3_number(x) {
+    return x != null && !isNaN(x);
+  }
   d3.mean = function(array, f) {
     var s = 0, n = array.length, a, i = -1, j = n;
     if (arguments.length === 1) {
-      while (++i < n) if (d3_numeric(a = d3_number(array[i]))) s += a; else --j;
+      while (++i < n) if (d3_number(a = array[i])) s += a; else --j;
     } else {
-      while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) s += a; else --j;
+      while (++i < n) if (d3_number(a = f.call(array, array[i], i))) s += a; else --j;
     }
     return j ? s / j : undefined;
   };
@@ -2335,13 +2332,9 @@ angular.module('xeditable').factory('editableThemes', function() {
     return e ? v + e * (values[h] - v) : v;
   };
   d3.median = function(array, f) {
-    var numbers = [], n = array.length, a, i = -1;
-    if (arguments.length === 1) {
-      while (++i < n) if (d3_numeric(a = d3_number(array[i]))) numbers.push(a);
-    } else {
-      while (++i < n) if (d3_numeric(a = d3_number(f.call(array, array[i], i)))) numbers.push(a);
-    }
-    return numbers.length ? d3.quantile(numbers.sort(d3_ascending), .5) : undefined;
+    if (arguments.length > 1) array = array.map(f);
+    array = array.filter(d3_number);
+    return array.length ? d3.quantile(array.sort(d3_ascending), .5) : undefined;
   };
   function d3_bisector(compare) {
     return {
@@ -2458,11 +2451,15 @@ angular.module('xeditable').factory('editableThemes', function() {
     return k;
   }
   function d3_class(ctor, properties) {
-    for (var key in properties) {
-      Object.defineProperty(ctor.prototype, key, {
-        value: properties[key],
-        enumerable: false
-      });
+    try {
+      for (var key in properties) {
+        Object.defineProperty(ctor.prototype, key, {
+          value: properties[key],
+          enumerable: false
+        });
+      }
+    } catch (e) {
+      ctor.prototype = properties;
     }
   }
   d3.map = function(object) {
@@ -2472,63 +2469,62 @@ angular.module('xeditable').factory('editableThemes', function() {
     }); else for (var key in object) map.set(key, object[key]);
     return map;
   };
-  function d3_Map() {
-    this._ = Object.create(null);
-  }
-  var d3_map_proto = "__proto__", d3_map_zero = "\x00";
+  function d3_Map() {}
   d3_class(d3_Map, {
     has: d3_map_has,
     get: function(key) {
-      return this._[d3_map_escape(key)];
+      return this[d3_map_prefix + key];
     },
     set: function(key, value) {
-      return this._[d3_map_escape(key)] = value;
+      return this[d3_map_prefix + key] = value;
     },
     remove: d3_map_remove,
     keys: d3_map_keys,
     values: function() {
       var values = [];
-      for (var key in this._) values.push(this._[key]);
+      this.forEach(function(key, value) {
+        values.push(value);
+      });
       return values;
     },
     entries: function() {
       var entries = [];
-      for (var key in this._) entries.push({
-        key: d3_map_unescape(key),
-        value: this._[key]
+      this.forEach(function(key, value) {
+        entries.push({
+          key: key,
+          value: value
+        });
       });
       return entries;
     },
     size: d3_map_size,
     empty: d3_map_empty,
     forEach: function(f) {
-      for (var key in this._) f.call(this, d3_map_unescape(key), this._[key]);
+      for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) f.call(this, key.substring(1), this[key]);
     }
   });
-  function d3_map_escape(key) {
-    return (key += "") === d3_map_proto || key[0] === d3_map_zero ? d3_map_zero + key : key;
-  }
-  function d3_map_unescape(key) {
-    return (key += "")[0] === d3_map_zero ? key.slice(1) : key;
-  }
+  var d3_map_prefix = "\x00", d3_map_prefixCode = d3_map_prefix.charCodeAt(0);
   function d3_map_has(key) {
-    return d3_map_escape(key) in this._;
+    return d3_map_prefix + key in this;
   }
   function d3_map_remove(key) {
-    return (key = d3_map_escape(key)) in this._ && delete this._[key];
+    key = d3_map_prefix + key;
+    return key in this && delete this[key];
   }
   function d3_map_keys() {
     var keys = [];
-    for (var key in this._) keys.push(d3_map_unescape(key));
+    this.forEach(function(key) {
+      keys.push(key);
+    });
     return keys;
   }
   function d3_map_size() {
     var size = 0;
-    for (var key in this._) ++size;
+    for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) ++size;
     return size;
   }
   function d3_map_empty() {
-    for (var key in this._) return false;
+    for (var key in this) if (key.charCodeAt(0) === d3_map_prefixCode) return false;
     return true;
   }
   d3.nest = function() {
@@ -2599,21 +2595,22 @@ angular.module('xeditable').factory('editableThemes', function() {
     if (array) for (var i = 0, n = array.length; i < n; ++i) set.add(array[i]);
     return set;
   };
-  function d3_Set() {
-    this._ = Object.create(null);
-  }
+  function d3_Set() {}
   d3_class(d3_Set, {
     has: d3_map_has,
-    add: function(key) {
-      this._[d3_map_escape(key += "")] = true;
-      return key;
+    add: function(value) {
+      this[d3_map_prefix + value] = true;
+      return value;
     },
-    remove: d3_map_remove,
+    remove: function(value) {
+      value = d3_map_prefix + value;
+      return value in this && delete this[value];
+    },
     values: d3_map_keys,
     size: d3_map_size,
     empty: d3_map_empty,
     forEach: function(f) {
-      for (var key in this._) f.call(this, d3_map_unescape(key));
+      for (var value in this) if (value.charCodeAt(0) === d3_map_prefixCode) f.call(this, value.substring(1));
     }
   });
   d3.behavior = {};
@@ -2630,7 +2627,7 @@ angular.module('xeditable').factory('editableThemes', function() {
   }
   function d3_vendorSymbol(object, name) {
     if (name in object) return name;
-    name = name.charAt(0).toUpperCase() + name.slice(1);
+    name = name.charAt(0).toUpperCase() + name.substring(1);
     for (var i = 0, n = d3_vendorPrefixes.length; i < n; ++i) {
       var prefixName = d3_vendorPrefixes[i] + name;
       if (prefixName in object) return prefixName;
@@ -2647,8 +2644,8 @@ angular.module('xeditable').factory('editableThemes', function() {
   d3_dispatch.prototype.on = function(type, listener) {
     var i = type.indexOf("."), name = "";
     if (i >= 0) {
-      name = type.slice(i + 1);
-      type = type.slice(0, i);
+      name = type.substring(i + 1);
+      type = type.substring(0, i);
     }
     if (type) return arguments.length < 2 ? this[type].on(name) : this[type].on(name, listener);
     if (arguments.length === 2) {
@@ -2723,7 +2720,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     return n.querySelector(s);
   }, d3_selectAll = function(s, n) {
     return n.querySelectorAll(s);
-  }, d3_selectMatcher = d3_documentElement.matches || d3_documentElement[d3_vendorSymbol(d3_documentElement, "matchesSelector")], d3_selectMatches = function(n, s) {
+  }, d3_selectMatcher = d3_documentElement[d3_vendorSymbol(d3_documentElement, "matchesSelector")], d3_selectMatches = function(n, s) {
     return d3_selectMatcher.call(n, s);
   };
   if (typeof Sizzle === "function") {
@@ -2789,8 +2786,8 @@ angular.module('xeditable').factory('editableThemes', function() {
     qualify: function(name) {
       var i = name.indexOf(":"), prefix = name;
       if (i >= 0) {
-        prefix = name.slice(0, i);
-        name = name.slice(i + 1);
+        prefix = name.substring(0, i);
+        name = name.substring(i + 1);
       }
       return d3_nsPrefix.hasOwnProperty(prefix) ? {
         space: d3_nsPrefix[prefix],
@@ -2858,7 +2855,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     return new RegExp("(?:^|\\s+)" + d3.requote(name) + "(?:\\s+|$)", "g");
   }
   function d3_selection_classes(name) {
-    return (name + "").trim().split(/^|\s+/);
+    return name.trim().split(/^|\s+/);
   }
   function d3_selection_classed(name, value) {
     name = d3_selection_classes(name).map(d3_selection_classedName);
@@ -2993,26 +2990,29 @@ angular.module('xeditable').factory('editableThemes', function() {
     function bind(group, groupData) {
       var i, n = group.length, m = groupData.length, n0 = Math.min(n, m), updateNodes = new Array(m), enterNodes = new Array(m), exitNodes = new Array(n), node, nodeData;
       if (key) {
-        var nodeByKeyValue = new d3_Map(), keyValues = new Array(n), keyValue;
+        var nodeByKeyValue = new d3_Map(), dataByKeyValue = new d3_Map(), keyValues = [], keyValue;
         for (i = -1; ++i < n; ) {
-          if (nodeByKeyValue.has(keyValue = key.call(node = group[i], node.__data__, i))) {
+          keyValue = key.call(node = group[i], node.__data__, i);
+          if (nodeByKeyValue.has(keyValue)) {
             exitNodes[i] = node;
           } else {
             nodeByKeyValue.set(keyValue, node);
           }
-          keyValues[i] = keyValue;
+          keyValues.push(keyValue);
         }
         for (i = -1; ++i < m; ) {
-          if (!(node = nodeByKeyValue.get(keyValue = key.call(groupData, nodeData = groupData[i], i)))) {
-            enterNodes[i] = d3_selection_dataNode(nodeData);
-          } else if (node !== true) {
+          keyValue = key.call(groupData, nodeData = groupData[i], i);
+          if (node = nodeByKeyValue.get(keyValue)) {
             updateNodes[i] = node;
             node.__data__ = nodeData;
+          } else if (!dataByKeyValue.has(keyValue)) {
+            enterNodes[i] = d3_selection_dataNode(nodeData);
           }
-          nodeByKeyValue.set(keyValue, true);
+          dataByKeyValue.set(keyValue, nodeData);
+          nodeByKeyValue.remove(keyValue);
         }
         for (i = -1; ++i < n; ) {
-          if (nodeByKeyValue.get(keyValues[i]) !== true) {
+          if (nodeByKeyValue.has(keyValues[i])) {
             exitNodes[i] = group[i];
           }
         }
@@ -3139,7 +3139,7 @@ angular.module('xeditable').factory('editableThemes', function() {
   };
   d3_selectionPrototype.size = function() {
     var n = 0;
-    d3_selection_each(this, function() {
+    this.each(function() {
       ++n;
     });
     return n;
@@ -3236,7 +3236,7 @@ angular.module('xeditable').factory('editableThemes', function() {
   };
   function d3_selection_on(type, listener, capture) {
     var name = "__on" + type, i = type.indexOf("."), wrap = d3_selection_onListener;
-    if (i > 0) type = type.slice(0, i);
+    if (i > 0) type = type.substring(0, i);
     var filter = d3_selection_onFilters.get(type);
     if (filter) type = filter, wrap = d3_selection_onFilter;
     function onRemove() {
@@ -3317,40 +3317,25 @@ angular.module('xeditable').factory('editableThemes', function() {
   d3.mouse = function(container) {
     return d3_mousePoint(container, d3_eventSource());
   };
-  var d3_mouse_bug44083 = /WebKit/.test(d3_window.navigator.userAgent) ? -1 : 0;
   function d3_mousePoint(container, e) {
     if (e.changedTouches) e = e.changedTouches[0];
     var svg = container.ownerSVGElement || container;
     if (svg.createSVGPoint) {
       var point = svg.createSVGPoint();
-      if (d3_mouse_bug44083 < 0 && (d3_window.scrollX || d3_window.scrollY)) {
-        svg = d3.select("body").append("svg").style({
-          position: "absolute",
-          top: 0,
-          left: 0,
-          margin: 0,
-          padding: 0,
-          border: "none"
-        }, "important");
-        var ctm = svg[0][0].getScreenCTM();
-        d3_mouse_bug44083 = !(ctm.f || ctm.e);
-        svg.remove();
-      }
-      if (d3_mouse_bug44083) point.x = e.pageX, point.y = e.pageY; else point.x = e.clientX, 
-      point.y = e.clientY;
+      point.x = e.clientX, point.y = e.clientY;
       point = point.matrixTransform(container.getScreenCTM().inverse());
       return [ point.x, point.y ];
     }
     var rect = container.getBoundingClientRect();
     return [ e.clientX - rect.left - container.clientLeft, e.clientY - rect.top - container.clientTop ];
   }
-  d3.touch = function(container, touches, identifier) {
-    if (arguments.length < 3) identifier = touches, touches = d3_eventSource().changedTouches;
-    if (touches) for (var i = 0, n = touches.length, touch; i < n; ++i) {
-      if ((touch = touches[i]).identifier === identifier) {
-        return d3_mousePoint(container, touch);
-      }
-    }
+  d3.touches = function(container, touches) {
+    if (arguments.length < 2) touches = d3_eventSource().touches;
+    return touches ? d3_array(touches).map(function(touch) {
+      var point = d3_mousePoint(container, touch);
+      point.identifier = touch.identifier;
+      return point;
+    }) : [];
   };
   d3.behavior.drag = function() {
     var event = d3_eventDispatch(drag, "drag", "dragstart", "dragend"), origin = null, mousedown = dragstart(d3_noop, d3.mouse, d3_behavior_dragMouseSubject, "mousemove", "mouseup"), touchstart = dragstart(d3_behavior_dragTouchId, d3.touch, d3_behavior_dragTouchSubject, "touchmove", "touchend");
@@ -3410,14 +3395,6 @@ angular.module('xeditable').factory('editableThemes', function() {
   function d3_behavior_dragMouseSubject() {
     return d3_window;
   }
-  d3.touches = function(container, touches) {
-    if (arguments.length < 2) touches = d3_eventSource().touches;
-    return touches ? d3_array(touches).map(function(touch) {
-      var point = d3_mousePoint(container, touch);
-      point.identifier = touch.identifier;
-      return point;
-    }) : [];
-  };
   var π = Math.PI, τ = 2 * π, halfπ = π / 2, ε = 1e-6, ε2 = ε * ε, d3_radians = π / 180, d3_degrees = 180 / π;
   function d3_sgn(x) {
     return x > 0 ? 1 : x < 0 ? -1 : 0;
@@ -3463,9 +3440,9 @@ angular.module('xeditable').factory('editableThemes', function() {
       x: 0,
       y: 0,
       k: 1
-    }, translate0, center0, center, size = [ 960, 500 ], scaleExtent = d3_behavior_zoomInfinity, mousedown = "mousedown.zoom", mousemove = "mousemove.zoom", mouseup = "mouseup.zoom", mousewheelTimer, touchstart = "touchstart.zoom", touchtime, event = d3_eventDispatch(zoom, "zoomstart", "zoom", "zoomend"), x0, x1, y0, y1;
+    }, translate0, center, size = [ 960, 500 ], scaleExtent = d3_behavior_zoomInfinity, mousedown = "mousedown.zoom", mousemove = "mousemove.zoom", mouseup = "mouseup.zoom", mousewheelTimer, touchstart = "touchstart.zoom", touchtime, event = d3_eventDispatch(zoom, "zoomstart", "zoom", "zoomend"), x0, x1, y0, y1;
     function zoom(g) {
-      g.on(mousedown, mousedowned).on(d3_behavior_zoomWheel + ".zoom", mousewheeled).on("dblclick.zoom", dblclicked).on(touchstart, touchstarted);
+      g.on(mousedown, mousedowned).on(d3_behavior_zoomWheel + ".zoom", mousewheeled).on(mousemove, mousewheelreset).on("dblclick.zoom", dblclicked).on(touchstart, touchstarted);
     }
     zoom.event = function(g) {
       g.each(function() {
@@ -3607,17 +3584,16 @@ angular.module('xeditable').factory('editableThemes', function() {
         zoomed(dispatch);
       }
       function ended() {
-        subject.on(mousemove, null).on(mouseup, null);
+        subject.on(mousemove, d3_window === that ? mousewheelreset : null).on(mouseup, null);
         dragRestore(dragged && d3.event.target === target);
         zoomended(dispatch);
       }
     }
     function touchstarted() {
-      var that = this, dispatch = event.of(that, arguments), locations0 = {}, distance0 = 0, scale0, zoomName = ".zoom-" + d3.event.changedTouches[0].identifier, touchmove = "touchmove" + zoomName, touchend = "touchend" + zoomName, targets = [], subject = d3.select(that), dragRestore = d3_event_dragSuppress();
+      var that = this, dispatch = event.of(that, arguments), locations0 = {}, distance0 = 0, scale0, zoomName = ".zoom-" + d3.event.changedTouches[0].identifier, touchmove = "touchmove" + zoomName, touchend = "touchend" + zoomName, targets = [], subject = d3.select(that).on(mousedown, null).on(touchstart, started), dragRestore = d3_event_dragSuppress();
       d3_selection_interrupt.call(that);
       started();
       zoomstarted(dispatch);
-      subject.on(mousedown, null).on(touchstart, started);
       function relocate() {
         var touches = d3.touches(that);
         scale0 = view.k;
@@ -3686,16 +3662,21 @@ angular.module('xeditable').factory('editableThemes', function() {
     }
     function mousewheeled() {
       var dispatch = event.of(this, arguments);
-      if (mousewheelTimer) clearTimeout(mousewheelTimer); else translate0 = location(center0 = center || d3.mouse(this)), 
-      d3_selection_interrupt.call(this), zoomstarted(dispatch);
+      if (mousewheelTimer) clearTimeout(mousewheelTimer); else d3_selection_interrupt.call(this), 
+      zoomstarted(dispatch);
       mousewheelTimer = setTimeout(function() {
         mousewheelTimer = null;
         zoomended(dispatch);
       }, 50);
       d3_eventPreventDefault();
+      var point = center || d3.mouse(this);
+      if (!translate0) translate0 = location(point);
       scaleTo(Math.pow(2, d3_behavior_zoomDelta() * .002) * view.k);
-      translateTo(center0, translate0);
+      translateTo(point, translate0);
       zoomed(dispatch);
+    }
+    function mousewheelreset() {
+      translate0 = null;
     }
     function dblclicked() {
       var dispatch = event.of(this, arguments), p = d3.mouse(this), l = location(p), k = Math.log(view.k) / Math.LN2;
@@ -3715,23 +3696,29 @@ angular.module('xeditable').factory('editableThemes', function() {
   }, "mousewheel") : (d3_behavior_zoomDelta = function() {
     return -d3.event.detail;
   }, "MozMousePixelScroll");
-  d3.color = d3_color;
-  function d3_color() {}
-  d3_color.prototype.toString = function() {
+  function d3_Color() {}
+  d3_Color.prototype.toString = function() {
     return this.rgb() + "";
   };
-  d3.hsl = d3_hsl;
+  d3.hsl = function(h, s, l) {
+    return arguments.length === 1 ? h instanceof d3_Hsl ? d3_hsl(h.h, h.s, h.l) : d3_rgb_parse("" + h, d3_rgb_hsl, d3_hsl) : d3_hsl(+h, +s, +l);
+  };
   function d3_hsl(h, s, l) {
-    return this instanceof d3_hsl ? void (this.h = +h, this.s = +s, this.l = +l) : arguments.length < 2 ? h instanceof d3_hsl ? new d3_hsl(h.h, h.s, h.l) : d3_rgb_parse("" + h, d3_rgb_hsl, d3_hsl) : new d3_hsl(h, s, l);
+    return new d3_Hsl(h, s, l);
   }
-  var d3_hslPrototype = d3_hsl.prototype = new d3_color();
+  function d3_Hsl(h, s, l) {
+    this.h = h;
+    this.s = s;
+    this.l = l;
+  }
+  var d3_hslPrototype = d3_Hsl.prototype = new d3_Color();
   d3_hslPrototype.brighter = function(k) {
     k = Math.pow(.7, arguments.length ? k : 1);
-    return new d3_hsl(this.h, this.s, this.l / k);
+    return d3_hsl(this.h, this.s, this.l / k);
   };
   d3_hslPrototype.darker = function(k) {
     k = Math.pow(.7, arguments.length ? k : 1);
-    return new d3_hsl(this.h, this.s, k * this.l);
+    return d3_hsl(this.h, this.s, k * this.l);
   };
   d3_hslPrototype.rgb = function() {
     return d3_hsl_rgb(this.h, this.s, this.l);
@@ -3753,18 +3740,25 @@ angular.module('xeditable').factory('editableThemes', function() {
     function vv(h) {
       return Math.round(v(h) * 255);
     }
-    return new d3_rgb(vv(h + 120), vv(h), vv(h - 120));
+    return d3_rgb(vv(h + 120), vv(h), vv(h - 120));
   }
-  d3.hcl = d3_hcl;
+  d3.hcl = function(h, c, l) {
+    return arguments.length === 1 ? h instanceof d3_Hcl ? d3_hcl(h.h, h.c, h.l) : h instanceof d3_Lab ? d3_lab_hcl(h.l, h.a, h.b) : d3_lab_hcl((h = d3_rgb_lab((h = d3.rgb(h)).r, h.g, h.b)).l, h.a, h.b) : d3_hcl(+h, +c, +l);
+  };
   function d3_hcl(h, c, l) {
-    return this instanceof d3_hcl ? void (this.h = +h, this.c = +c, this.l = +l) : arguments.length < 2 ? h instanceof d3_hcl ? new d3_hcl(h.h, h.c, h.l) : h instanceof d3_lab ? d3_lab_hcl(h.l, h.a, h.b) : d3_lab_hcl((h = d3_rgb_lab((h = d3.rgb(h)).r, h.g, h.b)).l, h.a, h.b) : new d3_hcl(h, c, l);
+    return new d3_Hcl(h, c, l);
   }
-  var d3_hclPrototype = d3_hcl.prototype = new d3_color();
+  function d3_Hcl(h, c, l) {
+    this.h = h;
+    this.c = c;
+    this.l = l;
+  }
+  var d3_hclPrototype = d3_Hcl.prototype = new d3_Color();
   d3_hclPrototype.brighter = function(k) {
-    return new d3_hcl(this.h, this.c, Math.min(100, this.l + d3_lab_K * (arguments.length ? k : 1)));
+    return d3_hcl(this.h, this.c, Math.min(100, this.l + d3_lab_K * (arguments.length ? k : 1)));
   };
   d3_hclPrototype.darker = function(k) {
-    return new d3_hcl(this.h, this.c, Math.max(0, this.l - d3_lab_K * (arguments.length ? k : 1)));
+    return d3_hcl(this.h, this.c, Math.max(0, this.l - d3_lab_K * (arguments.length ? k : 1)));
   };
   d3_hclPrototype.rgb = function() {
     return d3_hcl_lab(this.h, this.c, this.l).rgb();
@@ -3772,20 +3766,27 @@ angular.module('xeditable').factory('editableThemes', function() {
   function d3_hcl_lab(h, c, l) {
     if (isNaN(h)) h = 0;
     if (isNaN(c)) c = 0;
-    return new d3_lab(l, Math.cos(h *= d3_radians) * c, Math.sin(h) * c);
+    return d3_lab(l, Math.cos(h *= d3_radians) * c, Math.sin(h) * c);
   }
-  d3.lab = d3_lab;
+  d3.lab = function(l, a, b) {
+    return arguments.length === 1 ? l instanceof d3_Lab ? d3_lab(l.l, l.a, l.b) : l instanceof d3_Hcl ? d3_hcl_lab(l.l, l.c, l.h) : d3_rgb_lab((l = d3.rgb(l)).r, l.g, l.b) : d3_lab(+l, +a, +b);
+  };
   function d3_lab(l, a, b) {
-    return this instanceof d3_lab ? void (this.l = +l, this.a = +a, this.b = +b) : arguments.length < 2 ? l instanceof d3_lab ? new d3_lab(l.l, l.a, l.b) : l instanceof d3_hcl ? d3_hcl_lab(l.h, l.c, l.l) : d3_rgb_lab((l = d3_rgb(l)).r, l.g, l.b) : new d3_lab(l, a, b);
+    return new d3_Lab(l, a, b);
+  }
+  function d3_Lab(l, a, b) {
+    this.l = l;
+    this.a = a;
+    this.b = b;
   }
   var d3_lab_K = 18;
   var d3_lab_X = .95047, d3_lab_Y = 1, d3_lab_Z = 1.08883;
-  var d3_labPrototype = d3_lab.prototype = new d3_color();
+  var d3_labPrototype = d3_Lab.prototype = new d3_Color();
   d3_labPrototype.brighter = function(k) {
-    return new d3_lab(Math.min(100, this.l + d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
+    return d3_lab(Math.min(100, this.l + d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
   };
   d3_labPrototype.darker = function(k) {
-    return new d3_lab(Math.max(0, this.l - d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
+    return d3_lab(Math.max(0, this.l - d3_lab_K * (arguments.length ? k : 1)), this.a, this.b);
   };
   d3_labPrototype.rgb = function() {
     return d3_lab_rgb(this.l, this.a, this.b);
@@ -3795,10 +3796,10 @@ angular.module('xeditable').factory('editableThemes', function() {
     x = d3_lab_xyz(x) * d3_lab_X;
     y = d3_lab_xyz(y) * d3_lab_Y;
     z = d3_lab_xyz(z) * d3_lab_Z;
-    return new d3_rgb(d3_xyz_rgb(3.2404542 * x - 1.5371385 * y - .4985314 * z), d3_xyz_rgb(-.969266 * x + 1.8760108 * y + .041556 * z), d3_xyz_rgb(.0556434 * x - .2040259 * y + 1.0572252 * z));
+    return d3_rgb(d3_xyz_rgb(3.2404542 * x - 1.5371385 * y - .4985314 * z), d3_xyz_rgb(-.969266 * x + 1.8760108 * y + .041556 * z), d3_xyz_rgb(.0556434 * x - .2040259 * y + 1.0572252 * z));
   }
   function d3_lab_hcl(l, a, b) {
-    return l > 0 ? new d3_hcl(Math.atan2(b, a) * d3_degrees, Math.sqrt(a * a + b * b), l) : new d3_hcl(NaN, NaN, l);
+    return l > 0 ? d3_hcl(Math.atan2(b, a) * d3_degrees, Math.sqrt(a * a + b * b), l) : d3_hcl(NaN, NaN, l);
   }
   function d3_lab_xyz(x) {
     return x > .206893034 ? x * x * x : (x - 4 / 29) / 7.787037;
@@ -3809,29 +3810,36 @@ angular.module('xeditable').factory('editableThemes', function() {
   function d3_xyz_rgb(r) {
     return Math.round(255 * (r <= .00304 ? 12.92 * r : 1.055 * Math.pow(r, 1 / 2.4) - .055));
   }
-  d3.rgb = d3_rgb;
-  function d3_rgb(r, g, b) {
-    return this instanceof d3_rgb ? void (this.r = ~~r, this.g = ~~g, this.b = ~~b) : arguments.length < 2 ? r instanceof d3_rgb ? new d3_rgb(r.r, r.g, r.b) : d3_rgb_parse("" + r, d3_rgb, d3_hsl_rgb) : new d3_rgb(r, g, b);
-  }
+  d3.rgb = function(r, g, b) {
+    return arguments.length === 1 ? r instanceof d3_Rgb ? d3_rgb(r.r, r.g, r.b) : d3_rgb_parse("" + r, d3_rgb, d3_hsl_rgb) : d3_rgb(~~r, ~~g, ~~b);
+  };
   function d3_rgbNumber(value) {
-    return new d3_rgb(value >> 16, value >> 8 & 255, value & 255);
+    return d3_rgb(value >> 16, value >> 8 & 255, value & 255);
   }
   function d3_rgbString(value) {
     return d3_rgbNumber(value) + "";
   }
-  var d3_rgbPrototype = d3_rgb.prototype = new d3_color();
+  function d3_rgb(r, g, b) {
+    return new d3_Rgb(r, g, b);
+  }
+  function d3_Rgb(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+  var d3_rgbPrototype = d3_Rgb.prototype = new d3_Color();
   d3_rgbPrototype.brighter = function(k) {
     k = Math.pow(.7, arguments.length ? k : 1);
     var r = this.r, g = this.g, b = this.b, i = 30;
-    if (!r && !g && !b) return new d3_rgb(i, i, i);
+    if (!r && !g && !b) return d3_rgb(i, i, i);
     if (r && r < i) r = i;
     if (g && g < i) g = i;
     if (b && b < i) b = i;
-    return new d3_rgb(Math.min(255, r / k), Math.min(255, g / k), Math.min(255, b / k));
+    return d3_rgb(Math.min(255, ~~(r / k)), Math.min(255, ~~(g / k)), Math.min(255, ~~(b / k)));
   };
   d3_rgbPrototype.darker = function(k) {
     k = Math.pow(.7, arguments.length ? k : 1);
-    return new d3_rgb(k * this.r, k * this.g, k * this.b);
+    return d3_rgb(~~(k * this.r), ~~(k * this.g), ~~(k * this.b));
   };
   d3_rgbPrototype.hsl = function() {
     return d3_rgb_hsl(this.r, this.g, this.b);
@@ -3860,7 +3868,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       }
     }
     if (color = d3_rgb_names.get(format)) return rgb(color.r, color.g, color.b);
-    if (format != null && format.charAt(0) === "#" && !isNaN(color = parseInt(format.slice(1), 16))) {
+    if (format != null && format.charAt(0) === "#" && !isNaN(color = parseInt(format.substring(1), 16))) {
       if (format.length === 4) {
         r = (color & 3840) >> 4;
         r = r >> 4 | r;
@@ -3886,7 +3894,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       h = NaN;
       s = l > 0 && l < 1 ? 0 : h;
     }
-    return new d3_hsl(h, s, l);
+    return d3_hsl(h, s, l);
   }
   function d3_rgb_lab(r, g, b) {
     r = d3_rgb_xyz(r);
@@ -4079,7 +4087,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     };
     function respond() {
       var status = request.status, result;
-      if (!status && d3_xhrHasResponse(request) || status >= 200 && status < 300 || status === 304) {
+      if (!status && request.responseText || status >= 200 && status < 300 || status === 304) {
         try {
           result = response.call(xhr, request);
         } catch (e) {
@@ -4151,10 +4159,6 @@ angular.module('xeditable').factory('editableThemes', function() {
       callback(error == null ? request : null);
     } : callback;
   }
-  function d3_xhrHasResponse(request) {
-    var type = request.responseType;
-    return type && type !== "text" ? request.response : request.responseText;
-  }
   d3.dsv = function(delimiter, mimeType) {
     var reFormat = new RegExp('["' + delimiter + "\n]"), delimiterCode = delimiter.charCodeAt(0);
     function dsv(url, row, callback) {
@@ -4207,7 +4211,7 @@ angular.module('xeditable').factory('editableThemes', function() {
           } else if (c === 10) {
             eol = true;
           }
-          return text.slice(j + 1, i).replace(/""/g, '"');
+          return text.substring(j + 1, i).replace(/""/g, '"');
         }
         while (I < N) {
           var c = text.charCodeAt(I++), k = 1;
@@ -4215,9 +4219,9 @@ angular.module('xeditable').factory('editableThemes', function() {
             eol = true;
             if (text.charCodeAt(I) === 10) ++I, ++k;
           } else if (c !== delimiterCode) continue;
-          return text.slice(j, I - k);
+          return text.substring(j, I - k);
         }
-        return text.slice(j);
+        return text.substring(j);
       }
       while ((t = token()) !== EOF) {
         var a = [];
@@ -4225,7 +4229,7 @@ angular.module('xeditable').factory('editableThemes', function() {
           a.push(t);
           t = token();
         }
-        if (f && (a = f(a, n++)) == null) continue;
+        if (f && !(a = f(a, n++))) continue;
         rows.push(a);
       }
       return rows;
@@ -4259,6 +4263,14 @@ angular.module('xeditable').factory('editableThemes', function() {
   };
   d3.csv = d3.dsv(",", "text/csv");
   d3.tsv = d3.dsv("	", "text/tab-separated-values");
+  d3.touch = function(container, touches, identifier) {
+    if (arguments.length < 3) identifier = touches, touches = d3_eventSource().changedTouches;
+    if (touches) for (var i = 0, n = touches.length, touch; i < n; ++i) {
+      if ((touch = touches[i]).identifier === identifier) {
+        return d3_mousePoint(container, touch);
+      }
+    }
+  };
   var d3_timer_queueHead, d3_timer_queueTail, d3_timer_interval, d3_timer_timeout, d3_timer_active, d3_timer_frame = d3_window[d3_vendorSymbol(d3_window, "requestAnimationFrame")] || function(callback) {
     setTimeout(callback, 17);
   };
@@ -4348,22 +4360,21 @@ angular.module('xeditable').factory('editableThemes', function() {
     };
   }
   function d3_locale_numberFormat(locale) {
-    var locale_decimal = locale.decimal, locale_thousands = locale.thousands, locale_grouping = locale.grouping, locale_currency = locale.currency, formatGroup = locale_grouping && locale_thousands ? function(value, width) {
-      var i = value.length, t = [], j = 0, g = locale_grouping[0], length = 0;
+    var locale_decimal = locale.decimal, locale_thousands = locale.thousands, locale_grouping = locale.grouping, locale_currency = locale.currency, formatGroup = locale_grouping ? function(value) {
+      var i = value.length, t = [], j = 0, g = locale_grouping[0];
       while (i > 0 && g > 0) {
-        if (length + g + 1 > width) g = Math.max(1, width - length);
         t.push(value.substring(i -= g, i + g));
-        if ((length += g + 1) > width) break;
         g = locale_grouping[j = (j + 1) % locale_grouping.length];
       }
       return t.reverse().join(locale_thousands);
     } : d3_identity;
     return function(specifier) {
-      var match = d3_format_re.exec(specifier), fill = match[1] || " ", align = match[2] || ">", sign = match[3] || "-", symbol = match[4] || "", zfill = match[5], width = +match[6], comma = match[7], precision = match[8], type = match[9], scale = 1, prefix = "", suffix = "", integer = false, exponent = true;
+      var match = d3_format_re.exec(specifier), fill = match[1] || " ", align = match[2] || ">", sign = match[3] || "", symbol = match[4] || "", zfill = match[5], width = +match[6], comma = match[7], precision = match[8], type = match[9], scale = 1, prefix = "", suffix = "", integer = false;
       if (precision) precision = +precision.substring(1);
       if (zfill || fill === "0" && align === "=") {
         zfill = fill = "0";
         align = "=";
+        if (comma) width -= Math.floor((width - 1) / 4);
       }
       switch (type) {
        case "n":
@@ -4390,8 +4401,6 @@ angular.module('xeditable').factory('editableThemes', function() {
         if (symbol === "#") prefix = "0" + type.toLowerCase();
 
        case "c":
-        exponent = false;
-
        case "d":
         integer = true;
         precision = 0;
@@ -4412,7 +4421,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       return function(value) {
         var fullSuffix = suffix;
         if (integer && value % 1) return "";
-        var negative = value < 0 || value === 0 && 1 / value < 0 ? (value = -value, "-") : sign === "-" ? "" : sign;
+        var negative = value < 0 || value === 0 && 1 / value < 0 ? (value = -value, "-") : sign;
         if (scale < 0) {
           var unit = d3.formatPrefix(value, precision);
           value = unit.scale(value);
@@ -4421,17 +4430,10 @@ angular.module('xeditable').factory('editableThemes', function() {
           value *= scale;
         }
         value = type(value, precision);
-        var i = value.lastIndexOf("."), before, after;
-        if (i < 0) {
-          var j = exponent ? value.lastIndexOf("e") : -1;
-          if (j < 0) before = value, after = ""; else before = value.substring(0, j), after = value.substring(j);
-        } else {
-          before = value.substring(0, i);
-          after = locale_decimal + value.substring(i + 1);
-        }
-        if (!zfill && comma) before = formatGroup(before, Infinity);
+        var i = value.lastIndexOf("."), before = i < 0 ? value : value.substring(0, i), after = i < 0 ? "" : locale_decimal + value.substring(i + 1);
+        if (!zfill && comma) before = formatGroup(before);
         var length = prefix.length + before.length + after.length + (zcomma ? 0 : negative.length), padding = length < width ? new Array(length = width - length + 1).join(fill) : "";
-        if (zcomma) before = formatGroup(padding + before, padding.length ? width - after.length : Infinity);
+        if (zcomma) before = formatGroup(padding + before);
         negative += prefix;
         value = before + after;
         return (align === "<" ? negative + value + padding : align === ">" ? padding + negative + value : align === "^" ? padding.substring(0, length >>= 1) + negative + value + padding.substring(length) : negative + (zcomma ? value : padding + value)) + fullSuffix;
@@ -4654,14 +4656,14 @@ angular.module('xeditable').factory('editableThemes', function() {
         var string = [], i = -1, j = 0, c, p, f;
         while (++i < n) {
           if (template.charCodeAt(i) === 37) {
-            string.push(template.slice(j, i));
+            string.push(template.substring(j, i));
             if ((p = d3_time_formatPads[c = template.charAt(++i)]) != null) c = template.charAt(++i);
             if (f = d3_time_formats[c]) c = f(date, p == null ? c === "e" ? " " : "0" : p);
             string.push(c);
             j = i + 1;
           }
         }
-        string.push(template.slice(j, i));
+        string.push(template.substring(j, i));
         return string.join("");
       }
       format.parse = function(string) {
@@ -4682,7 +4684,7 @@ angular.module('xeditable').factory('editableThemes', function() {
           date.setFullYear(d.y, 0, 1);
           date.setFullYear(d.y, 0, "W" in d ? (d.w + 6) % 7 + d.W * 7 - (date.getDay() + 5) % 7 : d.w + d.U * 7 - (date.getDay() + 6) % 7);
         } else date.setFullYear(d.y, d.m, d.d);
-        date.setHours(d.H + (d.Z / 100 | 0), d.M + d.Z % 100, d.S, d.L);
+        date.setHours(d.H + Math.floor(d.Z / 100), d.M + d.Z % 100, d.S, d.L);
         return localZ ? date._ : date;
       };
       format.toString = function() {
@@ -4828,22 +4830,22 @@ angular.module('xeditable').factory('editableThemes', function() {
     };
     function d3_time_parseWeekdayAbbrev(date, string, i) {
       d3_time_dayAbbrevRe.lastIndex = 0;
-      var n = d3_time_dayAbbrevRe.exec(string.slice(i));
+      var n = d3_time_dayAbbrevRe.exec(string.substring(i));
       return n ? (date.w = d3_time_dayAbbrevLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
     }
     function d3_time_parseWeekday(date, string, i) {
       d3_time_dayRe.lastIndex = 0;
-      var n = d3_time_dayRe.exec(string.slice(i));
+      var n = d3_time_dayRe.exec(string.substring(i));
       return n ? (date.w = d3_time_dayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
     }
     function d3_time_parseMonthAbbrev(date, string, i) {
       d3_time_monthAbbrevRe.lastIndex = 0;
-      var n = d3_time_monthAbbrevRe.exec(string.slice(i));
+      var n = d3_time_monthAbbrevRe.exec(string.substring(i));
       return n ? (date.m = d3_time_monthAbbrevLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
     }
     function d3_time_parseMonth(date, string, i) {
       d3_time_monthRe.lastIndex = 0;
-      var n = d3_time_monthRe.exec(string.slice(i));
+      var n = d3_time_monthRe.exec(string.substring(i));
       return n ? (date.m = d3_time_monthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
     }
     function d3_time_parseLocaleFull(date, string, i) {
@@ -4856,7 +4858,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       return d3_time_parse(date, d3_time_formats.X.toString(), string, i);
     }
     function d3_time_parseAmPm(date, string, i) {
-      var n = d3_time_periodLookup.get(string.slice(i, i += 2).toLowerCase());
+      var n = d3_time_periodLookup.get(string.substring(i, i += 2).toLowerCase());
       return n == null ? -1 : (date.p = n, i);
     }
     return d3_time_format;
@@ -4880,31 +4882,31 @@ angular.module('xeditable').factory('editableThemes', function() {
   }
   function d3_time_parseWeekdayNumber(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 1));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 1));
     return n ? (date.w = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseWeekNumberSunday(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i));
+    var n = d3_time_numberRe.exec(string.substring(i));
     return n ? (date.U = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseWeekNumberMonday(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i));
+    var n = d3_time_numberRe.exec(string.substring(i));
     return n ? (date.W = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseFullYear(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 4));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 4));
     return n ? (date.y = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseYear(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.y = d3_time_expandYear(+n[0]), i + n[0].length) : -1;
   }
   function d3_time_parseZone(date, string, i) {
-    return /^[+-]\d{4}$/.test(string = string.slice(i, i + 5)) ? (date.Z = -string, 
+    return /^[+-]\d{4}$/.test(string = string.substring(i, i + 5)) ? (date.Z = -string, 
     i + 5) : -1;
   }
   function d3_time_expandYear(d) {
@@ -4912,46 +4914,46 @@ angular.module('xeditable').factory('editableThemes', function() {
   }
   function d3_time_parseMonthNumber(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.m = n[0] - 1, i + n[0].length) : -1;
   }
   function d3_time_parseDay(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.d = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseDayOfYear(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 3));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 3));
     return n ? (date.j = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseHour24(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.H = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseMinutes(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.M = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseSeconds(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 2));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 2));
     return n ? (date.S = +n[0], i + n[0].length) : -1;
   }
   function d3_time_parseMilliseconds(date, string, i) {
     d3_time_numberRe.lastIndex = 0;
-    var n = d3_time_numberRe.exec(string.slice(i, i + 3));
+    var n = d3_time_numberRe.exec(string.substring(i, i + 3));
     return n ? (date.L = +n[0], i + n[0].length) : -1;
   }
   function d3_time_zone(d) {
-    var z = d.getTimezoneOffset(), zs = z > 0 ? "-" : "+", zh = abs(z) / 60 | 0, zm = abs(z) % 60;
+    var z = d.getTimezoneOffset(), zs = z > 0 ? "-" : "+", zh = ~~(abs(z) / 60), zm = abs(z) % 60;
     return zs + d3_time_formatPad(zh, "0", 2) + d3_time_formatPad(zm, "0", 2);
   }
   function d3_time_parseLiteralPercent(date, string, i) {
     d3_time_percentRe.lastIndex = 0;
-    var n = d3_time_percentRe.exec(string.slice(i, i + 1));
+    var n = d3_time_percentRe.exec(string.substring(i, i + 1));
     return n ? i + n[0].length : -1;
   }
   function d3_time_formatMulti(formats) {
@@ -5559,6 +5561,35 @@ angular.module('xeditable').factory('editableThemes', function() {
   function d3_geo_clipSort(a, b) {
     return ((a = a.x)[0] < 0 ? a[1] - halfπ - ε : halfπ - a[1]) - ((b = b.x)[0] < 0 ? b[1] - halfπ - ε : halfπ - b[1]);
   }
+  function d3_geo_pointInPolygon(point, polygon) {
+    var meridian = point[0], parallel = point[1], meridianNormal = [ Math.sin(meridian), -Math.cos(meridian), 0 ], polarAngle = 0, winding = 0;
+    d3_geo_areaRingSum.reset();
+    for (var i = 0, n = polygon.length; i < n; ++i) {
+      var ring = polygon[i], m = ring.length;
+      if (!m) continue;
+      var point0 = ring[0], λ0 = point0[0], φ0 = point0[1] / 2 + π / 4, sinφ0 = Math.sin(φ0), cosφ0 = Math.cos(φ0), j = 1;
+      while (true) {
+        if (j === m) j = 0;
+        point = ring[j];
+        var λ = point[0], φ = point[1] / 2 + π / 4, sinφ = Math.sin(φ), cosφ = Math.cos(φ), dλ = λ - λ0, sdλ = dλ >= 0 ? 1 : -1, adλ = sdλ * dλ, antimeridian = adλ > π, k = sinφ0 * sinφ;
+        d3_geo_areaRingSum.add(Math.atan2(k * sdλ * Math.sin(adλ), cosφ0 * cosφ + k * Math.cos(adλ)));
+        polarAngle += antimeridian ? dλ + sdλ * τ : dλ;
+        if (antimeridian ^ λ0 >= meridian ^ λ >= meridian) {
+          var arc = d3_geo_cartesianCross(d3_geo_cartesian(point0), d3_geo_cartesian(point));
+          d3_geo_cartesianNormalize(arc);
+          var intersection = d3_geo_cartesianCross(meridianNormal, arc);
+          d3_geo_cartesianNormalize(intersection);
+          var φarc = (antimeridian ^ dλ >= 0 ? -1 : 1) * d3_asin(intersection[2]);
+          if (parallel > φarc || parallel === φarc && (arc[0] || arc[1])) {
+            winding += antimeridian ^ dλ >= 0 ? 1 : -1;
+          }
+        }
+        if (!j++) break;
+        λ0 = λ, sinφ0 = sinφ, cosφ0 = cosφ, point0 = point;
+      }
+    }
+    return (polarAngle < -ε || polarAngle < ε && d3_geo_areaRingSum < 0) ^ winding & 1;
+  }
   var d3_geo_clipAntimeridian = d3_geo_clip(d3_true, d3_geo_clipAntimeridianLine, d3_geo_clipAntimeridianInterpolate, [ -π, -π / 2 ]);
   function d3_geo_clipAntimeridianLine(listener) {
     var λ0 = NaN, φ0 = NaN, sλ0 = NaN, clean;
@@ -5625,35 +5656,6 @@ angular.module('xeditable').factory('editableThemes', function() {
     } else {
       listener.point(to[0], to[1]);
     }
-  }
-  function d3_geo_pointInPolygon(point, polygon) {
-    var meridian = point[0], parallel = point[1], meridianNormal = [ Math.sin(meridian), -Math.cos(meridian), 0 ], polarAngle = 0, winding = 0;
-    d3_geo_areaRingSum.reset();
-    for (var i = 0, n = polygon.length; i < n; ++i) {
-      var ring = polygon[i], m = ring.length;
-      if (!m) continue;
-      var point0 = ring[0], λ0 = point0[0], φ0 = point0[1] / 2 + π / 4, sinφ0 = Math.sin(φ0), cosφ0 = Math.cos(φ0), j = 1;
-      while (true) {
-        if (j === m) j = 0;
-        point = ring[j];
-        var λ = point[0], φ = point[1] / 2 + π / 4, sinφ = Math.sin(φ), cosφ = Math.cos(φ), dλ = λ - λ0, sdλ = dλ >= 0 ? 1 : -1, adλ = sdλ * dλ, antimeridian = adλ > π, k = sinφ0 * sinφ;
-        d3_geo_areaRingSum.add(Math.atan2(k * sdλ * Math.sin(adλ), cosφ0 * cosφ + k * Math.cos(adλ)));
-        polarAngle += antimeridian ? dλ + sdλ * τ : dλ;
-        if (antimeridian ^ λ0 >= meridian ^ λ >= meridian) {
-          var arc = d3_geo_cartesianCross(d3_geo_cartesian(point0), d3_geo_cartesian(point));
-          d3_geo_cartesianNormalize(arc);
-          var intersection = d3_geo_cartesianCross(meridianNormal, arc);
-          d3_geo_cartesianNormalize(intersection);
-          var φarc = (antimeridian ^ dλ >= 0 ? -1 : 1) * d3_asin(intersection[2]);
-          if (parallel > φarc || parallel === φarc && (arc[0] || arc[1])) {
-            winding += antimeridian ^ dλ >= 0 ? 1 : -1;
-          }
-        }
-        if (!j++) break;
-        λ0 = λ, sinφ0 = sinφ, cosφ0 = cosφ, point0 = point;
-      }
-    }
-    return (polarAngle < -ε || polarAngle < ε && d3_geo_areaRingSum < 0) ^ winding & 1;
   }
   function d3_geo_clipCircle(radius) {
     var cr = Math.cos(radius), smallRadius = cr > 0, notHemisphere = abs(cr) > ε, interpolate = d3_geo_circleInterpolate(radius, 6 * d3_radians);
@@ -6923,13 +6925,13 @@ angular.module('xeditable').factory('editableThemes', function() {
   (d3.geo.transverseMercator = function() {
     var projection = d3_geo_mercatorProjection(d3_geo_transverseMercator), center = projection.center, rotate = projection.rotate;
     projection.center = function(_) {
-      return _ ? center([ -_[1], _[0] ]) : (_ = center(), [ _[1], -_[0] ]);
+      return _ ? center([ -_[1], _[0] ]) : (_ = center(), [ -_[1], _[0] ]);
     };
     projection.rotate = function(_) {
       return _ ? rotate([ _[0], _[1], _.length > 2 ? _[2] + 90 : 90 ]) : (_ = rotate(), 
       [ _[0], _[1], _[2] - 90 ]);
     };
-    return rotate([ 0, 0, 90 ]);
+    return projection.rotate([ 0, 0 ]);
   }).raw = d3_geo_transverseMercator;
   d3.geom = {};
   function d3_geom_pointX(d) {
@@ -7843,9 +7845,9 @@ angular.module('xeditable').factory('editableThemes', function() {
   }
   d3.interpolateNumber = d3_interpolateNumber;
   function d3_interpolateNumber(a, b) {
-    a = +a, b = +b;
+    b -= a = +a;
     return function(t) {
-      return a * (1 - t) + b * t;
+      return a + b * t;
     };
   }
   d3.interpolateString = d3_interpolateString;
@@ -7854,7 +7856,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     a = a + "", b = b + "";
     while ((am = d3_interpolate_numberA.exec(a)) && (bm = d3_interpolate_numberB.exec(b))) {
       if ((bs = bm.index) > bi) {
-        bs = b.slice(bi, bs);
+        bs = b.substring(bi, bs);
         if (s[i]) s[i] += bs; else s[++i] = bs;
       }
       if ((am = am[0]) === (bm = bm[0])) {
@@ -7869,7 +7871,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       bi = d3_interpolate_numberB.lastIndex;
     }
     if (bi < b.length) {
-      bs = b.slice(bi);
+      bs = b.substring(bi);
       if (s[i]) s[i] += bs; else s[++i] = bs;
     }
     return s.length < 2 ? q[0] ? (b = q[0].x, function(t) {
@@ -7890,7 +7892,7 @@ angular.module('xeditable').factory('editableThemes', function() {
   }
   d3.interpolators = [ function(a, b) {
     var t = typeof b;
-    return (t === "string" ? d3_rgb_names.has(b) || /^(#|rgb\(|hsl\()/.test(b) ? d3_interpolateRgb : d3_interpolateString : b instanceof d3_color ? d3_interpolateRgb : Array.isArray(b) ? d3_interpolateArray : t === "object" && isNaN(b) ? d3_interpolateObject : d3_interpolateNumber)(a, b);
+    return (t === "string" ? d3_rgb_names.has(b) || /^(#|rgb\(|hsl\()/.test(b) ? d3_interpolateRgb : d3_interpolateString : b instanceof d3_Color ? d3_interpolateRgb : Array.isArray(b) ? d3_interpolateArray : t === "object" && isNaN(b) ? d3_interpolateObject : d3_interpolateNumber)(a, b);
   } ];
   d3.interpolateArray = d3_interpolateArray;
   function d3_interpolateArray(a, b) {
@@ -7939,7 +7941,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     }
   });
   d3.ease = function(name) {
-    var i = name.indexOf("-"), t = i >= 0 ? name.slice(0, i) : name, m = i >= 0 ? name.slice(i + 1) : "in";
+    var i = name.indexOf("-"), t = i >= 0 ? name.substring(0, i) : name, m = i >= 0 ? name.substring(i + 1) : "in";
     t = d3_ease.get(t) || d3_ease_default;
     m = d3_ease_mode.get(m) || d3_identity;
     return d3_ease_clamp(m(t.apply(null, d3_arraySlice.call(arguments, 1))));
@@ -8144,15 +8146,15 @@ angular.module('xeditable').factory('editableThemes', function() {
     };
   }
   function d3_uninterpolateNumber(a, b) {
-    b = (b -= a = +a) || 1 / b;
+    b = b - (a = +a) ? 1 / (b - a) : 0;
     return function(x) {
-      return (x - a) / b;
+      return (x - a) * b;
     };
   }
   function d3_uninterpolateClamp(a, b) {
-    b = (b -= a = +a) || 1 / b;
+    b = b - (a = +a) ? 1 / (b - a) : 0;
     return function(x) {
-      return Math.max(0, Math.min(1, (x - a) / b));
+      return Math.max(0, Math.min(1, (x - a) * b));
     };
   }
   d3.layout = {};
@@ -8754,7 +8756,6 @@ angular.module('xeditable').factory('editableThemes', function() {
   d3.layout.stack = function() {
     var values = d3_identity, order = d3_layout_stackOrderDefault, offset = d3_layout_stackOffsetZero, out = d3_layout_stackOut, x = d3_layout_stackX, y = d3_layout_stackY;
     function stack(data, index) {
-      if (!(n = data.length)) return data;
       var series = data.map(function(d, i) {
         return values.call(stack, d, i);
       });
@@ -8767,7 +8768,7 @@ angular.module('xeditable').factory('editableThemes', function() {
       series = d3.permute(series, orders);
       points = d3.permute(points, orders);
       var offsets = offset.call(stack, points, index);
-      var m = series[0].length, n, i, j, o;
+      var n = series.length, m = series[0].length, i, j, o;
       for (j = 0; j < m; ++j) {
         out.call(stack, series[0][j], o = offsets[j], points[0][j][1]);
         for (i = 1; i < n; ++i) {
@@ -9922,7 +9923,7 @@ angular.module('xeditable').factory('editableThemes', function() {
     }
     scale.domain = function(x) {
       if (!arguments.length) return domain;
-      domain = x.map(d3_number).filter(d3_numeric).sort(d3_ascending);
+      domain = x.filter(d3_number).sort(d3_ascending);
       return rescale();
     };
     scale.range = function(x) {
@@ -10871,25 +10872,61 @@ angular.module('xeditable').factory('editableThemes', function() {
       g.each(function() {
         var g = d3.select(this);
         var scale0 = this.__chart__ || scale, scale1 = this.__chart__ = scale.copy();
-        var ticks = tickValues == null ? scale1.ticks ? scale1.ticks.apply(scale1, tickArguments_) : scale1.domain() : tickValues, tickFormat = tickFormat_ == null ? scale1.tickFormat ? scale1.tickFormat.apply(scale1, tickArguments_) : d3_identity : tickFormat_, tick = g.selectAll(".tick").data(ticks, scale1), tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", ε), tickExit = d3.transition(tick.exit()).style("opacity", ε).remove(), tickUpdate = d3.transition(tick.order()).style("opacity", 1), tickSpacing = Math.max(innerTickSize, 0) + tickPadding, tickTransform;
+        var ticks = tickValues == null ? scale1.ticks ? scale1.ticks.apply(scale1, tickArguments_) : scale1.domain() : tickValues, tickFormat = tickFormat_ == null ? scale1.tickFormat ? scale1.tickFormat.apply(scale1, tickArguments_) : d3_identity : tickFormat_, tick = g.selectAll(".tick").data(ticks, scale1), tickEnter = tick.enter().insert("g", ".domain").attr("class", "tick").style("opacity", ε), tickExit = d3.transition(tick.exit()).style("opacity", ε).remove(), tickUpdate = d3.transition(tick.order()).style("opacity", 1), tickTransform;
         var range = d3_scaleRange(scale1), path = g.selectAll(".domain").data([ 0 ]), pathUpdate = (path.enter().append("path").attr("class", "domain"), 
         d3.transition(path));
         tickEnter.append("line");
         tickEnter.append("text");
-        var lineEnter = tickEnter.select("line"), lineUpdate = tickUpdate.select("line"), text = tick.select("text").text(tickFormat), textEnter = tickEnter.select("text"), textUpdate = tickUpdate.select("text"), sign = orient === "top" || orient === "left" ? -1 : 1, x1, x2, y1, y2;
-        if (orient === "bottom" || orient === "top") {
-          tickTransform = d3_svg_axisX, x1 = "x", y1 = "y", x2 = "x2", y2 = "y2";
-          text.attr("dy", sign < 0 ? "0em" : ".71em").style("text-anchor", "middle");
-          pathUpdate.attr("d", "M" + range[0] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize);
-        } else {
-          tickTransform = d3_svg_axisY, x1 = "y", y1 = "x", x2 = "y2", y2 = "x2";
-          text.attr("dy", ".32em").style("text-anchor", sign < 0 ? "end" : "start");
-          pathUpdate.attr("d", "M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize);
+        var lineEnter = tickEnter.select("line"), lineUpdate = tickUpdate.select("line"), text = tick.select("text").text(tickFormat), textEnter = tickEnter.select("text"), textUpdate = tickUpdate.select("text");
+        switch (orient) {
+         case "bottom":
+          {
+            tickTransform = d3_svg_axisX;
+            lineEnter.attr("y2", innerTickSize);
+            textEnter.attr("y", Math.max(innerTickSize, 0) + tickPadding);
+            lineUpdate.attr("x2", 0).attr("y2", innerTickSize);
+            textUpdate.attr("x", 0).attr("y", Math.max(innerTickSize, 0) + tickPadding);
+            text.attr("dy", ".71em").style("text-anchor", "middle");
+            pathUpdate.attr("d", "M" + range[0] + "," + outerTickSize + "V0H" + range[1] + "V" + outerTickSize);
+            break;
+          }
+
+         case "top":
+          {
+            tickTransform = d3_svg_axisX;
+            lineEnter.attr("y2", -innerTickSize);
+            textEnter.attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
+            lineUpdate.attr("x2", 0).attr("y2", -innerTickSize);
+            textUpdate.attr("x", 0).attr("y", -(Math.max(innerTickSize, 0) + tickPadding));
+            text.attr("dy", "0em").style("text-anchor", "middle");
+            pathUpdate.attr("d", "M" + range[0] + "," + -outerTickSize + "V0H" + range[1] + "V" + -outerTickSize);
+            break;
+          }
+
+         case "left":
+          {
+            tickTransform = d3_svg_axisY;
+            lineEnter.attr("x2", -innerTickSize);
+            textEnter.attr("x", -(Math.max(innerTickSize, 0) + tickPadding));
+            lineUpdate.attr("x2", -innerTickSize).attr("y2", 0);
+            textUpdate.attr("x", -(Math.max(innerTickSize, 0) + tickPadding)).attr("y", 0);
+            text.attr("dy", ".32em").style("text-anchor", "end");
+            pathUpdate.attr("d", "M" + -outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + -outerTickSize);
+            break;
+          }
+
+         case "right":
+          {
+            tickTransform = d3_svg_axisY;
+            lineEnter.attr("x2", innerTickSize);
+            textEnter.attr("x", Math.max(innerTickSize, 0) + tickPadding);
+            lineUpdate.attr("x2", innerTickSize).attr("y2", 0);
+            textUpdate.attr("x", Math.max(innerTickSize, 0) + tickPadding).attr("y", 0);
+            text.attr("dy", ".32em").style("text-anchor", "start");
+            pathUpdate.attr("d", "M" + outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + outerTickSize);
+            break;
+          }
         }
-        lineEnter.attr(y2, sign * innerTickSize);
-        textEnter.attr(y1, sign * tickSpacing);
-        lineUpdate.attr(x2, 0).attr(y2, sign * innerTickSize);
-        textUpdate.attr(x1, 0).attr(y1, sign * tickSpacing);
         if (scale1.rangeBand) {
           var x = scale1, dx = x.rangeBand() / 2;
           scale0 = scale1 = function(d) {
@@ -10898,10 +10935,10 @@ angular.module('xeditable').factory('editableThemes', function() {
         } else if (scale0.rangeBand) {
           scale0 = scale1;
         } else {
-          tickExit.call(tickTransform, scale1, scale0);
+          tickExit.call(tickTransform, scale1);
         }
-        tickEnter.call(tickTransform, scale0, scale1);
-        tickUpdate.call(tickTransform, scale1, scale1);
+        tickEnter.call(tickTransform, scale0);
+        tickUpdate.call(tickTransform, scale1);
       });
     }
     axis.scale = function(x) {
@@ -10962,16 +10999,14 @@ angular.module('xeditable').factory('editableThemes', function() {
     bottom: 1,
     left: 1
   };
-  function d3_svg_axisX(selection, x0, x1) {
+  function d3_svg_axisX(selection, x) {
     selection.attr("transform", function(d) {
-      var v0 = x0(d);
-      return "translate(" + (isFinite(v0) ? v0 : x1(d)) + ",0)";
+      return "translate(" + x(d) + ",0)";
     });
   }
-  function d3_svg_axisY(selection, y0, y1) {
+  function d3_svg_axisY(selection, y) {
     selection.attr("transform", function(d) {
-      var v0 = y0(d);
-      return "translate(0," + (isFinite(v0) ? v0 : y1(d)) + ")";
+      return "translate(0," + y(d) + ")";
     });
   }
   d3.svg.brush = function() {
@@ -11438,11 +11473,16 @@ angular.module('xeditable').factory('editableThemes', function() {
   d3.xml = d3_xhrType(function(request) {
     return request.responseXML;
   });
-  if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
-  this.d3 = d3;
+  if (typeof define === "function" && define.amd) {
+    define(d3);
+  } else if (typeof module === "object" && module.exports) {
+    module.exports = d3;
+  } else {
+    this.d3 = d3;
+  }
 }();
 /*!
- * ui-grid - v3.0.7 - 2015-10-06
+ * ui-grid - v3.0.6 - 2015-09-08
  * Copyright (c) 2015 ; License: MIT 
  */
 
@@ -14605,12 +14645,9 @@ angular.module('ui.grid')
         }
         
         if (newData) {
-          // columns length is greater than the number of row header columns, which don't count because they're created automatically
-          var hasColumns = self.grid.columns.length > (self.grid.rowHeaderColumns ? self.grid.rowHeaderColumns.length : 0);
-
           if (
-            // If we have no columns
-            !hasColumns &&
+            // If we have no columns (i.e. columns length is either 0 or equal to the number of row header columns, which don't count because they're created automatically)
+            self.grid.columns.length === (self.grid.rowHeaderColumns ? self.grid.rowHeaderColumns.length : 0) &&
             // ... and we don't have a ui-grid-columns attribute, which would define columns for us
             !$attrs.uiGridColumns &&
             // ... and we have no pre-defined columns
@@ -14622,8 +14659,8 @@ angular.module('ui.grid')
             self.grid.buildColumnDefsFromData(newData);
           }
 
-          // If we haven't built columns before and either have some columns defined or some data defined
-          if (!hasColumns && (self.grid.options.columnDefs.length > 0 || newData.length > 0)) {
+          // If we either have some columns defined, or some data defined
+          if (self.grid.options.columnDefs.length > 0 || newData.length > 0) {
             // Build the column set, then pre-compile the column cell templates
             promises.push(self.grid.buildColumns()
               .then(function() {
@@ -16028,7 +16065,6 @@ angular.module('ui.grid')
    * @methodOf ui.grid.class:Grid
    * @description creates or removes GridRow objects from the newRawData array.  Calls each registered
    * rowBuilder to further process the row
-   * @param {array} newRawData Modified set of data
    *
    * This method aims to achieve three things:
    * 1. the resulting rows array is in the same order as the newRawData, we'll call
@@ -16049,20 +16085,9 @@ angular.module('ui.grid')
    *     create newRow
    *   append to the newRows and add to newHash
    *   run the processors
-   * ```
-   * 
+   *
    * Rows are identified using the hashKey if configured.  If not configured, then rows
    * are identified using the gridOptions.rowEquality function
-   * 
-   * This method is useful when trying to select rows immediately after loading data without
-   * using a $timeout/$interval, e.g.:
-   * 
-   *   $scope.gridOptions.data =  someData;
-   *   $scope.gridApi.grid.modifyRows($scope.gridOptions.data);
-   *   $scope.gridApi.selection.selectRow($scope.gridOptions.data[0]);
-   * 
-   * OR to persist row selection after data update (e.g. rows selected, new data loaded, want
-   * originally selected rows to be re-selected))
    */
   Grid.prototype.modifyRows = function modifyRows(newRawData) {
     var self = this;
@@ -16896,8 +16921,7 @@ angular.module('ui.grid')
    * Emits the sortChanged event whenever the sort criteria are changed.
    * @param {GridColumn} column Column to set the sorting on
    * @param {uiGridConstants.ASC|uiGridConstants.DESC} [direction] Direction to sort by, either descending or ascending.
-   *   If not provided, the column will iterate through the sort directions
-   *   specified in the {@link ui.grid.class:GridOptions.columnDef#sortDirectionCycle sortDirectionCycle} attribute.
+   *   If not provided, the column will iterate through the sort directions: ascending, descending, unsorted.
    * @param {boolean} [add] Add this column to the sorting. If not provided or set to `false`, the Grid will reset any existing sorting and sort
    *   by this column only
    * @returns {Promise} A resolved promise that supplies the column.
@@ -16931,20 +16955,19 @@ angular.module('ui.grid')
     }
 
     if (!direction) {
-      // Find the current position in the cycle (or -1).
-      var i = column.sortDirectionCycle.indexOf(column.sort.direction ? column.sort.direction : null);
-      // Proceed to the next position in the cycle (or start at the beginning).
-      i = (i+1) % column.sortDirectionCycle.length;
-      // If suppressRemoveSort is set, and the next position in the cycle would
-      // remove the sort, skip it.
-      if (column.colDef && column.suppressRemoveSort && !column.sortDirectionCycle[i]) {
-        i = (i+1) % column.sortDirectionCycle.length;
+      // Figure out the sort direction
+      if (column.sort.direction && column.sort.direction === uiGridConstants.ASC) {
+        column.sort.direction = uiGridConstants.DESC;
       }
-
-      if (column.sortDirectionCycle[i]) {
-        column.sort.direction = column.sortDirectionCycle[i];
-      } else {
-        column.sort = {};
+      else if (column.sort.direction && column.sort.direction === uiGridConstants.DESC) {
+        if ( column.colDef && column.suppressRemoveSort ){
+          column.sort.direction = uiGridConstants.ASC;
+        } else {
+          column.sort = {};
+        }
+      }
+      else {
+        column.sort.direction = uiGridConstants.ASC;
       }
     }
     else {
@@ -17273,7 +17296,7 @@ angular.module('ui.grid')
       //}
 
       // The right position is the current X scroll position minus the grid width
-      var rightBound = self.renderContainers.body.prevScrollLeft + Math.ceil(self.renderContainers.body.getViewportWidth());
+      var rightBound = self.renderContainers.body.prevScrollLeft + Math.ceil(self.gridWidth);
 
       // If there's a vertical scrollbar, subtract it from the right boundary or we'll allow it to obscure cells
       //if (self.verticalScrollbarWidth) {
@@ -17950,7 +17973,7 @@ angular.module('ui.grid')
    * @propertyOf ui.grid.class:GridColumn
    * @description Filter on this column.
    * @example
-   * <pre>{ term: 'text', condition: uiGridConstants.filter.STARTS_WITH, placeholder: 'type to filter...', ariaLabel: 'Filter for text', flags: { caseSensitive: false }, type: uiGridConstants.filter.SELECT, [ { value: 1, label: 'male' }, { value: 2, label: 'female' } ] }</pre>
+   * <pre>{ term: 'text', condition: uiGridConstants.filter.STARTS_WITH, placeholder: 'type to filter...', ariaLabel: 'Filter for text, flags: { caseSensitive: false }, type: uiGridConstants.filter.SELECT, [ { value: 1, label: 'male' }, { value: 2, label: 'female' } ] }</pre>
    *
    */
 
@@ -18146,7 +18169,7 @@ angular.module('ui.grid')
    *
    */
 
- /**
+    /**
   * @ngdoc property
   * @name sort
   * @propertyOf ui.grid.class:GridOptions.columnDef
@@ -18172,10 +18195,18 @@ angular.module('ui.grid')
   /**
    * @ngdoc property
    * @name sortingAlgorithm
+   * @propertyOf ui.grid.class:GridColumn
+   * @description Algorithm to use for sorting this column. Takes 'a' and 'b' parameters
+   * like any normal sorting function.
+   *
+   */
+
+  /**
+   * @ngdoc property
+   * @name sortingAlgorithm
    * @propertyOf ui.grid.class:GridOptions.columnDef
    * @description Algorithm to use for sorting this column. Takes 'a' and 'b' parameters
-   * like any normal sorting function with additional 'rowA', 'rowB', and 'direction' parameters
-   * that are the row objects and the current direction of the sort respectively.
+   * like any normal sorting function.
    *
    */
 
@@ -18516,25 +18547,6 @@ angular.module('ui.grid')
     // Turn on sorting by default
     self.enableSorting = typeof(colDef.enableSorting) !== 'undefined' ? colDef.enableSorting : true;
     self.sortingAlgorithm = colDef.sortingAlgorithm;
-
-    /**
-     * @ngdoc property
-     * @name sortDirectionCycle
-     * @propertyOf ui.grid.class:GridOptions.columnDef
-     * @description (optional) An array of sort directions, specifying the order that they
-     * should cycle through as the user repeatedly clicks on the column heading.
-     * The default is `[null, uiGridConstants.ASC, uiGridConstants.DESC]`. Null
-     * refers to the unsorted state. This does not affect the initial sort
-     * direction; use the {@link ui.grid.class:GridOptions.columnDef#sort sort}
-     * property for that. If
-     * {@link ui.grid.class:GridOptions.columnDef#suppressRemoveSort suppressRemoveSort}
-     * is also set, the unsorted state will be skipped even if it is listed here.
-     * Each direction may not appear in the list more than once (e.g. `[ASC,
-     * DESC, DESC]` is not allowed), and the list may not be empty.
-     */
-    self.sortDirectionCycle = typeof(colDef.sortDirectionCycle) !== 'undefined' ?
-      colDef.sortDirectionCycle :
-      [null, uiGridConstants.ASC, uiGridConstants.DESC];
 
     /**
      * @ngdoc boolean
@@ -20074,7 +20086,7 @@ angular.module('ui.grid')
   };
 
   GridRenderContainer.prototype.needsHScrollbarPlaceholder = function () {
-    return this.grid.options.enableHorizontalScrollbar && !this.hasHScrollbar && !this.grid.disableScrolling;
+    return this.grid.options.enableHorizontalScrollbar && !this.hasHScrollbar;
   };
 
   GridRenderContainer.prototype.getViewportStyle = function () {
@@ -21637,7 +21649,7 @@ module.service('rowSorter', ['$parse', 'uiGridConstants', function ($parse, uiGr
     if (sortCols.length === 0) {
       return rows;
     }
-
+    
     // Re-usable variables
     var col, direction;
 
@@ -21663,7 +21675,7 @@ module.service('rowSorter', ['$parse', 'uiGridConstants', function ($parse, uiGr
         direction = sortCols[idx].sort.direction;
 
         sortFn = rowSorter.getSortFn(grid, col, r);
-
+        
         var propA, propB;
 
         if ( col.sortCellFiltered ){
@@ -21674,7 +21686,7 @@ module.service('rowSorter', ['$parse', 'uiGridConstants', function ($parse, uiGr
           propB = grid.getCellValue(rowB, col);
         }
 
-        tem = sortFn(propA, propB, rowA, rowB, direction);
+        tem = sortFn(propA, propB);
 
         idx++;
       }
@@ -21686,7 +21698,7 @@ module.service('rowSorter', ['$parse', 'uiGridConstants', function ($parse, uiGr
       if (tem === 0 ) {
         return rowA.entity.$$uiGridIndex - rowB.entity.$$uiGridIndex;
       }
-
+      
       // Made it this far, we don't have to worry about null & undefined
       if (direction === uiGridConstants.ASC) {
         return tem;
@@ -23160,7 +23172,7 @@ module.filter('px', function() {
                   label: 'položky'
               },
               groupPanel: {
-                  description: 'Přesuňte záhlaví zde pro vytvoření skupiny dle sloupce.'
+                  description: 'Přesuntě záhlaví zde pro vytvoření skupiny dle sloupce.'
               },
               search: {
                   placeholder: 'Hledat...',
@@ -23192,25 +23204,25 @@ module.filter('px', function() {
                   max: 'max.: '
               },
               pinning: {
-                  pinLeft: 'Zamknout vlevo',
-                  pinRight: 'Zamknout vpravo',
+                  pinLeft: 'Zamknout v levo',
+                  pinRight: 'Zamknout v pravo',
                   unpin: 'Odemknout'
               },
               gridMenu: {
                   columns: 'Sloupce:',
                   importerTitle: 'Importovat soubor',
-                  exporterAllAsCsv: 'Exportovat všechna data do csv',
-                  exporterVisibleAsCsv: 'Exportovat viditelná data do csv',
-                  exporterSelectedAsCsv: 'Exportovat vybraná data do csv',
-                  exporterAllAsPdf: 'Exportovat všechna data do pdf',
-                  exporterVisibleAsPdf: 'Exportovat viditelná data do pdf',
-                  exporterSelectedAsPdf: 'Exportovat vybraná data do pdf',
-                  clearAllFilters: 'Odstranit všechny filtry'
+                  exporterAllAsCsv: 'Exportovat všechny data do csv',
+                  exporterVisibleAsCsv: 'Exportovat viditelné data do csv',
+                  exporterSelectedAsCsv: 'Exportovat vybranné data do csv',
+                  exporterAllAsPdf: 'Exportovat všechny data do pdf',
+                  exporterVisibleAsPdf: 'Exportovat viditelné data do pdf',
+                  exporterSelectedAsPdf: 'Exportovat vybranné data do pdf',
+                clearAllFilters: 'Vyčistěte všechny filtry'
               },
               importer: {
                   noHeaders: 'Názvy sloupců se nepodařilo získat, obsahuje soubor záhlaví?',
                   noObjects: 'Data se nepodařilo zpracovat, obsahuje soubor řádky mimo záhlaví?',
-                  invalidCsv: 'Soubor nelze zpracovat, jedná se o CSV?',
+                  invalidCsv: 'Soubor nelze zpracovat, jedná se CSV?',
                   invalidJson: 'Soubor nelze zpracovat, je to JSON?',
                   jsonNotArray: 'Soubor musí obsahovat json. Ukončuji..'
               },
@@ -24226,8 +24238,7 @@ module.filter('px', function() {
         },
         pagination: {
             sizes: 'items per pagina',
-            totalItems: 'items',
-            of: 'van de'
+            totalItems: 'items'
         },
         grouping: {
             group: 'Groepeer',
@@ -27125,9 +27136,6 @@ module.filter('px', function() {
 
               //stop editing when grid is scrolled
               var deregOnGridScroll = $scope.col.grid.api.core.on.scrollBegin($scope, function () {
-                if ($scope.grid.disableScrolling) {
-                  return;
-                }
                 endEdit();
                 $scope.grid.api.edit.raise.afterCellEdit($scope.row.entity, $scope.col.colDef, cellModel($scope), origCellValue);
                 deregOnGridScroll();
@@ -27719,8 +27727,6 @@ module.filter('px', function() {
                * </pre>
                * @param {GridRow} row the row that was expanded
                */
-              rowExpandedBeforeStateChanged: function(scope,row){
-              },
               rowExpandedStateChanged: function (scope, row) {
               }
             }
@@ -27791,15 +27797,9 @@ module.filter('px', function() {
       },
 
       toggleRowExpansion: function (grid, row) {
-        // trigger the "before change" event. Can change row height dynamically this way.
-        grid.api.expandable.raise.rowExpandedBeforeStateChanged(row);
         row.isExpanded = !row.isExpanded;
-        if (angular.isUndefined(row.expandedRowHeight)){
-          row.expandedRowHeight = grid.options.expandableRowHeight;
-        }
-              
         if (row.isExpanded) {
-          row.height = row.grid.options.rowHeight + row.expandedRowHeight;
+          row.height = row.grid.options.rowHeight + grid.options.expandableRowHeight;
         }
         else {
           row.height = row.grid.options.rowHeight;
@@ -28675,7 +28675,7 @@ module.filter('px', function() {
         csvExport: function (grid, rowTypes, colTypes) {
           var self = this;
           this.loadAllDataIfNeeded(grid, rowTypes, colTypes).then(function() {
-            var exportColumnHeaders = grid.options.showHeader ? self.getColumnHeaders(grid, colTypes) : [];
+            var exportColumnHeaders = self.getColumnHeaders(grid, colTypes);
             var exportData = self.getData(grid, rowTypes, colTypes);
             var csvContent = self.formatAsCsv(exportColumnHeaders, exportData, grid.options.exporterCsvColumnSeparator);
 
@@ -28879,7 +28879,7 @@ module.filter('px', function() {
 
           var bareHeaders = exportColumnHeaders.map(function(header){return { value: header.displayName };});
 
-          var csv = bareHeaders.length > 0 ? (self.formatRowAsCsv(this, separator)(bareHeaders) + '\n') : '';
+          var csv = self.formatRowAsCsv(this, separator)(bareHeaders) + '\n';
 
           csv += exportData.map(this.formatRowAsCsv(this, separator)).join('\n');
 
@@ -31700,12 +31700,6 @@ module.filter('px', function() {
           }
 
           newVisibleRows = grid.getVisibleRowCount();
-
-          // in case not enough data is loaded to enable scroller - load more data
-          var canvasHeight = rowHeight * newVisibleRows;
-          if (grid.infiniteScroll.scrollDown && (viewportHeight > canvasHeight)) {
-            grid.api.infiniteScroll.raise.needLoadMoreData();
-          }
 
           if ( grid.infiniteScroll.direction === uiGridConstants.scrollDirection.UP ){
             oldTop = grid.infiniteScroll.prevScrollTop || 0;
@@ -35610,11 +35604,10 @@ module.filter('px', function() {
             return;
           }
 
-          var selectedRows;
           if (!multiSelect && !selected) {
             service.clearSelectedRows(grid, evt);
           } else if (!multiSelect && selected) {
-            selectedRows = service.getSelectedRows(grid);
+            var selectedRows = service.getSelectedRows(grid);
             if (selectedRows.length > 1) {
               selected = false; // Enable reselect of the row
               service.clearSelectedRows(grid, evt);
@@ -35627,11 +35620,9 @@ module.filter('px', function() {
             row.setSelected(!selected);
             if (row.isSelected === true) {
               grid.selection.lastSelectedRow = row;
+            } else {
+              grid.selection.selectAll = false;
             }
-
-            selectedRows = service.getSelectedRows(grid);
-            grid.selection.selectAll = grid.rows.length === selectedRows.length;
-
             grid.api.selection.raise.rowSelectionChanged(row, evt);
           }
         },
@@ -35703,7 +35694,6 @@ module.filter('px', function() {
           });
           service.decideRaiseSelectionBatchEvent( grid, changedRows, evt );
           grid.selection.selectAll = false;
-          grid.selection.selectedCount = 0;
         },
 
         /**
@@ -38047,7 +38037,7 @@ angular.module('ui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('ui-grid/uiGridHeaderCell',
-    "<div role=\"columnheader\" ng-class=\"{ 'sortable': sortable }\" ui-grid-one-bind-aria-labelledby-grid=\"col.uid + '-header-text ' + col.uid + '-sortdir-text'\" aria-sort=\"{{col.sort.direction == asc ? 'ascending' : ( col.sort.direction == desc ? 'descending' : (!col.sort.direction ? 'none' : 'other'))}}\"><div role=\"button\" tabindex=\"0\" class=\"ui-grid-cell-contents ui-grid-header-cell-primary-focus\" col-index=\"renderIndex\" title=\"TOOLTIP\"><span class=\"ui-grid-header-cell-label\" ui-grid-one-bind-id-grid=\"col.uid + '-header-text'\">{{ col.displayName CUSTOM_FILTERS }}</span> <span ui-grid-one-bind-id-grid=\"col.uid + '-sortdir-text'\" ui-grid-visible=\"col.sort.direction\" aria-label=\"{{getSortDirectionAriaLabel()}}\"><i ng-class=\"{ 'ui-grid-icon-up-dir': col.sort.direction == asc, 'ui-grid-icon-down-dir': col.sort.direction == desc, 'ui-grid-icon-blank': !col.sort.direction }\" title=\"{{col.sort.priority ? i18n.headerCell.priority + ' ' + col.sort.priority : null}}\" aria-hidden=\"true\"></i> <sub class=\"ui-grid-sort-priority-number\">{{col.sort.priority}}</sub></span></div><div role=\"button\" tabindex=\"0\" ui-grid-one-bind-id-grid=\"col.uid + '-menu-button'\" class=\"ui-grid-column-menu-button\" ng-if=\"grid.options.enableColumnMenus && !col.isRowHeader  && col.colDef.enableColumnMenu !== false\" ng-click=\"toggleMenu($event)\" ng-class=\"{'ui-grid-column-menu-button-last-col': isLastCol}\" ui-grid-one-bind-aria-label=\"i18n.headerCell.aria.columnMenuButtonLabel\" aria-haspopup=\"true\"><i class=\"ui-grid-icon-angle-down\" aria-hidden=\"true\">&nbsp;</i></div><div ui-grid-filter></div></div>"
+    "<div role=\"columnheader\" ng-class=\"{ 'sortable': sortable }\" ui-grid-one-bind-aria-labelledby-grid=\"col.uid + '-header-text ' + col.uid + '-sortdir-text'\" aria-sort=\"{{col.sort.direction == asc ? 'ascending' : ( col.sort.direction == desc ? 'descending' : (!col.sort.direction ? 'none' : 'other'))}}\"><div role=\"button\" tabindex=\"0\" class=\"ui-grid-cell-contents ui-grid-header-cell-primary-focus\" col-index=\"renderIndex\" title=\"TOOLTIP\"><span ui-grid-one-bind-id-grid=\"col.uid + '-header-text'\">{{ col.displayName CUSTOM_FILTERS }}</span> <span ui-grid-one-bind-id-grid=\"col.uid + '-sortdir-text'\" ui-grid-visible=\"col.sort.direction\" aria-label=\"{{getSortDirectionAriaLabel()}}\"><i ng-class=\"{ 'ui-grid-icon-up-dir': col.sort.direction == asc, 'ui-grid-icon-down-dir': col.sort.direction == desc, 'ui-grid-icon-blank': !col.sort.direction }\" title=\"{{col.sort.priority ? i18n.headerCell.priority + ' ' + col.sort.priority : null}}\" aria-hidden=\"true\">&nbsp;</i></span></div><div role=\"button\" tabindex=\"0\" ui-grid-one-bind-id-grid=\"col.uid + '-menu-button'\" class=\"ui-grid-column-menu-button\" ng-if=\"grid.options.enableColumnMenus && !col.isRowHeader  && col.colDef.enableColumnMenu !== false\" ng-click=\"toggleMenu($event)\" ng-class=\"{'ui-grid-column-menu-button-last-col': isLastCol}\" ui-grid-one-bind-aria-label=\"i18n.headerCell.aria.columnMenuButtonLabel\" aria-haspopup=\"true\"><i class=\"ui-grid-icon-angle-down\" aria-hidden=\"true\">&nbsp;</i></div><div ui-grid-filter></div></div>"
   );
 
 
@@ -38087,7 +38077,7 @@ angular.module('ui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('ui-grid/expandableRow',
-    "<div ui-grid-expandable-row ng-if=\"expandableRow.shouldRenderExpand()\" class=\"expandableRow\" style=\"float:left; margin-top: 1px; margin-bottom: 1px\" ng-style=\"{width: (grid.renderContainers.body.getCanvasWidth()) + 'px', height: row.expandedRowHeight + 'px'}\"></div>"
+    "<div ui-grid-expandable-row ng-if=\"expandableRow.shouldRenderExpand()\" class=\"expandableRow\" style=\"float:left; margin-top: 1px; margin-bottom: 1px\" ng-style=\"{width: (grid.renderContainers.body.getCanvasWidth()) + 'px', height: grid.options.expandableRowHeight + 'px'}\"></div>"
   );
 
 
@@ -38097,7 +38087,7 @@ angular.module('ui.grid').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('ui-grid/expandableScrollFiller',
-    "<div ng-if=\"expandableRow.shouldRenderFiller()\" ng-class=\"{scrollFiller:true, scrollFillerClass:(colContainer.name === 'body')}\" ng-style=\"{ width: (grid.getViewportWidth()) + 'px', height: row.expandedRowHeight + 2 + 'px', 'margin-left': grid.options.rowHeader.rowHeaderWidth + 'px' }\"><i class=\"ui-grid-icon-spin5 ui-grid-animate-spin\" ng-style=\"{'margin-top': ( row.expandedRowHeight/2 - 5) + 'px', 'margin-left' : ((grid.getViewportWidth() - grid.options.rowHeader.rowHeaderWidth)/2 - 5) + 'px'}\"></i></div>"
+    "<div ng-if=\"expandableRow.shouldRenderFiller()\" ng-class=\"{scrollFiller:true, scrollFillerClass:(colContainer.name === 'body')}\" ng-style=\"{ width: (grid.getViewportWidth()) + 'px', height: grid.options.expandableRowHeight + 2 + 'px', 'margin-left': grid.options.rowHeader.rowHeaderWidth + 'px' }\"><i class=\"ui-grid-icon-spin5 ui-grid-animate-spin\" ng-style=\"{'margin-top': ( grid.options.expandableRowHeight/2 - 5) + 'px', 'margin-left' : ((grid.getViewportWidth() - grid.options.rowHeader.rowHeaderWidth)/2 - 5) + 'px'}\"></i></div>"
   );
 
 

@@ -1277,7 +1277,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     }
   }])
-  .directive('faUiGrid', [function(faGridCellTemplates){
+  .directive('faUiGrid', [function(){
     return {
       restrict: 'E',
       scope: {
@@ -1315,7 +1315,6 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 col.cellTemplate = "<div class='ui-grid-cell-contents'>{{COL_FIELD ? '\u2713' : '\u2718'}}</div>";
                 break;
               case 'streetlight':
-                console.log('streetlight cell matched');
                 col.cellTemplate = "<div class='ui-grid-cell-contents'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
                 var predicate = col.faPredicate;
                 col.predicate = function(value, row){
