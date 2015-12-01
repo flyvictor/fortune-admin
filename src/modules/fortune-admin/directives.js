@@ -129,7 +129,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     }
   }])
-  .directive('faUiGrid', [function(){
+  .directive('faUiGrid', [function(faGridCellTemplates){
     return {
       restrict: 'E',
       scope: {
@@ -159,8 +159,27 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           $scope.fvOptions.actions.noBulk = true;
         }
         if ($scope.columns) {
-          //Creating shallow copy to avoind propagating local changes to parent $scope
-          $scope.gridOptions.columnDefs = angular.copy($scope.columns);
+          //Creating shallow copy to avoid propagating local changes to parent $scope
+          $scope.gridOptions.columnDefs = angular.copy($scope.columns).map(function(col){
+            if (!col.faCellType) return col;
+            switch (col.faCellType){
+              case 'checkmark':
+                col.cellTemplate = "<div class='ui-grid-cell-contents'>{{COL_FIELD ? '\u2713' : '\u2718'}}</div>";
+                break;
+              case 'streetlight':
+                console.log('streetlight cell matched');
+                col.cellTemplate = "<div class='ui-grid-cell-contents'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
+                var predicate = col.faPredicate;
+                col.predicate = function(value, row){
+                  var result = predicate(value, row);
+                  if (['red', 'amber', 'green'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);
+                  return result;
+                };
+                break;
+            }
+            return col;
+          });
+
 
           if( !$scope.fvOptions.ignoreIds ) {
             $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
