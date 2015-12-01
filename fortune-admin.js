@@ -1322,11 +1322,6 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                   var result = predicate(value, row);
                   if (['red', 'amber', 'green'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);
                   return result;
-                  /*return {
-                    red: "{'background-color': '#FF6666'}",
-                    amber: "{'background-color': '#FFCC66'}",
-                    green: "{'background-color': '#64A35D'}"
-                  }[result];*/
                 };
                 break;
             }
