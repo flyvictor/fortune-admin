@@ -161,14 +161,14 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         if ($scope.columns) {
           //Creating shallow copy to avoid propagating local changes to parent $scope
           $scope.gridOptions.columnDefs = angular.copy($scope.columns).map(function(col){
-            if (!col.faCellType) return col;
-            switch (col.faCellType){
+            if (!col.faCellOptions || !col.faCellOptions.type) return col;
+            switch (col.faCellOptions.type){
               case 'checkmark':
-                col.cellTemplate = "<div class='fa-ui-grid-default-cell'>{{COL_FIELD ? '\u2713' : '\u2718'}}</div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell checkmark'><span>{{COL_FIELD ? '\u2713' : '\u2718'}}</span></div>";
                 break;
               case 'streetlight':
                 col.cellTemplate = "<div class='fa-ui-grid-default-cell'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
-                var predicate = col.faPredicate;
+                var predicate = col.faCellOptions.predicate;
                 col.predicate = function(value, row){
                   var result = predicate(value, row);
                   if (['red', 'amber', 'green'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);

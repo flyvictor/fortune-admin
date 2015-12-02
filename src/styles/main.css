@@ -49,12 +49,18 @@ svg .ref {
     width: 20px;
     margin: auto;
 }
-.fa-ui-grid-default-cell .circle  .red {
+
+.fa-ui-grid-default-cell.checkmark {
+    width: 100%;
+    text-align: center;
+}
+
+.fa-ui-grid-default-cell .circle.red {
     background-color: #FF6666!important;
 }
-.fa-ui-grid-default-cell .circle .amber {
+.fa-ui-grid-default-cell .circle.amber {
     background-color: #FFCC66!important;
 }
-.fa-ui-grid-default-cell .circle .green {
+.fa-ui-grid-default-cell .circle.green {
     background-color: #64A35D!important;
 }
