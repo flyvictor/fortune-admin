@@ -1312,10 +1312,10 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
             if (!col.faCellType) return col;
             switch (col.faCellType){
               case 'checkmark':
-                col.cellTemplate = "<div class='ui-grid-cell-contents'>{{COL_FIELD ? '\u2713' : '\u2718'}}</div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell'>{{COL_FIELD ? '\u2713' : '\u2718'}}</div>";
                 break;
               case 'streetlight':
-                col.cellTemplate = "<div class='ui-grid-cell-contents'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
                 var predicate = col.faPredicate;
                 col.predicate = function(value, row){
                   var result = predicate(value, row);
