@@ -2005,3 +2005,25 @@ svg .ref {
     width: 100%;
     overflow-x: auto;
 }
+
+.fa-ui-grid-default-cell .circle {
+    border-radius: 10px;
+    height: 20px;
+    width: 20px;
+    margin: auto;
+}
+
+.fa-ui-grid-default-cell.checkmark {
+    width: 100%;
+    text-align: center;
+}
+
+.fa-ui-grid-default-cell .circle.red {
+    background-color: #FF6666!important;
+}
+.fa-ui-grid-default-cell .circle.amber {
+    background-color: #FFCC66!important;
+}
+.fa-ui-grid-default-cell .circle.green {
+    background-color: #64A35D!important;
+}
