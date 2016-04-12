@@ -175,6 +175,17 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                   return result;
                 };
                 break;
+              case 'custom-path':
+                // It can be useful to pass the entire entity to a function in
+                // order to make use of more complex business logic. In this
+                // scenario a predicate function which returns the value to be
+                // included in the cell will be attached to the element
+                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block'>{{col.colDef.predicate( row.entity )}}</span>";
+                var customPathPredicate = col.faCellOptions.predicate;
+                col.predicate = function( entity ){
+                  return customPathPredicate( entity );
+                };
+                break;
             }
             return col;
           });
