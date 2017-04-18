@@ -1312,10 +1312,12 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
             if (!col.faCellOptions || !col.faCellOptions.type) return col;
             switch (col.faCellOptions.type){
               case 'checkmark':
-                col.cellTemplate = "<div class='fa-ui-grid-default-cell checkmark'><span>{{COL_FIELD ? '\u2713' : '\u2718'}}</span></div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell checkmark'" + 
+                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + "><span>{{COL_FIELD ? '\u2713' : '\u2718'}}</span></div>";
                 break;
               case 'streetlight':
-                col.cellTemplate = "<div class='fa-ui-grid-default-cell'><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell'" + 
+                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + "><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
                 var predicate = col.faCellOptions.predicate;
                 col.predicate = function(value, row){
                   var result = predicate(value, row);
@@ -1328,7 +1330,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 // order to make use of more complex business logic. In this
                 // scenario a predicate function which returns the value to be
                 // included in the cell will be attached to the element
-                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block'>" +
+                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block'" + 
+                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + ">" +
                                    "{{col.colDef.predicate( row.entity )}}" +
                                    "</span>";
                 var customPathPredicate = col.faCellOptions.predicate;
