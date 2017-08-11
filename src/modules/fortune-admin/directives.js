@@ -173,7 +173,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 var predicate = col.faCellOptions.predicate;
                 col.predicate = function(value, row){
                   var result = predicate(value, row);
-                  if (['red', 'amber', 'green'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);
+                  if (['red', 'amber', 'green', 'grey'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);
                   return result;
                 };
                 break;
@@ -182,7 +182,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 // order to make use of more complex business logic. In this
                 // scenario a predicate function which returns the value to be
                 // included in the cell will be attached to the element
-                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block'" + 
+                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block;{{row.entity.additionalStyles}}'" + 
                 (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + ">" +
                                    "{{col.colDef.predicate( row.entity )}}" +
                                    "</span>";
