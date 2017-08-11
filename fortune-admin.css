@@ -2027,3 +2027,6 @@ svg .ref {
 .fa-ui-grid-default-cell .circle.green {
     background-color: #64A35D!important;
 }
+.fa-ui-grid-default-cell .circle.grey {
+    background-color: #808080!important;
+}
