@@ -13,8 +13,8 @@ This assumes you've setup ssh with. GitHub and cloned the repo with ssh; the for
 
 * npm install
 
-* grunt install:example
-* grunt serve:example
+* ./node_modules/.bin/grunt install:example
+* ./node_modules/.bin/grunt serve:example
 
 * open your browser and navigate the interface (http://127.0.0.1:1337); the top navigation has links to the UML
 

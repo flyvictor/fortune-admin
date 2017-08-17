@@ -1,9 +1,15 @@
 <section>
   <div ng-if="!fvOptions.noBulk && fvOptions.bulkPosition === 'top'">
-    <fa-bulk-actions collection-name="currentResource.route" options='fvOptions.actions' data="data"></fa-bulk-actions>
+    <div class="row bulk-actions">
+      <span ng-transclude="additionalInteractionControls"></span>
+      <fa-bulk-actions collection-name="currentResource.route" options='fvOptions.actions' data="data"></fa-bulk-actions>
+    </div>
   </div>
   <div class="fa-ui-grid" ui-grid="gridOptions" ui-grid-edit></div>
   <div  ng-if="!fvOptions.noBulk && fvOptions.bulkPosition !== 'top'">
+    <div class="row bulk-actions">
+      <span ng-transclude="additionalInteractionControls"></span>
       <fa-bulk-actions collection-name="currentResource.route" options='fvOptions.actions' data="data"></fa-bulk-actions>
+    </div>
   </div>
 </section>

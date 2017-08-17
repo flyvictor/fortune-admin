@@ -238,12 +238,11 @@ angular.module("/dist/views/directives/faAlert.html", []).run(["$templateCache",
 
 angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faBulkActions.html",
-    "<div class=\"row bulk-actions\">\n" +
-    "  <select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.title for action in actions | bulkActions\">\n" +
-    "    <option value=\"\">- Nothing selected -</option>\n" +
-    "  </select>\n" +
-    "  <span class=\"btn btn-default\" ng-disabled=\"!actionToRun || getSelected().length === 0\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply bulk action to selected items</span>\n" +
-    "</div>");
+    "<select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.title for action in actions | bulkActions\">\n" +
+    "  <option value=\"\">- Nothing selected -</option>\n" +
+    "</select>\n" +
+    "<span class=\"btn btn-default\" ng-disabled=\"!actionToRun || getSelected().length === 0\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply bulk action to selected items</span>\n" +
+    "");
 }]);
 
 angular.module("/dist/views/directives/faDeleteConfirm.html", []).run(["$templateCache", function($templateCache) {
@@ -390,11 +389,18 @@ angular.module("/dist/views/directives/faUiGrid.html", []).run(["$templateCache"
   $templateCache.put("/dist/views/directives/faUiGrid.html",
     "<section>\n" +
     "  <div ng-if=\"!fvOptions.noBulk && fvOptions.bulkPosition === 'top'\">\n" +
-    "    <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
+    "    <!-- <fa-action-row></fa-action-row> -->\n" +
+    "    <div class=\"row bulk-actions\">\n" +
+    "      <span ng-transclude=\"additionalInteractionControls\"></span>\n" +
+    "      <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "  <div class=\"fa-ui-grid\" ui-grid=\"gridOptions\" ui-grid-edit></div>\n" +
     "  <div  ng-if=\"!fvOptions.noBulk && fvOptions.bulkPosition !== 'top'\">\n" +
+    "    <div class=\"row bulk-actions\">\n" +
+    "      <span ng-transclude=\"additionalInteractionControls\"></span>\n" +
     "      <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</section>\n" +
     "");
@@ -1280,6 +1286,9 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
   .directive('faUiGrid', [function(){
     return {
       restrict: 'E',
+      transclude: {
+        'additionalInteractionControls': '?additionalInteractionControls'
+      },
       scope: {
         data: '=',
         currentResource: '=',
@@ -1289,6 +1298,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
+        
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
         $scope.fvOptions = $scope.fvOptions || {};
         $scope.fvOptions.actions = $scope.fvOptions.actions || {};
