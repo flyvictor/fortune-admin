@@ -6,7 +6,7 @@ module.exports = function(grunt){
   grunt.initConfig({
     shell: {
       bower_install: {
-        command: 'bower install'
+        command: './node_modules/.bin/bower install'
       },
       install_example: {
         command: 'git submodule init; git submodule update; cd examples/lib/fortune; npm install;'

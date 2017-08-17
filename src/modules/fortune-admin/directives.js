@@ -132,6 +132,9 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
   .directive('faUiGrid', [function(){
     return {
       restrict: 'E',
+      transclude: {
+        'additionalInteractionControls': '?additionalInteractionControls'
+      },
       scope: {
         data: '=',
         currentResource: '=',
@@ -141,6 +144,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
       controller: function($scope){
+        
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
         $scope.fvOptions = $scope.fvOptions || {};
         $scope.fvOptions.actions = $scope.fvOptions.actions || {};
