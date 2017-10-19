@@ -1,4 +1,4 @@
-<div class="btn-group" dropdown>
+<div class="btn-group" dropdown disabled-for-roles="sales">
   <button ng-if="!options.noBulk" type="button" class="btn" ng-class="{'btn-success': isSelected(model), 'btn-default': !isSelected(model)}" ng-click="toggleSelection(model)">
       <span class="glyphicon glyphicon-unchecked" ng-hide="isSelected(model)"></span>
       <span class="glyphicon glyphicon-ok" ng-show="isSelected(model)"></span>
