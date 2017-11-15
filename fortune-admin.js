@@ -1,4 +1,4 @@
-angular.module('templates-main', ['/dist/views/directives/attribute.html', '/dist/views/directives/description.html', '/dist/views/directives/example.html', '/dist/views/directives/gui.html', '/dist/views/directives/requestResponse.html', '/dist/views/directives/response.html', '/dist/views/docs.html', '/dist/views/directives/faActions.html', '/dist/views/directives/faAlert.html', '/dist/views/directives/faBulkActions.html', '/dist/views/directives/faDeleteConfirm.html', '/dist/views/directives/faDetails.html', '/dist/views/directives/faEditable.html', '/dist/views/directives/faGrid.html', '/dist/views/directives/faUiGrid.html', '/dist/views/directives/uml/canvas.html', '/dist/views/resources.html', '/dist/views/uml.html', '/dist/views/docsCells.html', '/dist/views/mynavbar.html', '/dist/views/resourcesCells.html', '/dist/views/umlCells.html']);
+angular.module('templates-main', ['/dist/views/directives/attribute.html', '/dist/views/directives/description.html', '/dist/views/directives/example.html', '/dist/views/directives/gui.html', '/dist/views/directives/requestResponse.html', '/dist/views/directives/response.html', '/dist/views/docs.html', '/dist/views/directives/faActionCell.html', '/dist/views/directives/faActionColumnHeader.html', '/dist/views/directives/faActions.html', '/dist/views/directives/faAlert.html', '/dist/views/directives/faBulkActions.html', '/dist/views/directives/faDeleteConfirm.html', '/dist/views/directives/faDetails.html', '/dist/views/directives/faEditable.html', '/dist/views/directives/faGrid.html', '/dist/views/directives/faUiGrid.html', '/dist/views/directives/uml/canvas.html', '/dist/views/resources.html', '/dist/views/uml.html', '/dist/views/docsCells.html', '/dist/views/mynavbar.html', '/dist/views/resourcesCells.html', '/dist/views/umlCells.html']);
 
 angular.module("/dist/views/directives/attribute.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/attribute.html",
@@ -196,6 +196,19 @@ angular.module("/dist/views/docs.html", []).run(["$templateCache", function($tem
     "</section>");
 }]);
 
+angular.module("/dist/views/directives/faActionCell.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faActionCell.html",
+    "<input type=\"checkbox\" ng-model=\"item.action_checked\">");
+}]);
+
+angular.module("/dist/views/directives/faActionColumnHeader.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("/dist/views/directives/faActionColumnHeader.html",
+    "<div>\n" +
+    "  <div ng-show=\"enabled\">enabled</div>\n" +
+    "  <div ng-show=\"!enabled\">disabled</div>\n" +
+    "</div>");
+}]);
+
 angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActions.html",
     "<div class=\"btn-group\" dropdown>\n" +
@@ -389,7 +402,6 @@ angular.module("/dist/views/directives/faUiGrid.html", []).run(["$templateCache"
   $templateCache.put("/dist/views/directives/faUiGrid.html",
     "<section>\n" +
     "  <div ng-if=\"!fvOptions.noBulk && fvOptions.bulkPosition === 'top'\">\n" +
-    "    <!-- <fa-action-row></fa-action-row> -->\n" +
     "    <div class=\"row bulk-actions\">\n" +
     "      <span ng-transclude=\"additionalInteractionControls\"></span>\n" +
     "      <fa-bulk-actions collection-name=\"currentResource.route\" options='fvOptions.actions' data=\"data\"></fa-bulk-actions>\n" +
@@ -997,6 +1009,36 @@ angular.module('fortuneAdmin.Controllers', [
         return selected;
       }
   }])
+  .controller('faActionColumnHeaderCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.isCheckedItemsExists = isCheckedItemsExists;
+
+    $scope.enabled = false;
+
+    function isCheckedItemsExists() {
+      return _.some($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
+    }
+
+    $scope.$watch('$parent.grid.options.data', function (newValue, oldValue, scope) {
+      $scope.enabled = ctrl.isCheckedItemsExists();
+    }, true);
+
+  }])
+  .controller('faActionCellCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.getItem = getItem;
+
+    $scope.item = ctrl.getItem($scope.id);
+
+    function getItem(id) {
+      return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
+      /*for(var i=0;i<$scope.$parent.grid.options.data.length; i++) {
+        if (id == $scope.$parent.grid.options.data[i].id)
+          return $scope.$parent.grid.options.data[i];
+      }
+      return null;*/
+    }
+  }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;
     $scope.close = function() {
@@ -1195,6 +1237,23 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     }
   }])
+  .directive('faActionColumnHeader', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionColumnHeader'),
+      controller: 'faActionColumnHeaderCtrl',
+    }
+  }])
+  .directive('faActionCell', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionCell'),
+      controller: 'faActionCellCtrl',
+      scope: {
+        id:'@'
+      }
+    }
+  }])
   .directive('faGrid', [function(){
     return {
       restrict: 'E',
@@ -1349,6 +1408,12 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                   return customPathPredicate( entity );
                 };
                 break;
+              case 'action-checkbox':
+                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}"></fa-action-cell>';
+                col.headerCellTemplate = '<fa-action-column-header></fa-action-column-header>';
+                col.enableSorting = false;
+                col.enableCellEdit = false;
+                break;  
             }
             return col;
           });

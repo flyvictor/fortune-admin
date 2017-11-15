@@ -130,6 +130,31 @@ angular.module('fortuneAdmin.Controllers', [
         return selected;
       }
   }])
+  .controller('faActionColumnHeaderCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.isCheckedItemsExists = isCheckedItemsExists;
+
+    $scope.enabled = false;
+
+    function isCheckedItemsExists() {
+      return _.some($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
+    }
+
+    $scope.$watch('$parent.grid.options.data', function (newValue, oldValue, scope) {
+      $scope.enabled = ctrl.isCheckedItemsExists();
+    }, true);
+
+  }])
+  .controller('faActionCellCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.getItem = getItem;
+
+    $scope.item = ctrl.getItem($scope.id);
+
+    function getItem(id) {
+      return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
+    }
+  }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;
     $scope.close = function() {

@@ -41,6 +41,23 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     }
   }])
+  .directive('faActionColumnHeader', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionColumnHeader'),
+      controller: 'faActionColumnHeaderCtrl',
+    }
+  }])
+  .directive('faActionCell', [function(){
+    return {
+      restrict: 'E',
+      templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionCell'),
+      controller: 'faActionCellCtrl',
+      scope: {
+        id:'@'
+      }
+    }
+  }])
   .directive('faGrid', [function(){
     return {
       restrict: 'E',
@@ -195,6 +212,12 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                   return customPathPredicate( entity );
                 };
                 break;
+              case 'action-checkbox':
+                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}"></fa-action-cell>';
+                col.headerCellTemplate = '<fa-action-column-header></fa-action-column-header>';
+                col.enableSorting = false;
+                col.enableCellEdit = false;
+                break;  
             }
             return col;
           });
