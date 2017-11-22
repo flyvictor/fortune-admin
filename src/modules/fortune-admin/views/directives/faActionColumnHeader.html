@@ -1,4 +1,12 @@
 <div>
-  <div ng-show="enabled">enabled</div>
+  <div ng-show="enabled" class="btn-group" dropdown>
+    <div><a id="action-show-link-{{name}}" ng-click="showMenu($event)">show</a></div>
+    <ul class="dropdown-menu" role="menu" ng-style="popupPosition">
+      <li ng-repeat="action in actions">
+        <a ng-click="actionClick(action)">{{action.title}}</a>
+      </li>
+    </ui> 
+  </div>
+
   <div ng-show="!enabled">disabled</div>
 </div>

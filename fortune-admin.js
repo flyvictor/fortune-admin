@@ -198,13 +198,23 @@ angular.module("/dist/views/docs.html", []).run(["$templateCache", function($tem
 
 angular.module("/dist/views/directives/faActionCell.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActionCell.html",
-    "<input type=\"checkbox\" ng-model=\"item.action_checked\">");
+    "<div ng-show=\"!empty\" >\n" +
+    "<input type=\"checkbox\" ng-model=\"item.action_checked\" style=\"width:100%\"> \n" +
+    "</div>");
 }]);
 
 angular.module("/dist/views/directives/faActionColumnHeader.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActionColumnHeader.html",
     "<div>\n" +
-    "  <div ng-show=\"enabled\">enabled</div>\n" +
+    "  <div ng-show=\"enabled\" class=\"btn-group\" dropdown>\n" +
+    "    <div><a id=\"action-show-link-{{name}}\" ng-click=\"showMenu($event)\">show</a></div>\n" +
+    "    <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
+    "      <li ng-repeat=\"action in actions\">\n" +
+    "        <a ng-click=\"actionClick(action)\">{{action.title}}</a>\n" +
+    "      </li>\n" +
+    "    </ui> \n" +
+    "  </div>\n" +
+    "\n" +
     "  <div ng-show=\"!enabled\">disabled</div>\n" +
     "</div>");
 }]);
@@ -1012,11 +1022,22 @@ angular.module('fortuneAdmin.Controllers', [
   .controller('faActionColumnHeaderCtrl', ['$scope', function($scope) {
     var ctrl = this;
     ctrl.isCheckedItemsExists = isCheckedItemsExists;
+    ctrl.getCheckedItems = getCheckedItems;
 
     $scope.enabled = false;
+    $scope.actions = $scope.$parent.col.grid.options.actions[$scope.name];
+
+    $scope.actionClick = function(action) {
+      if (action && action.callback)
+        action.callback(ctrl.getCheckedItems());
+    }
 
     function isCheckedItemsExists() {
       return _.some($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
+    }
+
+    function getCheckedItems() {
+      return _.filter($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
     }
 
     $scope.$watch('$parent.grid.options.data', function (newValue, oldValue, scope) {
@@ -1027,16 +1048,23 @@ angular.module('fortuneAdmin.Controllers', [
   .controller('faActionCellCtrl', ['$scope', function($scope) {
     var ctrl = this;
     ctrl.getItem = getItem;
+    ctrl.isEmpty = isEmpty;
+    ctrl.getColumnDef = getColumnDef;
 
     $scope.item = ctrl.getItem($scope.id);
+    $scope.empty = ctrl.isEmpty($scope.item);
+
+    function isEmpty(item) {
+      var col = ctrl.getColumnDef($scope.name);
+      return col && col.checkEmptyCellCallback ? col.checkEmptyCellCallback(item) : false;
+    }
 
     function getItem(id) {
       return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
-      /*for(var i=0;i<$scope.$parent.grid.options.data.length; i++) {
-        if (id == $scope.$parent.grid.options.data[i].id)
-          return $scope.$parent.grid.options.data[i];
-      }
-      return null;*/
+    }
+
+    function getColumnDef(name) {
+      return _.find($scope.$parent.col.grid.options.columnDefs, function(col){ return col.name === name; });
     }
   }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
@@ -1196,7 +1224,7 @@ angular.module('fortuneAdmin.Controllers', [
 
 'use strict';
 angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.pagination', 'fortuneAdmin.Filters'])
-  .directive('faActions', [function(){
+  .directive('faActions', [function () {
     return {
       restrict: 'E',
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActions'),
@@ -1205,27 +1233,27 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         model: "=ngModel",
         data: "=",
         collectionName: "=",
-        options : "="
+        options: "="
       },
-      link: function(scope){
-        scope.setClickCoords = function($event, model, data){
+      link: function (scope) {
+        scope.setClickCoords = function ($event, model, data) {
           //Current row
-          var el = $( $event.target ).parents("div[class*='ui-grid-row']").eq(0),
-          //Canvas is being offset while scrolling, so we need to take that into account
-              canvas = el.parents("div[class*='ui-grid-canvas']").eq(0);
+          var el = $($event.target).parents("div[class*='ui-grid-row']").eq(0),
+            //Canvas is being offset while scrolling, so we need to take that into account
+            canvas = el.parents("div[class*='ui-grid-canvas']").eq(0);
 
           scope.popupPosition = {
             position: 'fixed',
-            top  : el.position().top + canvas.position().top + 'px',
-            right:  "0px",
-            left : "auto",
+            top: el.position().top + canvas.position().top + 'px',
+            right: "0px",
+            left: "auto",
             'x-index': 100500
           };
         };
       }
     }
   }])
-  .directive('faBulkActions', [function(){
+  .directive('faBulkActions', [function () {
     return {
       restrict: 'E',
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faBulkActions'),
@@ -1233,28 +1261,60 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       scope: {
         data: '=',
         collectionName: '=',
-        options : "="
+        options: "="
       }
     }
   }])
-  .directive('faActionColumnHeader', [function(){
+  .directive('faActionColumnHeader', [function () {
     return {
       restrict: 'E',
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionColumnHeader'),
       controller: 'faActionColumnHeaderCtrl',
+      scope: {
+        name: '@'
+      },
+      link: function (scope) {
+        $(document).click(function (e) {
+          if ('action-show-link-' + scope.name != $(e.target).attr('id')) {
+            scope.$apply(function () { scope.hideMenu() });
+          }
+        });
+        $(document).keyup(function (e) {
+          if (e.keyCode == 27) {
+            scope.$apply(function () { scope.hideMenu() });
+          }
+        });
+
+        scope.showMenu = function ($event, model, data) {
+          var el = $('.ui-grid-row').eq(0);
+          scope.popupPosition = {
+            position: 'fixed',
+            top: (el.position().top + 25) + 'px',
+            left: "auto",
+            display: "block",
+            "min-width": 100
+          };
+        };
+        scope.hideMenu = function () {
+          scope.popupPosition = {
+            display: "none"
+          };
+        }
+      }
     }
   }])
-  .directive('faActionCell', [function(){
+  .directive('faActionCell', [function () {
     return {
       restrict: 'E',
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faActionCell'),
       controller: 'faActionCellCtrl',
       scope: {
-        id:'@'
+        id: '@',
+        name: '@'
       }
     }
   }])
-  .directive('faGrid', [function(){
+  .directive('faGrid', [function () {
     return {
       restrict: 'E',
       scope: {
@@ -1269,13 +1329,13 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         strictFilters: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faGrid'),
-      link: function(scope, attr){
+      link: function (scope, attr) {
 
-        scope.typeaheadList = function(str, name, type){
+        scope.typeaheadList = function (str, name, type) {
           console.log('calling getTypeaheadList ', str, name, type);
-          return scope.getTypeaheadList({str: str, name: name, type: type})
+          return scope.getTypeaheadList({ str: str, name: name, type: type })
         };
-        scope.dropFilter = function(fieldName, taQuery){
+        scope.dropFilter = function (fieldName, taQuery) {
           delete scope.filter['filter[' + fieldName + '][regex]'];
           delete scope.filter['filter[' + fieldName + '][options]'];
           delete scope.filter['filter[' + fieldName + '][gte]'];
@@ -1284,19 +1344,19 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           scope.filterChangedCb()
         };
 
-        scope.getSubresourceRoute = function(url, params){
+        scope.getSubresourceRoute = function (url, params) {
           return CONFIG.fortuneAdmin.route(url, params);
         };
 
-        scope.applyFilter = function(selected, fieldName, type){
+        scope.applyFilter = function (selected, fieldName, type) {
           console.log("scope.fields", scope.fields);
           var isStrict = !!scope.strictFilters[scope.currentResource.route];
-          switch (type){
+          switch (type) {
             case 'String':
               //Derived from typeahead
-              if (isStrict){
+              if (isStrict) {
                 scope.filter['filter[' + fieldName + ']'] = selected.model;
-              }else{
+              } else {
                 scope.filter['filter[' + fieldName + '][regex]'] = selected.model;
                 scope.filter['filter[' + fieldName + '][options]'] = 'i';
               }
@@ -1313,28 +1373,28 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           scope.filterChangedCb();
         };
 
-        scope.resolveFieldName = function(linkName){
+        scope.resolveFieldName = function (linkName) {
           //No need to dig deeper as there's no nested schemas
           var parts = linkName.split('.');
           return parts[parts.length - 1];
         };
 
-        scope.resolveInverse = function(linkName){
+        scope.resolveInverse = function (linkName) {
           var fieldName = this.resolveFieldName(linkName);
           var ref = scope.currentResource.schema[fieldName];
 
           var inverse = '';
-          if (angular.isArray(ref)){
+          if (angular.isArray(ref)) {
             inverse = ref[0].inverse;
-          }else if(angular.isObject(ref)){
+          } else if (angular.isObject(ref)) {
             inverse = ref.inverse;
-          }else {
+          } else {
             throw new Error('Malformed reference');
           }
           return inverse;
         };
 
-        scope.linkToMany = function(linkName){
+        scope.linkToMany = function (linkName) {
           var fieldName = this.resolveFieldName(linkName);
           var ref = scope.currentResource.schema[fieldName];
           return angular.isArray(ref);
@@ -1342,7 +1402,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     }
   }])
-  .directive('faUiGrid', [function(){
+  .directive('faUiGrid', [function () {
     return {
       restrict: 'E',
       transclude: {
@@ -1356,8 +1416,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         fvOptions: '='
       },
       templateUrl: CONFIG.fortuneAdmin.prepareViewTemplateUrl('directives/faUiGrid'),
-      controller: function($scope){
-        
+      controller: function ($scope) {
+
         $scope.options = angular.isObject($scope.options) ? $scope.options : {};
         $scope.fvOptions = $scope.fvOptions || {};
         $scope.fvOptions.actions = $scope.fvOptions.actions || {};
@@ -1365,30 +1425,30 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           //TODO: this be achieved requiring this controller from nested directives?
           _fortuneAdminData: { //Quite ugly hack to pass custom data through ui-grid
             currentResource: $scope.currentResource,
-            actionsOptions : $scope.fvOptions.actions
+            actionsOptions: $scope.fvOptions.actions
           }
         });
         $scope.gridOptions.data = $scope.data;
         $scope.gridOptions.enableCellEdit = true;
         $scope.gridOptions.enableColumnResizing = true;
 
-        if( $scope.fvOptions.noBulk ) {
+        if ($scope.fvOptions.noBulk) {
           $scope.fvOptions.actions.noBulk = true;
         }
         if ($scope.columns) {
           //Creating shallow copy to avoid propagating local changes to parent $scope
-          $scope.gridOptions.columnDefs = angular.copy($scope.columns).map(function(col){
+          $scope.gridOptions.columnDefs = angular.copy($scope.columns).map(function (col) {
             if (!col.faCellOptions || !col.faCellOptions.type) return col;
-            switch (col.faCellOptions.type){
+            switch (col.faCellOptions.type) {
               case 'checkmark':
-                col.cellTemplate = "<div class='fa-ui-grid-default-cell checkmark'" + 
-                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + "><span>{{COL_FIELD ? '\u2713' : '\u2718'}}</span></div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell checkmark'" +
+                  (col.faCellOptions.tooltip ? " title='" + col.faCellOptions.tooltip + "'" : "") + "><span>{{COL_FIELD ? '\u2713' : '\u2718'}}</span></div>";
                 break;
               case 'streetlight':
-                col.cellTemplate = "<div class='fa-ui-grid-default-cell'" + 
-                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + "><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
+                col.cellTemplate = "<div class='fa-ui-grid-default-cell'" +
+                  (col.faCellOptions.tooltip ? " title='" + col.faCellOptions.tooltip + "'" : "") + "><div class='circle {{col.colDef.predicate(COL_FIELD, row)}}'></div></div>";
                 var predicate = col.faCellOptions.predicate;
-                col.predicate = function(value, row){
+                col.predicate = function (value, row) {
                   var result = predicate(value, row);
                   if (['red', 'amber', 'green', 'grey'].indexOf(result) === -1) throw new Error('Unexpected predicate result for streetlight cell. Expected red/amber/green, got ' + result);
                   return result;
@@ -1399,36 +1459,38 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 // order to make use of more complex business logic. In this
                 // scenario a predicate function which returns the value to be
                 // included in the cell will be attached to the element
-                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block;{{row.entity.additionalStyles}}'" + 
-                (col.faCellOptions.tooltip ? " title='"+col.faCellOptions.tooltip+"'" : "") + ">" +
-                                   "{{col.colDef.predicate( row.entity )}}" +
-                                   "</span>";
+                col.cellTemplate = "<span class='ui-grid-cell-contents' style='display:inline-block;{{row.entity.additionalStyles}}'" +
+                  (col.faCellOptions.tooltip ? " title='" + col.faCellOptions.tooltip + "'" : "") + ">" +
+                  "{{col.colDef.predicate( row.entity )}}" +
+                  "</span>";
                 var customPathPredicate = col.faCellOptions.predicate;
-                col.predicate = function( entity ){
-                  return customPathPredicate( entity );
+                col.predicate = function (entity) {
+                  return customPathPredicate(entity);
                 };
                 break;
               case 'action-checkbox':
-                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}"></fa-action-cell>';
-                col.headerCellTemplate = '<fa-action-column-header></fa-action-column-header>';
+                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}" name="' + col.name + '"></fa-action-cell>';
+                col.headerCellTemplate = '<fa-action-column-header name="' + col.name + '"></fa-action-column-header>';
                 col.enableSorting = false;
                 col.enableCellEdit = false;
-                break;  
+                $scope.gridOptions.actions = $scope.gridOptions.actions || {};
+                $scope.gridOptions.actions[col.name] = col.actions;
+                break;
             }
             return col;
           });
 
 
-          if( !$scope.fvOptions.ignoreIds ) {
+          if (!$scope.fvOptions.ignoreIds) {
             $scope.gridOptions.columnDefs.unshift({ name: 'id', enableCellEdit: false });
           }
 
-          if (!$scope.fvOptions.disableActions){
+          if (!$scope.fvOptions.disableActions) {
             $scope.gridOptions.columnDefs.push(_.extend({
               name: ' ',
-              enableColumnMenu : false,
+              enableColumnMenu: false,
               enableCellEdit: false,
-              enableSorting : false,
+              enableSorting: false,
               width: $scope.fvOptions.noBulk ? 35 : 68,
               cellTemplate: "<fa-actions ng-model='row.entity' options='row.grid.options._fortuneAdminData.actionsOptions' data='row.grid.options.data' collection-name='row.grid.options._fortuneAdminData.currentResource.route'></fa-actions>"
             }, $scope.fvOptions.actions.colDef || {}));
@@ -1437,7 +1499,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       }
     };
   }])
-  .directive('faEditable', [function(){
+  .directive('faEditable', [function () {
     return {
       restrict: 'E',
       replace: true,
@@ -1454,7 +1516,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
   }])
 
   .directive('faRef', ['$http', '$compile',
-    function($http, $compile){
+    function ($http, $compile) {
       return {
         restrict: 'E',
         replace: false,
@@ -1465,23 +1527,23 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           resourceId: '@'
         },
         controller: 'faEditableCtrl',
-        link: function(scope, elt){
+        link: function (scope, elt) {
           var refTo = scope.path = scope.ref.ref;
           var resources = scope.resources,
             currentResource,
             refRoute;
 
 
-          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', {cache: true}).success(function(data){
+          $http.get(CONFIG.fortuneAdmin.baseEndpoint + '/resources', { cache: true }).success(function (data) {
             resources = data.resources;
-            angular.forEach(resources, function(resource){
-              if (resource.name === scope.ref.ref){
+            angular.forEach(resources, function (resource) {
+              if (resource.name === scope.ref.ref) {
                 refRoute = resource.route;
                 currentResource = resource;
               }
             });
-            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute, {cache: true})
-              .success(function(data){
+            $http.get(CONFIG.fortuneAdmin.getApiNamespace() + '/' + refRoute, { cache: true })
+              .success(function (data) {
                 var PK = currentResource.modelOptions ? currentResource.modelOptions.pk || 'id' : 'id';
                 scope.list = data[refRoute];
                 var tpl = ['<a href="#" editable-select="value" ',
