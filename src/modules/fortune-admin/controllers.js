@@ -130,6 +130,54 @@ angular.module('fortuneAdmin.Controllers', [
         return selected;
       }
   }])
+  .controller('faActionColumnHeaderCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.isCheckedItemsExists = isCheckedItemsExists;
+    ctrl.getCheckedItems = getCheckedItems;
+
+    $scope.enabled = false;
+    $scope.actions = $scope.$parent.col.grid.options.actions[$scope.name];
+
+    $scope.actionClick = function(action) {
+      if (action && action.callback)
+        action.callback(ctrl.getCheckedItems());
+    }
+
+    function isCheckedItemsExists() {
+      return _.some($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
+    }
+
+    function getCheckedItems() {
+      return _.filter($scope.$parent.grid.options.data, function(item){ return item.action_checked; });
+    }
+
+    $scope.$watch('$parent.grid.options.data', function (newValue, oldValue, scope) {
+      $scope.enabled = ctrl.isCheckedItemsExists();
+    }, true);
+
+  }])
+  .controller('faActionCellCtrl', ['$scope', function($scope) {
+    var ctrl = this;
+    ctrl.getItem = getItem;
+    ctrl.isEmpty = isEmpty;
+    ctrl.getColumnDef = getColumnDef;
+
+    $scope.item = ctrl.getItem($scope.id);
+    $scope.empty = ctrl.isEmpty($scope.item);
+
+    function isEmpty(item) {
+      var col = ctrl.getColumnDef($scope.name);
+      return col && col.checkEmptyCellCallback ? col.checkEmptyCellCallback(item) : false;
+    }
+
+    function getItem(id) {
+      return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
+    }
+
+    function getColumnDef(name) {
+      return _.find($scope.$parent.col.grid.options.columnDefs, function(col){ return col.name === name; });
+    }
+  }])
   .controller('DetailsCtrl', ['$scope', '$modalInstance', 'model', function($scope, $modalInstance, model) {
     $scope.model = model;
     $scope.close = function() {
