@@ -2027,3 +2027,22 @@ svg .ref {
 .fa-ui-grid-default-cell .circle.green {
     background-color: #64A35D!important;
 }
+
+img.fa-ui-grid-action-icon-active {
+    width:12px; 
+    height:12px; 
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+    margin-top: 6px; 
+    cursor: pointer;
+}
+
+img.fa-ui-grid-action-icon-disabled{
+    width:12px; 
+    height:12px; 
+    display: block; 
+    margin-left: auto; 
+    margin-right: auto; 
+    margin-top: 6px; 
+}

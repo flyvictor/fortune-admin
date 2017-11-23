@@ -206,8 +206,12 @@ angular.module("/dist/views/directives/faActionCell.html", []).run(["$templateCa
 angular.module("/dist/views/directives/faActionColumnHeader.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActionColumnHeader.html",
     "<div>\n" +
-    "  <div ng-show=\"enabled\" class=\"btn-group\" dropdown>\n" +
-    "    <div><a id=\"action-show-link-{{name}}\" ng-click=\"showMenu($event)\">show</a></div>\n" +
+    "  <div ng-show=\"enabled\" >\n" +
+    "    <div>\n" +
+    "      <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAASBJREFUKJFjYCAAmDi5VbgtPe5yGdkfYmRh5WckpIFD02Qhm5RCHAMDA8Of96+PMOExWZnL0HbfrwfXm/+8fbmHgYGBgYGRkYkZt2L7/cx8gvrMQuLuP66eivr/7/+/nzfPpWJoYOLkVuIytD/AxMkly8DAwMDExi7CwMom+vPm+TSGf/9+ojiJiYNLEVkxAwMDw59P7878vHkhC64GWTGnEYbis9/PH3b9/+f3B5gYM1SxAqeR/UFmTm45fIqhNjAyMQuKOjJxIJv8/hxU8XsMP7LJq1f+//nj+c9bF/L/////H6L4kAs2xQwMDAwMXIa2e3gdAr6zCIl7sIrLRjGysApiVQgFLIzsXAp/3r3azcjJrfz76b2p+BQzMDAwAAC7bnEbFL9VuAAAAABJRU5ErkJggg==\" \n" +
+    "      class=\"fa-ui-grid-action-icon-active\" \n" +
+    "      id=\"action-show-link-{{name}}\" ng-click=\"showMenu($event)\">\n" +
+    "    </div>\n" +
     "    <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
     "      <li ng-repeat=\"action in actions\">\n" +
     "        <a ng-click=\"actionClick(action)\">{{action.title}}</a>\n" +
@@ -215,8 +219,12 @@ angular.module("/dist/views/directives/faActionColumnHeader.html", []).run(["$te
     "    </ui> \n" +
     "  </div>\n" +
     "\n" +
-    "  <div ng-show=\"!enabled\">disabled</div>\n" +
-    "</div>");
+    "  <div ng-show=\"!enabled\">\n" +
+    "    <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAATBJREFUKJFjYCAAmCVkVISnbror2Dz7ECMXNz8zIQ28CcX97HpmDsxiUvKsGvo2TDhNFpdWFqifse/r6tnNPy8c38PAwMDAwMiEXT2zuLSy8Mxtj8TXnf8vPGndDWZxaWWehKJ+Ri4eTCcxi0krCTTPPsAiKinLwMDAwMQnKMLIKyD6eWZrGsPvXz9ZUBVLKQo0zznAIiohCxP7ffvKmc+z27NgfCa8iu9cPfu+MdP1/7cvH+DqGBgYGJhFJRUEWuYeZBGVlMOnGGIDIyMTq46JI7OwOJLJ1869b8x0/f/183t0PzJxByZU/nv/5vnnuV35///9+w9RnOGCTTEDAwMDg0D9tD2iK058ZzOw9OCwcY9i5OYVxKoQZgOzqKTCrwvHdjOLyyj/OLJzGU6ToQAAfSNykDCT1VkAAAAASUVORK5CYII=\" \n" +
+    "      class=\"fa-ui-grid-action-icon-disabled\">  \n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "");
 }]);
 
 angular.module("/dist/views/directives/faActions.html", []).run(["$templateCache", function($templateCache) {
