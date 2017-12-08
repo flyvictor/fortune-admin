@@ -1060,7 +1060,7 @@ div.ui-grid-cell input:focus {
   outline: none;
 }
 div.ui-grid-cell input[type="checkbox"] {
-  margin: 9px 0 0 6px;
+  margin: 9px 0 6px 0;
   width: auto;
 }
 div.ui-grid-cell input.ng-invalid {
