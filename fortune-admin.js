@@ -199,7 +199,7 @@ angular.module("/dist/views/docs.html", []).run(["$templateCache", function($tem
 angular.module("/dist/views/directives/faActionCell.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActionCell.html",
     "<div ng-show=\"!empty\" >\n" +
-    "  <input type=\"checkbox\" class=\"checkbox-action\" ng-model=\"item.action_checked\" style=\"transform:scale(1.8, 1.8); margin: 10px 15px 0 0; \">\n" +
+    "  <input type=\"checkbox\" class=\"fa-ui-grid-checkbox-action\" ng-model=\"item.action_checked\">\n" +
     "</div>");
 }]);
 

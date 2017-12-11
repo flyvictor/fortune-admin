@@ -82,3 +82,7 @@ svg .ref {
 .fa-ui-grid-action-icon-open {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAATBJREFUKJFjYCAAmCVkVISnbror2Dz7ECMXNz8zIQ28CcX97HpmDsxiUvKsGvo2TDhNFpdWFqifse/r6tnNPy8c38PAwMDAwMiEXT2zuLSy8Mxtj8TXnf8vPGndDWZxaWWehKJ+Ri4eTCcxi0krCTTPPsAiKinLwMDAwMQnKMLIKyD6eWZrGsPvXz9ZUBVLKQo0zznAIiohCxP7ffvKmc+z27NgfCa8iu9cPfu+MdP1/7cvH+DqGBgYGJhFJRUEWuYeZBGVlMOnGGIDIyMTq46JI7OwOJLJ1869b8x0/f/183t0PzJxByZU/nv/5vnnuV35///9+w9RnOGCTTEDAwMDg0D9tD2iK058ZzOw9OCwcY9i5OYVxKoQZgOzqKTCrwvHdjOLyyj/OLJzGU6ToQAAfSNykDCT1VkAAAAASUVORK5CYII=");
 }
+
+.fa-ui-grid-checkbox-action {
+    transform: scale(1.8, 1.8);
+}
