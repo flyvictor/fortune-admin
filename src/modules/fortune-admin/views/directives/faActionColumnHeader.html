@@ -1,7 +1,7 @@
 <div>
   <div ng-show="enabled" >
     <div>
-      <div class="fa-ui-grid-action-icon-active"
+      <div class="fa-ui-grid-action-icon fa-ui-grid-action-icon-active" ng-class="{'fa-ui-grid-action-icon-open': popupIsOpen}"
            id="action-show-link-{{name}}" ng-click="showMenu($event)">
       </div>
     </div>
@@ -13,7 +13,7 @@
   </div>
 
   <div ng-show="!enabled">
-    <div class="fa-ui-grid-action-icon-disabled">
+    <div class="fa-ui-grid-action-icon">
     </div>
   </div>
 </div>

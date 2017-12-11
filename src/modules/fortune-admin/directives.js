@@ -50,6 +50,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         name: '@'
       },
       link: function (scope) {
+        scope.popupIsOpen = false;
         $(document).click(function (e) {
           if ('action-show-link-' + scope.name != $(e.target).attr('id')) {
             scope.$apply(function () { scope.hideMenu() });
@@ -63,6 +64,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
 
         scope.showMenu = function ($event, model, data) {
           var el = $('.ui-grid-row').eq(0);
+          scope.popupIsOpen = true;
           scope.popupPosition = {
             position: 'fixed',
             top: (el.position().top + 25) + 'px',
@@ -72,6 +74,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           };
         };
         scope.hideMenu = function () {
+          scope.popupIsOpen = false;
           scope.popupPosition = {
             display: "none"
           };
