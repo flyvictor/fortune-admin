@@ -199,7 +199,7 @@ angular.module("/dist/views/docs.html", []).run(["$templateCache", function($tem
 angular.module("/dist/views/directives/faActionCell.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faActionCell.html",
     "<div ng-show=\"!empty\" >\n" +
-    "<input type=\"checkbox\" ng-model=\"item.action_checked\" style=\"width:100%\"> \n" +
+    "  <input type=\"checkbox\" class=\"checkbox-action\" ng-model=\"item.action_checked\" style=\"transform:scale(1.8, 1.8); margin: 10px 15px 0 0; \">\n" +
     "</div>");
 }]);
 
@@ -208,20 +208,20 @@ angular.module("/dist/views/directives/faActionColumnHeader.html", []).run(["$te
     "<div>\n" +
     "  <div ng-show=\"enabled\" >\n" +
     "    <div>\n" +
-    "      <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAASBJREFUKJFjYCAAmDi5VbgtPe5yGdkfYmRh5WckpIFD02Qhm5RCHAMDA8Of96+PMOExWZnL0HbfrwfXm/+8fbmHgYGBgYGRkYkZt2L7/cx8gvrMQuLuP66eivr/7/+/nzfPpWJoYOLkVuIytD/AxMkly8DAwMDExi7CwMom+vPm+TSGf/9+ojiJiYNLEVkxAwMDw59P7878vHkhC64GWTGnEYbis9/PH3b9/+f3B5gYM1SxAqeR/UFmTm45fIqhNjAyMQuKOjJxIJv8/hxU8XsMP7LJq1f+//nj+c9bF/L/////H6L4kAs2xQwMDAwMXIa2e3gdAr6zCIl7sIrLRjGysApiVQgFLIzsXAp/3r3azcjJrfz76b2p+BQzMDAwAAC7bnEbFL9VuAAAAABJRU5ErkJggg==\" \n" +
-    "      class=\"fa-ui-grid-action-icon-active\" \n" +
-    "      id=\"action-show-link-{{name}}\" ng-click=\"showMenu($event)\">\n" +
+    "      <div class=\"fa-ui-grid-action-icon fa-ui-grid-action-icon-active\" ng-class=\"{'fa-ui-grid-action-icon-open': popupIsOpen}\"\n" +
+    "           id=\"action-show-link-{{name}}\" ng-click=\"showMenu($event)\">\n" +
+    "      </div>\n" +
     "    </div>\n" +
     "    <ul class=\"dropdown-menu\" role=\"menu\" ng-style=\"popupPosition\">\n" +
     "      <li ng-repeat=\"action in actions\">\n" +
     "        <a ng-click=\"actionClick(action)\">{{action.title}}</a>\n" +
     "      </li>\n" +
-    "    </ui> \n" +
+    "    </ul>\n" +
     "  </div>\n" +
     "\n" +
     "  <div ng-show=\"!enabled\">\n" +
-    "    <img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABHNCSVQICAgIfAhkiAAAATBJREFUKJFjYCAAmCVkVISnbror2Dz7ECMXNz8zIQ28CcX97HpmDsxiUvKsGvo2TDhNFpdWFqifse/r6tnNPy8c38PAwMDAwMiEXT2zuLSy8Mxtj8TXnf8vPGndDWZxaWWehKJ+Ri4eTCcxi0krCTTPPsAiKinLwMDAwMQnKMLIKyD6eWZrGsPvXz9ZUBVLKQo0zznAIiohCxP7ffvKmc+z27NgfCa8iu9cPfu+MdP1/7cvH+DqGBgYGJhFJRUEWuYeZBGVlMOnGGIDIyMTq46JI7OwOJLJ1869b8x0/f/183t0PzJxByZU/nv/5vnnuV35///9+w9RnOGCTTEDAwMDg0D9tD2iK058ZzOw9OCwcY9i5OYVxKoQZgOzqKTCrwvHdjOLyyj/OLJzGU6ToQAAfSNykDCT1VkAAAAASUVORK5CYII=\" \n" +
-    "      class=\"fa-ui-grid-action-icon-disabled\">  \n" +
+    "    <div class=\"fa-ui-grid-action-icon\">\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</div>\n" +
     "");
@@ -1282,6 +1282,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
         name: '@'
       },
       link: function (scope) {
+        scope.popupIsOpen = false;
         $(document).click(function (e) {
           if ('action-show-link-' + scope.name != $(e.target).attr('id')) {
             scope.$apply(function () { scope.hideMenu() });
@@ -1295,6 +1296,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
 
         scope.showMenu = function ($event, model, data) {
           var el = $('.ui-grid-row').eq(0);
+          scope.popupIsOpen = true;
           scope.popupPosition = {
             position: 'fixed',
             top: (el.position().top + 25) + 'px',
@@ -1304,6 +1306,7 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
           };
         };
         scope.hideMenu = function () {
+          scope.popupIsOpen = false;
           scope.popupPosition = {
             display: "none"
           };
