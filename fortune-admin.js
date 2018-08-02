@@ -270,7 +270,7 @@ angular.module("/dist/views/directives/faAlert.html", []).run(["$templateCache",
 angular.module("/dist/views/directives/faBulkActions.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("/dist/views/directives/faBulkActions.html",
     "<select class=\"selectpicker\" ng-model=\"actionToRun\" ng-options=\"action as action.title for action in actions | bulkActions\">\n" +
-    "  <option value=\"\">- Nothing selected -</option>\n" +
+    "  <option value=\"\">- {{options.bulkPlaceholder || 'Nothing selected'}} -</option>\n" +
     "</select>\n" +
     "<span class=\"btn btn-default\" ng-disabled=\"!actionToRun || getSelected().length === 0\" ng-click=\"applyBulkAction(actionToRun, data)\">Apply bulk action to selected items</span>\n" +
     "");
