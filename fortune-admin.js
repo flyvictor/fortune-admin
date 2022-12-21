@@ -1068,6 +1068,7 @@ angular.module('fortuneAdmin.Controllers', [
     }
 
     function getItem(id) {
+      if ($scope.customGetItem) return $scope.customGetItem($scope.$parent.grid.options.data || [], id);  
       return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
     }
 
@@ -1321,7 +1322,8 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
       controller: 'faActionCellCtrl',
       scope: {
         id: '@',
-        name: '@'
+        name: '@',
+        customGetItem: '=',
       }
     }
   }])
@@ -1480,12 +1482,15 @@ angular.module('fortuneAdmin.Directives', ['ui.grid', 'ui.grid.edit', 'ui.grid.r
                 };
                 break;
               case 'action-checkbox':
-                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}" name="' + col.name + '"></fa-action-cell>';
+                col.cellTemplate = '<fa-action-cell id="{{COL_FIELD}}" custom-get-item="col.colDef.customGetItem" name="' + col.name + '"></fa-action-cell>';
                 col.headerCellTemplate = '<fa-action-column-header name="' + col.name + '"></fa-action-column-header>';
                 col.enableSorting = false;
                 col.enableCellEdit = false;
                 $scope.gridOptions.actions = $scope.gridOptions.actions || {};
                 $scope.gridOptions.actions[col.name] = col.actions;
+
+                var getItem = col.faCellOptions.getItem;
+                col.customGetItem = getItem;
                 break;
             }
             return col;
