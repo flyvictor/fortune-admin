@@ -171,6 +171,7 @@ angular.module('fortuneAdmin.Controllers', [
     }
 
     function getItem(id) {
+      if ($scope.customGetItem) return $scope.customGetItem($scope.$parent.grid.options.data || [], id);  
       return _.find($scope.$parent.grid.options.data, function(item){ return id === item.id; });
     }
 
