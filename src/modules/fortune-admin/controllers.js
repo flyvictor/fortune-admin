@@ -162,8 +162,10 @@ angular.module('fortuneAdmin.Controllers', [
     ctrl.isEmpty = isEmpty;
     ctrl.getColumnDef = getColumnDef;
 
-    $scope.item = ctrl.getItem($scope.id);
-    $scope.empty = ctrl.isEmpty($scope.item);
+    $scope.$watch('id', function () {
+      $scope.item = ctrl.getItem($scope.id);
+      $scope.empty = ctrl.isEmpty($scope.item);
+    });
 
     function isEmpty(item) {
       var col = ctrl.getColumnDef($scope.name);
